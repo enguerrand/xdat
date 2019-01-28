@@ -47,86 +47,45 @@ import org.xdat.chart.Filter;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.data.DataSheet;
 import org.xdat.data.Design;
+import org.xdat.data.Parameter;
 import org.xdat.exceptions.NoAxisFoundException;
 import org.xdat.gui.frames.ChartFrame;
 import org.xdat.gui.menus.parallelCoordinatesChart.ParallelCoordinatesContextMenu;
 import org.xdat.gui.tables.DataSheetTableColumnModel;
 
-/**
- * Panel that is used to display a
- * {@link org.xdat.chart.ParallelCoordinatesChart}.
- */
 public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMotionListener, MouseListener, MouseWheelListener {
-	/** The version tracking unique identifier for Serialization. */
 	static final long serialVersionUID = 0005;
 
-	/** Flag to enable debug message printing for this class. */
 	static final boolean printLog = false;
 
-	/** The main window. */
 	private Main mainWindow;
 
-	/** The chart frame. */
 	private ChartFrame chartFrame;
 
-	/** The chart . */
 	private ParallelCoordinatesChart chart;
 
-	/**
-	 * The buffered image that is used to make redrawing the chart more
-	 * efficient.
-	 */
 	private BufferedImage bufferedImage;
 
-	/** Reference to a filter that is currently being dragged by the user. */
 	private Filter draggedFilter;
-
-	/**
-	 * When the user is dragging a filter, the initial x position is stored in
-	 * this field.
-	 */
-	private int dragStartX;
-
-	/**
-	 * When the user is dragging a filter, the initial y position is stored in
-	 * this field.
-	 */
-	private int dragStartY;
-
-	/** Stores how far left or right the mouse was dragged for further use. */
-	private int dragCurrentX;
-
-	/** Stores how far up or down the mouse was dragged for further use. */
-	private int dragOffsetY;
-
-	/** Reference to an axis that is currently being dragged by the user. */
 	private Axis draggedAxis;
-	
+
+	private int dragStartX;
+	private int dragStartY;
+	private int dragCurrentX;
+	private int dragOffsetY;
+	private boolean dragSelecting = false;
+
 	/** Stores all designs under the cursor to display them in their selection color */
 	private HashSet<Integer> hoverList;
 
 	/** Stores all lines in a map with references to their respective ids */
 	private Map<int[], HashSet<Integer>> lineMap;
 
-	/** Stores the drag selection state */
-	private boolean dragSelecting = false;
-
-	/**
-	 * Instantiates a new parallel coordinates chart panel.
-	 * 
-	 * @param mainWindow
-	 *            the main Window
-	 * @param chartFrame 
-	 * 			the chart frame
-	 * @param chart
-	 *            the chart
-	 */
 	public ParallelCoordinatesChartPanel(Main mainWindow, ChartFrame chartFrame, ParallelCoordinatesChart chart) {
 		super(mainWindow.getDataSheet(), chart);
 		this.mainWindow = mainWindow;
 		this.chartFrame = chartFrame;
 		this.chart = chart;
-		log("constructor called");
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
 		this.addMouseWheelListener(this);
@@ -135,11 +94,6 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		this.hoverList = new HashSet<Integer>();
 	}
 
-	/**
-	 * Overridden to implement the painting of the chart.
-	 * 
-	 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
-	 */
 	public void paintComponent(Graphics g) {
 		long begin = System.currentTimeMillis();
 		Graphics cg;
@@ -161,7 +115,6 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 
 		if (this.draggedAxis != null) {
 			cg.drawImage(this.bufferedImage, 0, 0, this);
-			log("paintComponent: drawing dragged axis ");
 			cg.setColor(new Color(100, 100, 100));
 			int yPosition = chart.getAxisTopPos();
 			int xPosition = this.dragCurrentX;
@@ -181,10 +134,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 			g.drawImage(canvas, 0, 0, null);
 		}
 	}
-	
-	/**
-	 * Draws the selection rectangle
-	 */
+
 	private void drawSelection(Graphics g) {
 		if (dragSelecting) {
 			Rectangle rec = getSelectionRectangle();
@@ -197,23 +147,11 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		}
 	}
 	
-	/** 
-	 * Gets the region that currently is in the selection 
-	 * @return the rectangle describing the drag selection
-	 * */
-	public Rectangle getSelectionRectangle() {
+	private Rectangle getSelectionRectangle() {
 		return pointsToRectangle(dragStartX, dragStartY, dragCurrentX, dragOffsetY);
 	}
 
-	/**
-	 * Builds a rectangle from 2 points
-	 * @param x1 the x coordinate of the first point
-	 * @param y1 the y coordinate of the first point
-	 * @param x2 the x coordinate of the second point 
-	 * @param y2 the y coordinate of the second point
-	 * @return the rectangle
-	 */
-	public Rectangle pointsToRectangle(int x1, int y1, int x2, int y2) {
+	private Rectangle pointsToRectangle(int x1, int y1, int x2, int y2) {
 		if (x1 <= x2 && y1 >= y2) {
 			// Quadrant 1
 			return new Rectangle(x1, y2, x2 - x1, y1 - y2);
@@ -234,7 +172,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 	 * @param x the x coordinate where to look
 	 * @return the axis id 
 	 */
-	public int withinAxisDragZone(int x) {
+    private int withinAxisDragZone(int x) {
 		for (int i = 0; i < chart.getAxisCount(); i++) {
 			Axis axis = chart.getAxis(i);
 			int axisPos = axis.getUpperFilter().getXPos();
@@ -246,13 +184,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		return -1;
 	}
 
-	/**
-	 * Draws the lines representing the designs.
-	 * 
-	 * @param g
-	 *            the graphics object
-	 */
-	public void drawDesigns(final Graphics g) {
+	private void drawDesigns(final Graphics g) {
 		if(chart.isAntiAliasing()){
 			Graphics2D graphics2D = (Graphics2D) g;
 			graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -266,57 +198,35 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		int[] axisWidths = new int[axisCount];
 		double[] axisMaxValues = new double[axisCount];
 		double[] axisMinValues = new double[axisCount];
-		int[] axisTicLabelFontsizes = new int[axisCount];
 		boolean[] axisActiveFlags = new boolean[axisCount];
 		boolean[] axisInversionFlags = new boolean[axisCount];
-		for (int i = 0; i < axisCount; i++) // read all the display settings and
-		// put them into arrays to improve
-		// rendering speed of the chart
+		for (int i = 0; i < axisCount; i++) // read all the display settings and put them into arrays to improve rendering speed of the chart
 		{
 			axisRanges[i] = chart.getAxis(i).getMax() - chart.getAxis(i).getMin();
 			axisHeights[i] = chart.getAxisHeight();
 			axisWidths[i] = chart.getAxis(i).getWidth();
 			axisMaxValues[i] = chart.getAxis(i).getMax();
 			axisMinValues[i] = chart.getAxis(i).getMin();
-			axisTicLabelFontsizes[i] = chart.getAxis(i).getTicLabelFontSize();
 			axisActiveFlags[i] = chart.getAxis(i).isActive();
 			axisInversionFlags[i] = chart.getAxis(i).isAxisInverted();
 		}
 
 		this.lineMap.clear();
 		boolean useAlpha = chart.isUseAlpha();
-		for (int designIndex = 0; designIndex < getDataSheet().getDesignCount(); designIndex++) // draw
-		// all
-		// designs
-		{
+		List<Design> highlightedDesigns = new ArrayList<>();
+		for (int designIndex = 0; designIndex < getDataSheet().getDesignCount(); designIndex++) {
 			Design currentDesign = getDataSheet().getDesign(designIndex);
-			// log("drawDesigns: currentDesign.isInsideBounds(chart) = "+currentDesign.isInsideBounds(chart));
-			if (!currentDesign.isInsideBounds(chart)) // do not draw design if
-			// it is not inside
-			// bounds of the chart
-			{
-				log("design not inside bounds, continue");
+			if (!currentDesign.isInsideBounds(chart)){
 				continue;
 			}
-			boolean firstAxisDrawn = false;
 			boolean currentDesignClusterActive = true;
-			if (currentDesign.getCluster() != null) // determine if design
-			// belongs to an active
-			// cluster
-			{
+			if (currentDesign.getCluster() != null) {
 				currentDesignClusterActive = currentDesign.getCluster().isActive();
 			}
 
-			// log("drawDesigns: currentDesignClusterActive = "+currentDesignClusterActive);
-			boolean currentDesignActive = true;
-			currentDesignActive = currentDesign.isActive(chart); // determine if
-			// current
-			// design is
-			// active
-			// log("drawDesigns: currentDesign.isActive(chart) = "+currentDesign.isActive(chart));
+			boolean currentDesignActive = currentDesign.isActive(chart);
 
-			boolean displayDesign; // flag that determines if design will be
-			// displayed
+			boolean displayDesign;
 
 			if (chart.isShowOnlySelectedDesigns()) {
 				displayDesign = currentDesign.isSelected() && (currentDesignActive || chart.isShowFilteredDesigns()) && (currentDesignClusterActive);
@@ -324,86 +234,89 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 				displayDesign = (currentDesignActive || chart.isShowFilteredDesigns()) && (currentDesignClusterActive);
 			}
 
-			if (displayDesign) // only draw design if the cluster is active and
-			// the design is active (or inactive design
-			// drawing is active)
-			{
-				int lineThickness;
+			if (displayDesign) {
 				if ((chart.isShowOnlySelectedDesigns() || !currentDesign.isSelected())&&(!hoverList.contains(currentDesign.getId()))) {
 					g.setColor(chart.getDesignColor(currentDesign, currentDesignActive, useAlpha));
-					lineThickness = chart.getDesignLineThickness(currentDesign);
+				    int lineThickness = chart.getDesignLineThickness(currentDesign);
+                    drawDesign(g, chart, axisTopPos, designLabelFontSize, axisCount, axisRanges, axisHeights, axisWidths, axisMaxValues, axisMinValues, axisActiveFlags,
+                            axisInversionFlags, currentDesign, lineThickness);
 				} else {
-					g.setColor(chart.getSelectedDesignColor());
-					lineThickness = chart.getSelectedDesignsLineThickness();
-				}
-				int xPositionCurrent = getMarginLeft();
-				int yPositionCurrent = axisTopPos;
-				int xPositionLast = xPositionCurrent;
-				int yPositionLast;
-				for (int i = 0; i < axisCount; i++) {
-					int yPosition = axisTopPos;
-					if (axisActiveFlags[i]) {
-						double value = currentDesign.getDoubleValue(getDataSheet().getParameter(i));
-
-						int yPositionRelToBottom;
-						if (axisRanges[i] == 0) {
-							yPositionRelToBottom = (int) (axisHeights[i] * 0.5);
-						} else {
-							double ratio;
-							if (axisInversionFlags[i]) {
-								ratio = (axisMaxValues[i] - value) / axisRanges[i];
-							} else {
-								ratio = (value - axisMinValues[i]) / axisRanges[i];
-							}
-							yPositionRelToBottom = (int) (axisHeights[i] * ratio);
-						}
-
-						yPositionLast = yPositionCurrent;
-						yPositionCurrent = yPosition + (axisHeights[i]) - yPositionRelToBottom;
-
-						if (firstAxisDrawn) {
-							xPositionCurrent = xPositionCurrent + (int) (axisWidths[i] * 0.5);
-
-							if (lineThickness == 0) {
-								g.drawLine(xPositionLast - 3, yPositionLast, xPositionLast + 3, yPositionLast);
-								g.drawLine(xPositionCurrent - 3, yPositionCurrent, xPositionCurrent + 3, yPositionCurrent);
-							} else {
-								for (int t = 1; t <= lineThickness; t++) {
-									int deltaY = -((int) (t / 2)) * (2 * (t % 2) - 1);
-									g.drawLine(xPositionLast, yPositionLast + deltaY, xPositionCurrent, yPositionCurrent + deltaY);
-									int[] key = {xPositionLast, yPositionLast + deltaY, xPositionCurrent, yPositionCurrent + deltaY};
-
-									if (!lineMap.containsKey(key)) {
-										lineMap.put(key, new HashSet<Integer>());
-									}
-
-									lineMap.get(key).add(currentDesign.getId());
-								}
-							}
-
-						} else {
-							firstAxisDrawn = true;
-							if (chart.isShowDesignIDs()) {
-								FontMetrics fm = g.getFontMetrics();
-								g.setFont(new Font("SansSerif", Font.PLAIN, designLabelFontSize));
-								g.drawString(Integer.toString(currentDesign.getId()), xPositionCurrent - 5 - fm.stringWidth(Integer.toString(currentDesign.getId())), yPositionCurrent + (int) (0.5 * chart.getAxis(i).getTicLabelFontSize()));
-							}
-						}
-						xPositionLast = xPositionCurrent;
-						xPositionCurrent = xPositionCurrent + (int) (axisWidths[i] * 0.5);
-					}
+                    highlightedDesigns.add(currentDesign);
 				}
 			}
 		}
+        for (Design highlightedDesign : highlightedDesigns) {
+					g.setColor(chart.getSelectedDesignColor());
+            int lineThickness = chart.getSelectedDesignsLineThickness();
+                    drawDesign(g, chart, axisTopPos, designLabelFontSize, axisCount, axisRanges, axisHeights, axisWidths, axisMaxValues, axisMinValues, axisActiveFlags,
+                            axisInversionFlags, highlightedDesign, lineThickness);
+
+        }
 	}
 
-	/**
-	 * Draws the axes.
-	 * 
-	 * @param g
-	 *            the graphics object
-	 */
-	public void drawAxes(Graphics g) {
+    private void drawDesign(Graphics g, ParallelCoordinatesChart chart, int axisTopPos, int designLabelFontSize, int axisCount, double[] axisRanges, int[] axisHeights,
+							int[] axisWidths, double[] axisMaxValues, double[] axisMinValues, boolean[] axisActiveFlags, boolean[] axisInversionFlags, Design currentDesign,
+							int lineThickness) {
+        int xPositionCurrent = getMarginLeft();
+        int yPositionCurrent = axisTopPos;
+        int xPositionLast = xPositionCurrent;
+        int yPositionLast;
+        boolean firstAxisDrawn = false;
+        for (int i = 0; i < axisCount; i++) {
+            int yPosition = axisTopPos;
+            if (axisActiveFlags[i]) {
+                Parameter parameter = getDataSheet().getParameter(i);
+                double value = currentDesign.getDoubleValue(parameter);
+
+                int yPositionRelToBottom;
+                if (axisRanges[i] == 0) {
+                    yPositionRelToBottom = (int) (axisHeights[i] * 0.5);
+                } else {
+                    double ratio;
+                    if (axisInversionFlags[i]) {
+                        ratio = (axisMaxValues[i] - value) / axisRanges[i];
+                    } else {
+                        ratio = (value - axisMinValues[i]) / axisRanges[i];
+                    }
+                    yPositionRelToBottom = (int) (axisHeights[i] * ratio);
+                }
+
+                yPositionLast = yPositionCurrent;
+                yPositionCurrent = yPosition + (axisHeights[i]) - yPositionRelToBottom;
+
+                FontMetrics fm = g.getFontMetrics();
+                g.setFont(new Font("SansSerif", Font.PLAIN, designLabelFontSize));
+                if (firstAxisDrawn) {
+                    xPositionCurrent = xPositionCurrent + (int) (axisWidths[i] * 0.5);
+
+                    if (lineThickness == 0) {
+                        g.drawLine(xPositionLast - 3, yPositionLast, xPositionLast + 3, yPositionLast);
+                        g.drawLine(xPositionCurrent - 3, yPositionCurrent, xPositionCurrent + 3, yPositionCurrent);
+                    } else {
+                        for (int t = 1; t <= lineThickness; t++) {
+                            int deltaY = -(t / 2) * (2 * (t % 2) - 1);
+                            g.drawLine(xPositionLast, yPositionLast + deltaY, xPositionCurrent, yPositionCurrent + deltaY);
+                            int[] key = {xPositionLast, yPositionLast + deltaY, xPositionCurrent, yPositionCurrent + deltaY};
+
+                            lineMap.computeIfAbsent(key, k -> new HashSet<>())
+                                    .add(currentDesign.getId());
+
+                        }
+                    }
+
+                } else {
+                    firstAxisDrawn = true;
+                    if (chart.isShowDesignIDs()) {
+                        g.drawString(Integer.toString(currentDesign.getId()), xPositionCurrent - 5 - fm.stringWidth(Integer.toString(currentDesign.getId())), yPositionCurrent + (int) (0.5 * chart.getAxis(i).getTicLabelFontSize()));
+                    }
+                }
+                xPositionLast = xPositionCurrent;
+                xPositionCurrent = xPositionCurrent + (int) (axisWidths[i] * 0.5);
+            }
+        }
+    }
+
+	private void drawAxes(Graphics g) {
 		ParallelCoordinatesChart chart = ((ParallelCoordinatesChart) this.getChart());
 		int xPosition = this.getMarginLeft();
 		int yPosition = chart.getAxisTopPos();
@@ -412,7 +325,6 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		Axis currentAxis;
 		int drawnAxisCount = 0;
 		for (int i = 0; i < chart.getAxisCount(); i++) {
-			// log("drawing axis "+chart.getAxis(i).getName());
 			if (chart.getAxis(i).isActive()) {
 				// axes
 				currentAxis = chart.getAxis(i);
@@ -527,13 +439,6 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		}
 	}
 
-	/**
-	 * Finds the axis at a given location in the chart.
-	 * 
-	 * @param x
-	 *            the location
-	 * @return the found axis
-	 */
 	private Axis getAxisAtLocation(int x) throws NoAxisFoundException {
 		for (int i = 0; i < this.chart.getAxisCount(); i++) {
 			Filter uf = this.chart.getAxis(i).getUpperFilter();
@@ -557,19 +462,12 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 			Filter uf = this.chart.getAxis(i).getUpperFilter();
 			if // check if this axis was meant by the click
 			(this.chart.getAxis(i).isActive() && x < uf.getXPos()) {
-				log("getNewAxisIndexAtLocation: returning index " + i);
 				return i;
 			}
 		}
-		log("getNewAxisIndexAtLocation: returning index " + this.chart.getAxisCount());
 		return this.chart.getAxisCount();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
-	 */
 	public void mouseClicked(MouseEvent e) {
 		if (e.getButton() == 1 && updateHoverList(e.getX(), e.getY())) {
 			List<Integer> newSelection = new ArrayList<Integer>();
@@ -587,15 +485,11 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 			this.mainWindow.getDataSheetTablePanel().setSelectedRows(newSelection);
 		}
 		else if (e.getButton() == 3) {
-			log("mouseClicked: button " + e.getButton());
 			int x = e.getX();
 			int y = e.getY();
 
-			log("mouseClicked: x " + x);
-			log("mouseClicked: y " + y);
 			try {
 				Axis axis = this.getAxisAtLocation(x);
-				log("Clicked on axis " + axis.getName());
 				(new ParallelCoordinatesContextMenu(this.mainWindow, this.chartFrame, axis)).show(this, x, y);
 			} catch (NoAxisFoundException e1) {
 				e1.printStackTrace();
@@ -604,29 +498,14 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
-	 */
 	public void mouseEntered(MouseEvent e) {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
-	 */
 	public void mouseExited(MouseEvent e) {
 		this.hoverList.clear();
 		this.repaint();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
-	 */
 	public void mousePressed(MouseEvent e) {
 		ParallelCoordinatesChart chart = ((ParallelCoordinatesChart) this.getChart());
 		dragStartX = e.getX();
@@ -653,9 +532,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 				try {
 					this.draggedAxis = this.getAxisAtLocation(dragStartX);
 					setCursor(new Cursor(Cursor.MOVE_CURSOR));
-					log("mousePressed: Drag started, dragged axis : " + this.draggedAxis.getName());
 				} catch (NoAxisFoundException e1) {
-					log("No axis found. ");
 					if (this.printLog) {
 						e1.printStackTrace();
 					}
@@ -666,12 +543,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 			}
 		}
 	}
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
-	 */
+
 	public void mouseReleased(MouseEvent e) {
 		setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
@@ -686,7 +558,6 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 				int newIndex = this.getNewAxisIndexAtLocation(e.getX() - 1); // column index starts at  one, param index at 0
 				DataSheetTableColumnModel cm = (DataSheetTableColumnModel) this.mainWindow.getDataSheetTablePanel().getDataTable().getColumnModel();
 				int currentIndex = this.mainWindow.getDataSheet().getParameterIndex(this.draggedAxis.getName()) + 1;
-				log("mouseReleased: dragged axis " + this.draggedAxis.getName() + " had index " + currentIndex);
 				if (newIndex > currentIndex) {
 					cm.moveColumn(currentIndex, newIndex);
 				} else if (newIndex < currentIndex) {
@@ -714,7 +585,6 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 					Filter lf = chart.getAxis(i).getLowerFilter();
 
 					if (rec.contains(uf.getXPos(), rec.y + 1)) {
-						log("axis " + chart.getAxis(i).getName() + " is in selection");
 						uf.setYPos(rec.y);
 						lf.setYPos(rec.y + rec.height);
 					}
@@ -726,12 +596,6 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.MouseMotionListener#mouseMoved(java.awt.event.MouseEvent)
-	 */
 	public void mouseMoved(MouseEvent e) {
 		boolean needRepaint = false;
 
@@ -814,20 +678,11 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		return designsFound;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.MouseMotionListener#mouseDragged(java.awt.event.MouseEvent
-	 * )
-	 */
 	public void mouseDragged(MouseEvent e) {
 		if (this.draggedFilter != null) {
 			// try to make the filter follow the drag operation, but always keep
 			// it within axis boundaries and opposite filter
 			this.draggedFilter.setYPos(Math.max(Math.min(e.getY() + this.dragOffsetY, this.draggedFilter.getLowestPos()), this.draggedFilter.getHighestPos()));
-			log("ChartPanel: Dragging filter on axis " + this.draggedFilter.getAxis().getName());
-			log("ChartPanel: Related parameter name is " + this.draggedFilter.getAxis().getParameter().getName());
 			repaint();
 		} else if (this.draggedAxis != null) {
 			this.dragCurrentX = e.getX();
@@ -848,7 +703,6 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 			int x = e.getX();
 			try {
 				Axis axis = this.getAxisAtLocation(x);
-				log("wheeled on axis " + axis.getName());
 				axis.setWidth(Math.max(0, axis.getWidth() - e.getUnitsToScroll()));
 			} catch (NoAxisFoundException e1) {
 			}
@@ -858,7 +712,6 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 			int x = e.getX();
 			try {
 				Axis axis = this.getAxisAtLocation(x);
-				log("wheeled on axis " + axis.getName());
 				axis.setTicCount(Math.max(2, axis.getTicCount() - e.getWheelRotation()));
 			} catch (NoAxisFoundException e1) {
 			}
@@ -867,23 +720,13 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 
 	}
 
-	/**
-	 * Writes the current chart state to the temporary buffered image.
-	 */
-	public void storeBufferedImage() {
+	private void storeBufferedImage() {
 		this.bufferedImage = new BufferedImage(chartFrame.getChartPanel().getWidth(), chartFrame.getChartPanel().getHeight(), BufferedImage.TYPE_INT_ARGB);
-		;
 		Graphics g = this.bufferedImage.createGraphics();
 		this.paintComponent(g);
 		g.dispose();
 	}
 
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
 	private void log(String message) {
 		if (ParallelCoordinatesChartPanel.printLog && Main.isLoggingEnabled()) {
 			System.out.println(this.getClass().getName() + "." + message);
