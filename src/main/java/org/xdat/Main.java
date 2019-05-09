@@ -26,6 +26,7 @@ import java.awt.HeadlessException;
 import java.io.IOException;
 import java.io.InvalidClassException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
@@ -34,6 +35,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ListDataListener;
 
 import org.xdat.actionListeners.scatter2DChartSettings.ParallelChartFrameComboModel;
@@ -95,7 +98,13 @@ public class Main extends JFrame {
 	/** Combobox models that require update when chart frame list changes. */
 	private transient Vector<ParallelChartFrameComboModel> comboModels = new Vector<ParallelChartFrameComboModel>(0);
 
-	/**
+    private static final List<String> LOOK_AND_FEEL_ORDER_OF_PREF = Arrays.asList(
+            "com.sun.java.swing.plaf.gtk.GTKLookAndFeel",
+            "com.sun.java.swing.plaf.windows.WindowsLookAndFeel",
+            "javax.swing.plaf.nimbus.NimbusLookAndFeel"
+    );
+
+    /**
 	 * Instantiates a new main.
 	 */
 	public Main() {
@@ -190,7 +199,18 @@ public class Main extends JFrame {
 	 *            the command line arguments (not used)
 	 */
 	public static void main(String[] args) {
+	    setLookAndFeel();
 		new Main();
+	}
+
+	private static void setLookAndFeel() {
+		for (String lnf : LOOK_AND_FEEL_ORDER_OF_PREF) {
+			try {
+				UIManager.setLookAndFeel(lnf);
+				break;
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ignored) {
+			}
+		}
 	}
 
 	/**
