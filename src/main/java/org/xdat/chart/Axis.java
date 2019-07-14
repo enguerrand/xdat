@@ -87,6 +87,8 @@ public class Axis implements Serializable {
 	/** The number of tics on this Axis. */
 	private int ticCount;
 
+	private int ticLabelDigitCount = 3;
+
 	/**
 	 * The axis color.
 	 * <p>
@@ -125,14 +127,6 @@ public class Axis implements Serializable {
 	 * field specifies which font size should be used for this label.
 	 */
 	private int ticLabelFontSize;
-
-	/**
-	 * The tic label number format.
-	 * <p>
-	 * Each tic has a label showing the value to which the tic corresponds. This
-	 * field specifies which number format should be used for this label.
-	 */
-	private String ticLabelFormat;
 
 	/** The tic length in pixels. */
 	private int ticLength;
@@ -208,7 +202,7 @@ public class Axis implements Serializable {
 		this.ticLabelFontColor = userPreferences.getParallelCoordinatesAxisTicLabelFontColor();
 		this.axisLabelFontSize = userPreferences.getParallelCoordinatesAxisLabelFontSize();
 		this.ticLabelFontSize = userPreferences.getParallelCoordinatesAxisTicLabelFontSize();
-		this.ticLabelFormat = userPreferences.getParallelCoordinatesAxisTicLabelFormat();
+		this.ticLabelDigitCount = userPreferences.getParallelCoordinatesAxisTicLabelDigitCount();
 		this.ticLength = userPreferences.getParallelCoordinatesAxisTicLength();
 		this.filterInverted = userPreferences.isFilterInverted();
 		this.axisInverted = userPreferences.isParallelCoordinatesAxisInverted();
@@ -367,12 +361,6 @@ public class Axis implements Serializable {
 			return this.parameter.getDiscreteLevelCount();
 	}
 
-	/**
-	 * Sets the tic count.
-	 * 
-	 * @param ticCount
-	 *            the new tic count
-	 */
 	public void setTicCount(int ticCount) {
 		this.ticCount = ticCount;
 		if (ticCount < 2) {
@@ -380,209 +368,95 @@ public class Axis implements Serializable {
 		}
 	}
 
-	/**
-	 * Gets the tic label font size.
-	 * 
-	 * @return the tic label font size
-	 */
+	public void setTicLabelDigitCount(int value) {
+		this.ticLabelDigitCount = value;
+	}
+
+	public int getTicLabelDigitCount(){
+		return this.ticLabelDigitCount;
+	}
+
 	public int getTicLabelFontSize() {
 		return ticLabelFontSize;
 	}
 
-	/**
-	 * Sets the tic label font size.
-	 * 
-	 * @param ticLabelFontSize
-	 *            the new tic label font size
-	 */
 	public void setTicLabelFontSize(int ticLabelFontSize) {
 		this.ticLabelFontSize = ticLabelFontSize;
 	}
 
-	/**
-	 * Gets the tic label format.
-	 * 
-	 * @return the tic label format
-	 */
 	public String getTicLabelFormat() {
-		return ticLabelFormat;
+        int digitCount = getTicLabelDigitCount();
+        return "%"+(digitCount+1)+"."+digitCount+"f";
 	}
 
-	/**
-	 * Sets the tic label number format.
-	 * 
-	 * @param ticLabelFormat
-	 *            the new tic label number format
-	 */
-	public void setTicLabelFormat(String ticLabelFormat) {
-		this.ticLabelFormat = ticLabelFormat;
-	}
-
-	/**
-	 * Gets the tic length in pixels.
-	 * 
-	 * @return the tic length
-	 */
 	public int getTicLength() {
 		return ticLength;
 	}
 
-	/**
-	 * Sets the tic length in pixels.
-	 * 
-	 * @param ticLength
-	 *            the new tic length
-	 */
 	public void setTicLength(int ticLength) {
 		this.ticLength = ticLength;
 	}
 
-	/**
-	 * Gets the Axis width in pixels.
-	 * 
-	 * @return the Axis width
-	 */
 	public int getWidth() {
 		return width;
 	}
 
-	/**
-	 * Sets the Axis width in pixels.
-	 * 
-	 * @param width
-	 *            the new Axis width
-	 */
 	public void setWidth(int width) {
 		this.width = width;
 	}
 
-	/**
-	 * Checks if this Axis is active.
-	 * 
-	 * @return true, if this Axis is active
-	 */
 	public boolean isActive() {
 		return active;
 	}
 
-	/**
-	 * Specifies whether this Axis is active.
-	 * 
-	 * @param active
-	 *            the new active
-	 */
 	public void setActive(boolean active) {
 		this.active = active;
 	}
 
-	/**
-	 * Gets the data sheet.
-	 * 
-	 * @return the data sheet
-	 */
 	public DataSheet getDataSheet() {
 		return dataSheet;
 	}
 
-	/**
-	 * Sets the data sheet.
-	 * 
-	 * @param dataSheet
-	 *            the new data sheet
-	 */
 	public void setDataSheet(DataSheet dataSheet) {
 		this.dataSheet = dataSheet;
 	}
 
-	/**
-	 * Gets the parameter represented by this Axis.
-	 * 
-	 * @return the parameter represented by this Axis
-	 */
 	public Parameter getParameter() {
 		return parameter;
 	}
 
-	/**
-	 * Sets the parameter represented by this Axis.
-	 * 
-	 * @param parameter
-	 *            the new parameter represented by this Axis
-	 */
 	public void setParameter(Parameter parameter) {
 		this.parameter = parameter;
 	}
 
-	/**
-	 * Gets the axis color.
-	 * 
-	 * @return the axis color
-	 */
 	public Color getAxisColor() {
 		return axisColor;
 	}
 
-	/**
-	 * Sets the axis color.
-	 * 
-	 * @param axisColor
-	 *            the new axis color
-	 */
 	public void setAxisColor(Color axisColor) {
 		this.axisColor = axisColor;
 	}
 
-	/**
-	 * Gets the axis tic label font color.
-	 * 
-	 * @return the axis tic label font color
-	 */
 	public Color getAxisTicLabelFontColor() {
 		return ticLabelFontColor;
 	}
 
-	/**
-	 * Sets the tic label font color.
-	 * 
-	 * @param ticLabelFontColor
-	 *            the new tic label font color
-	 */
 	public void setTicLabelFontColor(Color ticLabelFontColor) {
 		this.ticLabelFontColor = ticLabelFontColor;
 	}
 
-	/**
-	 * Gets the name of the Parameter represented by this Axis.
-	 * 
-	 * @return the name of the Parameter represented by this Axis.
-	 */
 	public String getName() {
 		return this.parameter.getName();
 	}
 
-	/**
-	 * Gets the lower filter.
-	 * 
-	 * @return the lower filter
-	 */
 	public Filter getLowerFilter() {
 		return lowerFilter;
 	}
 
-	/**
-	 * Gets the upper filter.
-	 * 
-	 * @return the upper filter
-	 */
 	public Filter getUpperFilter() {
 		return upperFilter;
 	}
 
-	/**
-	 * Gets the min filter.
-	 * 
-	 * @return the min filter
-	 */
 	public Filter getMinimumFilter() {
 		if (this.isAxisInverted())
 			return this.upperFilter;
@@ -590,11 +464,6 @@ public class Axis implements Serializable {
 			return lowerFilter;
 	}
 
-	/**
-	 * Gets the max filter.
-	 * 
-	 * @return the max filter
-	 */
 	public Filter getMaximumFilter() {
 		if (this.isAxisInverted())
 			return this.lowerFilter;
@@ -602,61 +471,28 @@ public class Axis implements Serializable {
 			return this.upperFilter;
 	}
 
-	/**
-	 * Gets the chart to which this Axis belongs.
-	 * 
-	 * @return the chart to which this Axis belongs
-	 */
 	public ParallelCoordinatesChart getChart() {
 		return chart;
 	}
 
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
 	private void log(String message) {
 		if (Axis.printLog && Main.isLoggingEnabled()) {
 			System.out.println(this.getClass().getName() + "." + message);
 		}
 	}
 
-	/**
-	 * Checks if the Filters are inverted.
-	 * 
-	 * @return true, if is filter inverted
-	 */
 	public boolean isFilterInverted() {
 		return filterInverted;
 	}
 
-	/**
-	 * Specifies whether the filter should be inverted.
-	 * 
-	 * @param filterInverted
-	 *            specifies whether the filter should be inverted
-	 */
 	public void setFilterInverted(boolean filterInverted) {
 		this.filterInverted = filterInverted;
 	}
 
-	/**
-	 * Checks if this Axis is inverted.
-	 * 
-	 * @return true, if this Axis is inverted
-	 */
 	public boolean isAxisInverted() {
 		return this.axisInverted;
 	}
 
-	/**
-	 * Specifies whether this axis is inverted.
-	 * 
-	 * @param axisInverted
-	 *            Specifies whether this axis is inverted.
-	 */
 	public void setAxisInverted(boolean axisInverted) {
 		double maxFilterValue = this.getMaximumFilter().getValue();
 		double minFilterValue = this.getMinimumFilter().getValue();
@@ -665,11 +501,6 @@ public class Axis implements Serializable {
 		this.getMinimumFilter().setValue(minFilterValue);
 	}
 
-	/**
-	 * Checks if this axis is autofitted.
-	 * 
-	 * @return true, if this axis is autofitted.
-	 */
 	public boolean isAutoFit() {
 		if (this.parameter.isNumeric())
 			return autoFit;
@@ -677,12 +508,6 @@ public class Axis implements Serializable {
 			return true;
 	}
 
-	/**
-	 * Specifies whether this Axis should be autofitted.
-	 * 
-	 * @param autoFit
-	 *            specifies whether this Axis should be autofitted
-	 */
 	public void setAutoFit(boolean autoFit) {
 		this.autoFit = autoFit;
 	}
@@ -722,4 +547,5 @@ public class Axis implements Serializable {
 		this.upperFilter.reset();
 		this.lowerFilter.reset();
 	}
+
 }

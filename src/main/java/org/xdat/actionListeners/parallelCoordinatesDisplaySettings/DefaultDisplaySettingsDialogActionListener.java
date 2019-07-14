@@ -101,6 +101,7 @@ public class DefaultDisplaySettingsDialogActionListener implements ActionListene
 			UserPreferences.getInstance().setParallelCoordinatesAxisLabelFontSize((Integer) this.dialog.getAxisDisplaySettingsPanel().getAxisLabelFontSizeSpinner().getValue());
 			UserPreferences.getInstance().setParallelCoordinatesAxisTicLength((Integer) this.dialog.getAxisDisplaySettingsPanel().getTicSizeSpinner().getValue());
 			UserPreferences.getInstance().setParallelCoordinatesAxisTicCount((Integer) this.dialog.getAxisDisplaySettingsPanel().getTicCountSpinner().getValue());
+			UserPreferences.getInstance().setParallelCoordinatesAxisTicLabelDigitCount((Integer) this.dialog.getAxisDisplaySettingsPanel().getTicLabelDigitCountSpinner().getValue());
 			UserPreferences.getInstance().setParallelCoordinatesAxisTicLabelFontSize((Integer) this.dialog.getAxisDisplaySettingsPanel().getTicLabelFontSizeSpinner().getValue());
 			log(" OK: Tic label color = " + UserPreferences.getInstance().getParallelCoordinatesAxisTicLabelFontColor().toString());
 			this.dialog.dispose();

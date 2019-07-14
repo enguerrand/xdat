@@ -349,6 +349,7 @@ public class AxisDisplaySettingsActionListener implements ActionListener, Change
 		axis.setAxisLabelFontSize((Integer) this.panel.getAxisLabelFontSizeSpinner().getValue());
 		axis.setTicLength((Integer) this.panel.getTicSizeSpinner().getValue());
 		axis.setTicCount((Integer) this.panel.getTicCountSpinner().getValue());
+		axis.setTicLabelDigitCount((Integer) this.panel.getTicLabelDigitCountSpinner().getValue());
 		axis.setTicLabelFontColor(this.ticLabelColor);
 		axis.setTicLabelFontSize((Integer) this.panel.getTicLabelFontSizeSpinner().getValue());
 		axis.setFilterInverted(this.invertFilter);

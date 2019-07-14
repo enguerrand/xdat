@@ -553,6 +553,14 @@ public class UserPreferences {
 		this.prefs.put("ParallelCoordinatesAxisTicLabelFormat", axisTicLabelFormat);
 	}
 
+	public int getParallelCoordinatesAxisTicLabelDigitCount(){
+		return this.prefs.getInt("ParallelCoordinatesAxisTicLengthTicLabelDigitCount", 3);
+	}
+
+	public void setParallelCoordinatesAxisTicLabelDigitCount(int count){
+		this.prefs.putInt("ParallelCoordinatesAxisTicLengthTicLabelDigitCount", count);
+	}
+
 	/**
 	 * Gets the axis tick length for parallel coordinate charts.
 	 * 

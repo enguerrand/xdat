@@ -53,94 +53,66 @@ import org.xdat.gui.frames.ChartFrame;
  * {@link org.xdat.chart.ParallelCoordinatesChart}.
  */
 public class AxisDisplaySettingsPanel extends JPanel {
-	/** The version tracking unique identifier for Serialization. */
 	static final long serialVersionUID = 0000;
 
-	/** Flag to enable debug message printing for this class. */
 	static final boolean printLog = false;
 
-	/** The main window. */
 	private Main mainWindow;
 
-	/** The dialog on which the panel is located. */
 	private ParallelCoordinatesDisplaySettingsDialog dialog;
 
-	/** The user preferences. */
 	private UserPreferences userPreferences;
 
-	/** The action listener for this panel. */
 	private AxisDisplaySettingsActionListener cmd;
 
-	/** The content panel. */
 	private TitledSubPanel contentPanel = new TitledSubPanel("");
 
-	/** The axis color button. */
 	private ColorChoiceButton axisColorButton;
 
-	/** The axis label color button. */
 	private ColorChoiceButton axisLabelColorButton;
 
-	/** The axis label font size spinner. */
 	private JSpinner axisLabelFontSizeSpinner = new JSpinner(new MinMaxSpinnerModel(0, 100));
 
-	/** The axis width spinner. */
 	private JSpinner axisWidthSpinner = new JSpinner(new MinMaxSpinnerModel(0, 1000));
 
-	/** The tic size spinner. */
 	private JSpinner ticSizeSpinner = new JSpinner(new MinMaxSpinnerModel(0, 100));
 
-	/** The tic count spinner. */
 	private JSpinner ticCountSpinner = new JSpinner(new MinMaxSpinnerModel(1, 500));
 
-	/** The tic label color button. */
+	private JSpinner ticLabelDigitCountSpinner = new JSpinner(new MinMaxSpinnerModel(0, 20));
+
 	private ColorChoiceButton ticLabelColorButton;
 
-	/** The tic label font size spinner. */
 	private JSpinner ticLabelFontSizeSpinner = new JSpinner(new MinMaxSpinnerModel(0, 100));
 
-	/** The invert filter true button. */
 	private JRadioButton invertFilterTrueButton = new JRadioButton("Yes");
 
-	/** The invert filter false button. */
 	private JRadioButton invertFilterFalseButton = new JRadioButton("No");
 
-	/** The invert axis true button. */
 	private JRadioButton invertAxisTrueButton = new JRadioButton("Yes");
 
-	/** The invert axis false button. */
 	private JRadioButton invertAxisFalseButton = new JRadioButton("No");
 
-	/** The auto fit axis true button. */
 	private JRadioButton autoFitAxisTrueButton = new JRadioButton("Yes");
 
-	/** The auto fit axis false button. */
 	private JRadioButton autoFitAxisFalseButton = new JRadioButton("No");
 
-	/** The axis minimum value text field. */
 	private JTextField axisMinTextField = new JTextField();
 
-	/** The axis maximum value text field. */
 	private JTextField axisMaxTextField = new JTextField();
 
-	/** The invert filter button group. */
 	private ButtonGroup invertFilterButtonGroup = new ButtonGroup();
 
-	/** The invert axis button group. */
 	private ButtonGroup invertAxisButtonGroup = new ButtonGroup();
 
-	/** The auto fit axis button group. */
 	private ButtonGroup autoFitAxisButtonGroup = new ButtonGroup();
 
-	/** The axis choice combo. */
 	private JComboBox axisChoiceCombo;
 
-	/** The cancel button. */
 	private JButton cancelButton = new JButton("Cancel");
 
-	/** The ok button. */
 	private JButton okButton = new JButton("Ok");
 
-	/** The chart frame. */
 	private ChartFrame chartFrame;
 
 	/**
@@ -167,6 +139,7 @@ public class AxisDisplaySettingsPanel extends JPanel {
 		this.axisWidthSpinner.setValue(this.userPreferences.getParallelCoordinatesAxisWidth());
 		this.ticSizeSpinner.setValue(this.userPreferences.getParallelCoordinatesAxisTicLength());
 		this.ticCountSpinner.setValue(this.userPreferences.getParallelCoordinatesAxisTicCount());
+		this.ticLabelDigitCountSpinner.setValue(this.userPreferences.getParallelCoordinatesAxisTicLabelDigitCount());
 		this.ticLabelFontSizeSpinner.setValue(this.userPreferences.getParallelCoordinatesAxisTicLabelFontSize());
 		Dimension maxMinTextFieldsPreferredSizes = new Dimension(60, 25);
 		this.axisMinTextField.setText(Double.toString(this.userPreferences.getParallelCoordinatesAxisDefaultMin()));
@@ -226,6 +199,7 @@ public class AxisDisplaySettingsPanel extends JPanel {
 		this.axisWidthSpinner.setValue(axis.getWidth());
 		this.ticSizeSpinner.setValue(axis.getTicLength());
 		this.ticCountSpinner.setValue(axis.getTicCount());
+		this.ticLabelDigitCountSpinner.setValue(axis.getTicLabelDigitCount());
 		this.ticLabelFontSizeSpinner.setValue(axis.getTicLabelFontSize());
 		this.axisColorButton.setCurrentColor(axis.getAxisColor());
 		this.axisLabelColorButton.setCurrentColor(axis.getAxisLabelFontColor());
@@ -270,6 +244,7 @@ public class AxisDisplaySettingsPanel extends JPanel {
 		JLabel axisWidthLabel = new JLabel("Axis Spacing");
 		JLabel ticSizeLabel = new JLabel("Tic Size");
 		JLabel nrOfTicsLabel = new JLabel("Number of Tics");
+		JLabel ticLabelDigitCountLabel = new JLabel("Number of Digits");
 		JLabel ticLabelColorLabel = new JLabel("Tic Label Color");
 		JLabel ticLabelFontSizeLabel = new JLabel("Tic Label Font Size");
 		JLabel invertFilterLabel = new JLabel("Invert Filter");
@@ -317,6 +292,8 @@ public class AxisDisplaySettingsPanel extends JPanel {
 		controlsPanel.add(ticSizeSpinner);
 		labelPanel.add(nrOfTicsLabel);
 		controlsPanel.add(ticCountSpinner);
+		labelPanel.add(ticLabelDigitCountLabel);
+		controlsPanel.add(ticLabelDigitCountSpinner);
 		labelPanel.add(ticLabelColorLabel);
 		JPanel ticLabelColorButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		ticLabelColorButtonPanel.add(ticLabelColorButton);
@@ -353,12 +330,6 @@ public class AxisDisplaySettingsPanel extends JPanel {
 		okButtonPanel.add(okButton);
 	}
 
-	/**
-	 * Sets the action listeners to the controls.
-	 * 
-	 * @param cmd
-	 *            the new action listener
-	 */
 	public void setActionListener(AxisDisplaySettingsActionListener cmd) {
 		this.cmd = cmd;
 		axisColorButton.addActionListener(cmd);
@@ -376,14 +347,11 @@ public class AxisDisplaySettingsPanel extends JPanel {
 		axisWidthSpinner.addChangeListener(cmd);
 		ticSizeSpinner.addChangeListener(cmd);
 		ticCountSpinner.addChangeListener(cmd);
+		ticLabelDigitCountSpinner.addChangeListener(cmd);
 		ticLabelFontSizeSpinner.addChangeListener(cmd);
 
 	}
 
-	/**
-	 * Tells the panel that the settings should be applied to the user
-	 * preferences
-	 */
 	public void setOkCancelButtonTargetDefaultSettings() {
 		DefaultDisplaySettingsDialogActionListener cmd = new DefaultDisplaySettingsDialogActionListener(dialog);
 		log("setOkCancelButtonTargetDefaultSettings called");
@@ -391,34 +359,16 @@ public class AxisDisplaySettingsPanel extends JPanel {
 		okButton.addActionListener(cmd);
 	}
 
-	/**
-	 * Tells the panel that the settings should be applied to the a specific
-	 * chart
-	 * 
-	 * @param chart
-	 *            chart to which the settings should be applied
-	 */
 	public void setOkCancelButtonTargetChart(ParallelCoordinatesChart chart) {
 		log("setOkCancelButtonTargetChart called");
 		cancelButton.addActionListener(new ChartSpecificDisplaySettingsDialogActionListener(this.mainWindow, dialog, chart, chartFrame));
 		okButton.addActionListener(new ChartSpecificDisplaySettingsDialogActionListener(this.mainWindow, dialog, chart, chartFrame));
 	}
 
-	/**
-	 * Gets the axis display settings action listener.
-	 * 
-	 * @return the axis display settings action listener
-	 */
 	public AxisDisplaySettingsActionListener getAxisDisplaySettingsActionListener() {
 		return this.cmd;
 	}
 
-	/**
-	 * Sets the invert filter selection.
-	 * 
-	 * @param invertFilterSelection
-	 *            the new invert filter selection
-	 */
 	public void setInvertFilterSelection(boolean invertFilterSelection) {
 		if (invertFilterSelection)
 			invertFilterButtonGroup.setSelected(invertFilterTrueButton.getModel(), true);
@@ -427,11 +377,6 @@ public class AxisDisplaySettingsPanel extends JPanel {
 
 	}
 
-	/**
-	 * Gets the invert filter selection.
-	 * 
-	 * @return the invert filter selection
-	 */
 	public boolean getInvertFilterSelection() {
 		if (invertFilterTrueButton.getModel().equals(invertFilterButtonGroup.getSelection())) {
 			return true;
@@ -440,12 +385,6 @@ public class AxisDisplaySettingsPanel extends JPanel {
 		}
 	}
 
-	/**
-	 * Sets the invert axis selection.
-	 * 
-	 * @param invertAxisSelection
-	 *            the new invert axis selection
-	 */
 	public void setInvertAxisSelection(boolean invertAxisSelection) {
 		if (invertAxisSelection)
 			invertAxisButtonGroup.setSelected(invertAxisTrueButton.getModel(), true);
@@ -454,11 +393,6 @@ public class AxisDisplaySettingsPanel extends JPanel {
 
 	}
 
-	/**
-	 * Gets the invert axis selection.
-	 * 
-	 * @return the invert axis selection
-	 */
 	public boolean getInvertAxisSelection() {
 		if (invertAxisTrueButton.getModel().equals(invertAxisButtonGroup.getSelection())) {
 			return true;
@@ -467,12 +401,6 @@ public class AxisDisplaySettingsPanel extends JPanel {
 		}
 	}
 
-	/**
-	 * Sets the auto fit axis selection.
-	 * 
-	 * @param autoFitAxisSelection
-	 *            the new auto fit axis selection
-	 */
 	public void setAutoFitAxisSelection(boolean autoFitAxisSelection) {
 		if (autoFitAxisSelection) {
 			autoFitAxisButtonGroup.setSelected(autoFitAxisTrueButton.getModel(), true);
@@ -486,11 +414,6 @@ public class AxisDisplaySettingsPanel extends JPanel {
 
 	}
 
-	/**
-	 * Gets the auto fit axis selection.
-	 * 
-	 * @return the auto fit axis selection
-	 */
 	public boolean getAutoFitAxisSelection() {
 		if (autoFitAxisTrueButton.getModel().equals(autoFitAxisButtonGroup.getSelection())) {
 			return true;
@@ -499,113 +422,56 @@ public class AxisDisplaySettingsPanel extends JPanel {
 		}
 	}
 
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
 	private void log(String message) {
 		if (AxisDisplaySettingsPanel.printLog && Main.isLoggingEnabled()) {
 			System.out.println(this.getClass().getName() + "." + message);
 		}
 	}
 
-	/**
-	 * Gets the axis label font size spinner.
-	 * 
-	 * @return the axis label font size spinner
-	 */
 	public JSpinner getAxisLabelFontSizeSpinner() {
 		return axisLabelFontSizeSpinner;
 	}
 
-	/**
-	 * Gets the tic count spinner.
-	 * 
-	 * @return the tic count spinner
-	 */
 	public JSpinner getTicCountSpinner() {
 		return ticCountSpinner;
 	}
 
-	/**
-	 * Gets the tic label font size spinner.
-	 * 
-	 * @return the tic label font size spinner
-	 */
+	public JSpinner getTicLabelDigitCountSpinner() {
+		return ticLabelDigitCountSpinner;
+	}
+
 	public JSpinner getTicLabelFontSizeSpinner() {
 		return ticLabelFontSizeSpinner;
 	}
 
-	/**
-	 * Gets the tic size spinner.
-	 * 
-	 * @return the tic size spinner
-	 */
 	public JSpinner getTicSizeSpinner() {
 		return ticSizeSpinner;
 	}
 
-	/**
-	 * Gets the axis width spinner.
-	 * 
-	 * @return the axis width spinner
-	 */
 	public JSpinner getAxisWidthSpinner() {
 		return axisWidthSpinner;
 	}
 
-	/**
-	 * Gets the axis color button.
-	 * 
-	 * @return the axis color button
-	 */
 	public ColorChoiceButton getAxisColorButton() {
 		return axisColorButton;
 	}
 
-	/**
-	 * Gets the axis label color button.
-	 * 
-	 * @return the axis label color button
-	 */
 	public ColorChoiceButton getAxisLabelColorButton() {
 		return axisLabelColorButton;
 	}
 
-	/**
-	 * Gets the tic label color button.
-	 * 
-	 * @return the tic label color button
-	 */
 	public ColorChoiceButton getTicLabelColorButton() {
 		return ticLabelColorButton;
 	}
 
-	/**
-	 * Gets the axis choice combo.
-	 * 
-	 * @return the axis choice combo
-	 */
 	public JComboBox getAxisChoiceCombo() {
 		return axisChoiceCombo;
 	}
 
-	/**
-	 * Gets the chart frame.
-	 * 
-	 * @return the chart frame
-	 */
 	public ChartFrame getChartFrame() {
 		return chartFrame;
 	}
 
-	/**
-	 * Gets the axis max.
-	 * 
-	 * @return the axis max
-	 */
 	public double getAxisMax() {
 		double max;
 		if (this.chartFrame == null) {
@@ -621,11 +487,6 @@ public class AxisDisplaySettingsPanel extends JPanel {
 		}
 	}
 
-	/**
-	 * Gets the axis min.
-	 * 
-	 * @return the axis min
-	 */
 	public double getAxisMin() {
 		double min;
 		if (this.chartFrame == null) {

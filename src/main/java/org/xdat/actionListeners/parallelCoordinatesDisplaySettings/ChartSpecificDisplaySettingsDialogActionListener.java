@@ -30,7 +30,6 @@ import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.gui.dialogs.ParallelCoordinatesDisplaySettingsDialog;
 import org.xdat.gui.frames.ChartFrame;
 import org.xdat.gui.panels.ParallelCoordinatesChartDisplaySettingsPanel;
-import org.xdat.gui.panels.ParallelCoordinatesChartPanel;
 import org.xdat.gui.panels.ParallelCoordinatesChartSidebarPanel;
 
 /**
@@ -116,6 +115,7 @@ public class ChartSpecificDisplaySettingsDialogActionListener implements ActionL
 			axis.setAxisLabelFontSize((Integer) this.dialog.getAxisDisplaySettingsPanel().getAxisLabelFontSizeSpinner().getValue());
 			axis.setTicLength((Integer) this.dialog.getAxisDisplaySettingsPanel().getTicSizeSpinner().getValue());
 			axis.setTicCount((Integer) this.dialog.getAxisDisplaySettingsPanel().getTicCountSpinner().getValue());
+			axis.setTicLabelDigitCount((Integer) this.dialog.getAxisDisplaySettingsPanel().getTicLabelDigitCountSpinner().getValue());
 			axis.setTicLabelFontColor(this.dialog.getAxisDisplaySettingsPanel().getAxisDisplaySettingsActionListener().getTicLabelColor());
 			axis.setTicLabelFontSize((Integer) this.dialog.getAxisDisplaySettingsPanel().getTicLabelFontSizeSpinner().getValue());
 			axis.setFilterInverted(this.dialog.getAxisDisplaySettingsPanel().getAxisDisplaySettingsActionListener().isInvertFilter());
