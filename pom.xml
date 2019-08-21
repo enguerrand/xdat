@@ -6,7 +6,7 @@
 
     <groupId>org.xdat</groupId>
     <artifactId>xdat</artifactId>
-    <version>2-SNAPSHOT</version>
+    <version>develop-SNAPSHOT</version>
     <properties>
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>

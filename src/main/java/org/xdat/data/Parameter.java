@@ -73,6 +73,9 @@ public class Parameter implements Serializable {
 	/** The discrete levels. Only applies for non-numeric parameters. */
 	private TreeSet<String> discreteLevels = new TreeSet<String>(new ReverseStringComparator());
 
+
+    private int ticLabelDigitCount = 3;
+
 	/**
 	 * Instantiates a new parameter.
 	 * 
@@ -368,6 +371,20 @@ public class Parameter implements Serializable {
 			}
 		}
 	}
+
+
+    public void setTicLabelDigitCount(int value) {
+        this.ticLabelDigitCount = value;
+    }
+
+    public int getTicLabelDigitCount(){
+        return this.ticLabelDigitCount;
+    }
+
+    public String getTicLabelFormat() {
+        int digitCount = getTicLabelDigitCount();
+        return "%"+(digitCount+1)+"."+digitCount+"f";
+    }
 
 	/**
 	 * Reset discrete levels to an empty TreeSet.

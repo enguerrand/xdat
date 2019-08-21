@@ -131,12 +131,12 @@ public class DataSheet implements TableModel, Serializable, ListModel {
 			this.delimiter = this.delimiter + "+";
 		importData(pathToInputFile, dataHasHeaders, progressMonitor);
 		boolean continueChecking = true;
-		for (int i = 0; i < this.parameters.size(); i++) {
-			if (this.parameters.get(i).isMixed() && continueChecking) {
-				int userAction = JOptionPane.showConfirmDialog(mainWindow, "Parameter " + this.parameters.get(i).getName() + " has numeric values in some designs\n" + "and non-numerical values in others. \nThis will result in the parameter being treated as a \n" + "non-numeric parameter. \n" + "If this is incorrect it is recommended to find the design(s)\n" + "with non-numeric values and correct or remove them.\n\n" + "Press Ok to continue checking parameters or Cancel to\n" + "suppress further warnings.", "Mixed Parameter Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		for (Parameter parameter : this.parameters) {
+			if (parameter.isMixed() && continueChecking) {
+				int userAction = JOptionPane.showConfirmDialog(mainWindow, "Parameter " + parameter.getName() + " has numeric values in some designs\n" + "and non-numerical values in others. \nThis will result in the parameter being treated as a \n" + "non-numeric parameter. \n" + "If this is incorrect it is recommended to find the design(s)\n" + "with non-numeric values and correct or remove them.\n\n" + "Press Ok to continue checking parameters or Cancel to\n" + "suppress further warnings.", "Mixed Parameter Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 				continueChecking = (userAction == JOptionPane.OK_OPTION);
-
 			}
+			parameter.setTicLabelDigitCount(userPreferences.getParallelCoordinatesAxisTicLabelDigitCount());
 		}
 	}
 

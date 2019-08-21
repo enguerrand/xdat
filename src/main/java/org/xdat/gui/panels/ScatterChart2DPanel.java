@@ -398,39 +398,23 @@ public class ScatterChart2DPanel extends ChartPanel {
 
 	}
 
-	/**
-	 * Finds the string value for a tic label on the x axis.
-	 * 
-	 * @param plot
-	 *            the plot
-	 * @param ticIndex
-	 *            the tic index
-	 * @return the tic label
-	 */
 	private String getTicLabelX(ScatterPlot2D plot, int ticIndex) {
 		double value = plot.getMinX() + ticIndex * (plot.getMaxX() - plot.getMinX()) / (plot.getTicCountX() - 1);
-		if (plot.getParameterForXAxis().isNumeric()) {
-			return String.format("%4.3f", value);
+		Parameter parameterForXAxis = plot.getParameterForXAxis();
+		if (parameterForXAxis.isNumeric()) {
+			return String.format(parameterForXAxis.getTicLabelFormat(), value);
 		} else {
-			return plot.getParameterForXAxis().getStringValueOf(ticIndex);
+			return parameterForXAxis.getStringValueOf(ticIndex);
 		}
 	}
 
-	/**
-	 * Finds the string value for a tic label on the y axis.
-	 * 
-	 * @param plot
-	 *            the plot
-	 * @param ticIndex
-	 *            the tic index
-	 * @return the tic label
-	 */
 	private String getTicLabelY(ScatterPlot2D plot, int ticIndex) {
 		double value = plot.getMinY() + ticIndex * (plot.getMaxY() - plot.getMinY()) / (plot.getTicCountY() - 1);
-		if (plot.getParameterForYAxis().isNumeric()) {
-			return String.format(ScatterPlot2D.TIC_LABEL_FORMAT, value);
+		Parameter parameterForYAxis = plot.getParameterForYAxis();
+		if (parameterForYAxis.isNumeric()) {
+			return String.format(parameterForYAxis.getTicLabelFormat(), value);
 		} else {
-			return plot.getParameterForYAxis().getStringValueOf(ticIndex);
+			return parameterForYAxis.getStringValueOf(ticIndex);
 		}
 	}
 

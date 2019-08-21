@@ -87,8 +87,6 @@ public class Axis implements Serializable {
 	/** The number of tics on this Axis. */
 	private int ticCount;
 
-	private int ticLabelDigitCount = 3;
-
 	/**
 	 * The axis color.
 	 * <p>
@@ -202,7 +200,6 @@ public class Axis implements Serializable {
 		this.ticLabelFontColor = userPreferences.getParallelCoordinatesAxisTicLabelFontColor();
 		this.axisLabelFontSize = userPreferences.getParallelCoordinatesAxisLabelFontSize();
 		this.ticLabelFontSize = userPreferences.getParallelCoordinatesAxisTicLabelFontSize();
-		this.ticLabelDigitCount = userPreferences.getParallelCoordinatesAxisTicLabelDigitCount();
 		this.ticLength = userPreferences.getParallelCoordinatesAxisTicLength();
 		this.filterInverted = userPreferences.isFilterInverted();
 		this.axisInverted = userPreferences.isParallelCoordinatesAxisInverted();
@@ -369,11 +366,11 @@ public class Axis implements Serializable {
 	}
 
 	public void setTicLabelDigitCount(int value) {
-		this.ticLabelDigitCount = value;
+		this.parameter.setTicLabelDigitCount(value);
 	}
 
 	public int getTicLabelDigitCount(){
-		return this.ticLabelDigitCount;
+		return this.parameter.getTicLabelDigitCount();
 	}
 
 	public int getTicLabelFontSize() {
@@ -385,8 +382,7 @@ public class Axis implements Serializable {
 	}
 
 	public String getTicLabelFormat() {
-        int digitCount = getTicLabelDigitCount();
-        return "%"+(digitCount+1)+"."+digitCount+"f";
+        return this.parameter.getTicLabelFormat();
 	}
 
 	public int getTicLength() {
