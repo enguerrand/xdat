@@ -312,25 +312,6 @@ public class AxisDisplaySettingsActionListener implements ActionListener, Change
 	}
 
 	/**
-	 * Gets the axis that is currently being edited.
-	 * 
-	 * @return the axis that is currently being edited.
-	 */
-	public Axis getCurrentAxis() {
-		return currentAxis;
-	}
-
-	/**
-	 * Sets the current axis.
-	 * 
-	 * @param currentAxis
-	 *            the new current axis
-	 */
-	public void setCurrentAxis(Axis currentAxis) {
-		this.currentAxis = currentAxis;
-	}
-
-	/**
 	 * Apply settings.
 	 * 
 	 * @param axis

@@ -174,9 +174,6 @@ public class AxisDisplaySettingsPanel extends JPanel {
 				axes.add(chart.getAxis(i).getName());
 		}
 		axisChoiceCombo = new JComboBox(axes);
-		// axisChoiceCombo.addActionListener(new
-		// AxisDisplaySettingsAxisChoiceComboActionListener(chart, this,
-		// axisChoiceCombo));
 		axisChoiceCombo.setSelectedIndex(0);
 		axisChoiceCombo.setPreferredSize(new Dimension(100, 25));
 		contentPanel.add(axisChoiceCombo, BorderLayout.NORTH);
