@@ -27,6 +27,7 @@ import java.util.Properties;
 
 import javax.swing.JOptionPane;
 
+import org.xdat.BuildProperties;
 import org.xdat.Main;
 import org.xdat.gui.menus.mainWIndow.MainHelpMenu;
 
@@ -47,6 +48,7 @@ public class MainHelpMenuActionListener implements ActionListener {
 	 * Flag to enable debug message printing for this class.
 	 */
 	static final boolean printLog = false;
+	private final BuildProperties properties;
 
 	/**
 	 * Instantiates a new main help menu action listener.
@@ -56,6 +58,7 @@ public class MainHelpMenuActionListener implements ActionListener {
 	 */
 	public MainHelpMenuActionListener(Main mainWindow) {
 		this.mainWindow = mainWindow;
+		properties = new BuildProperties();
 
 	}
 
@@ -67,14 +70,8 @@ public class MainHelpMenuActionListener implements ActionListener {
 	 */
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals("About")) {
-			final Properties properties = new Properties();
-			try {
-				properties.load(getClass().getClassLoader().getResourceAsStream("build.properties"));
-			} catch (IOException e1) {
-				//ignore
-			}
-			final String version = properties.getProperty("version", "Unknown");
-			final String buildDate = properties.getProperty("build.date", "Unknown");
+			final String version = properties.getVersion();
+			final String buildDate = properties.getBuildDate();
 			JOptionPane.showMessageDialog(mainWindow,
 					"xdat "+version+"\n" +
 							"Built on "+buildDate +"\n" +
