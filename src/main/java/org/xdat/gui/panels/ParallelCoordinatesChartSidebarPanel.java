@@ -280,7 +280,7 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 		clusterScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 		clusterListeners = new HashMap<>();
 		clusterAlphaSliders = new LinkedHashMap<>(10);
-		this.cmd = new ParallelChartSidebarActionListener(getMainWindow(), this, (ParallelCoordinatesChartPanel) getChartPanel());
+		this.cmd = new ParallelChartSidebarActionListener(getMainWindow(), this, (ParallelCoordinatesChartPanel) getChartPanel(), getMainWindow().getClusterFactory());
 	}
 
 	public void setAlphaSlidersEnabled(boolean enabled) {

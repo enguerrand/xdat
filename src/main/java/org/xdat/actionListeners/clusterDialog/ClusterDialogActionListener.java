@@ -22,6 +22,7 @@ package org.xdat.actionListeners.clusterDialog;
 
 import org.xdat.Main;
 import org.xdat.gui.dialogs.ClusterDialog;
+import org.xdat.gui.tables.ClusterTableModel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,20 +30,22 @@ import java.awt.event.ActionListener;
 public class ClusterDialogActionListener implements ActionListener {
 	private Main mainWindow;
 	private ClusterDialog dialog;
+	private ClusterTableModel tableModel;
 
-	public ClusterDialogActionListener(Main mainWindow, ClusterDialog dialog) {
+	public ClusterDialogActionListener(Main mainWindow, ClusterDialog dialog, ClusterTableModel tableModel) {
 		this.mainWindow = mainWindow;
 		this.dialog = dialog;
+		this.tableModel = tableModel;
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		String actionCommand = e.getActionCommand();
 		if (actionCommand.equals("Add")) {
-			this.dialog.getDataSheet().getClusterSet().addClusterToBuffer();
+			this.tableModel.addCluster();
 		} else if (actionCommand.equals("Remove")) {
 			int[] selectedRows = this.dialog.getClusterTable().getSelectedRows();
 			for (int i = selectedRows.length - 1; i >= 0; i--) {
-				this.dialog.getDataSheet().getClusterSet().removeClusterFromBuffer(selectedRows[i]);
+				this.tableModel.removeCluster(selectedRows[i]);
 			}
 		} else if (actionCommand.equals("Cancel")) {
 			dialog.setVisible(false);
@@ -53,7 +56,7 @@ public class ClusterDialogActionListener implements ActionListener {
 				this.dialog.getClusterTable().getCellEditor().stopCellEditing();
 			}
 
-			this.dialog.getDataSheet().getClusterSet().applyChanges();
+			this.tableModel.applyBuffer(this.dialog.getDataSheet().getClusterSet().getClusters(), this.dialog.getDataSheet());
 			for (int i = 0; i < this.mainWindow.getChartFrameCount(); i++) {
 				this.mainWindow.getChartFrame(i).validate();
 				this.mainWindow.getChartFrame(i).repaint();

@@ -20,9 +20,16 @@
 
 package org.xdat.actionListeners.parallelCoordinatesChartFrame;
 
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import org.xdat.Main;
+import org.xdat.UserPreferences;
+import org.xdat.chart.ParallelCoordinatesChart;
+import org.xdat.data.Cluster;
+import org.xdat.data.ClusterFactory;
+import org.xdat.data.ClusterSet;
+import org.xdat.data.DataSheet;
+import org.xdat.gui.buttons.ColorChoiceButton;
+import org.xdat.gui.panels.ParallelCoordinatesChartPanel;
+import org.xdat.gui.panels.ParallelCoordinatesChartSidebarPanel;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -30,16 +37,9 @@ import javax.swing.JColorChooser;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-import org.xdat.Main;
-import org.xdat.UserPreferences;
-import org.xdat.chart.ParallelCoordinatesChart;
-import org.xdat.data.Cluster;
-import org.xdat.data.ClusterSet;
-import org.xdat.data.DataSheet;
-import org.xdat.gui.buttons.ColorChoiceButton;
-import org.xdat.gui.panels.ParallelCoordinatesChartPanel;
-import org.xdat.gui.panels.ParallelCoordinatesChartSidebarPanel;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * ActionListener for a
@@ -51,14 +51,15 @@ public class ParallelChartSidebarActionListener implements ActionListener, Chang
 	private ParallelCoordinatesChartSidebarPanel sidePanel;
 	private Main mainWindow;
 	private ParallelCoordinatesChartPanel chartPanel;
-
+	private ClusterFactory clusterFactory;
 	private Color activeDesignColor;
 
-	public ParallelChartSidebarActionListener(Main mainWindow, ParallelCoordinatesChartSidebarPanel panel, ParallelCoordinatesChartPanel chartPanel) {
+	public ParallelChartSidebarActionListener(Main mainWindow, ParallelCoordinatesChartSidebarPanel panel, ParallelCoordinatesChartPanel chartPanel, ClusterFactory clusterFactory) {
 		this.mainWindow = mainWindow;
 		this.sidePanel = panel;
 		this.chartPanel = chartPanel;
 		this.activeDesignColor = ((ParallelCoordinatesChart) chartPanel.getChart()).getDefaultDesignColor(true,  chartPanel.getChart().isUseAlpha());
+		this.clusterFactory = clusterFactory;
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -81,17 +82,12 @@ public class ParallelChartSidebarActionListener implements ActionListener, Chang
 			}
 		} else if (actionCommand.equals("Add Cluster")) {
 			DataSheet data = mainWindow.getDataSheet();
-			data.getClusterSet().createBuffer();
-			data.getClusterSet().addClusterToBuffer();
-			data.getClusterSet().applyChanges();
-
+			data.getClusterSet().newCluster(clusterFactory);
 			this.sidePanel.updateClusterList(data.getClusterSet());
 		} else if (actionCommand.equals("Remove")) {
 			JButton button = (JButton) e.getSource();
 			ClusterSet clusterSet = mainWindow.getDataSheet().getClusterSet();
-			clusterSet.createBuffer();
-			clusterSet.removeClusterFromBuffer(button.getName());
-			clusterSet.applyChanges();
+			clusterSet.removeCluster(button.getName());
 
 			this.sidePanel.updateClusterList(clusterSet);
 			this.chartPanel.revalidate();

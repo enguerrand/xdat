@@ -23,6 +23,7 @@ package org.xdat;
 import org.xdat.actionListeners.scatter2DChartSettings.ParallelChartFrameComboModel;
 import org.xdat.chart.Chart;
 import org.xdat.chart.ParallelCoordinatesChart;
+import org.xdat.data.ClusterFactory;
 import org.xdat.data.DataSheet;
 import org.xdat.exceptions.NoParametersDefinedException;
 import org.xdat.gui.WindowClosingAdapter;
@@ -66,6 +67,7 @@ public class Main extends JFrame {
 	private transient List<ListDataListener> listDataListener = new LinkedList<>();
 	private transient List<ParallelChartFrameComboModel> comboModels = new LinkedList<>();
 	private final BuildProperties buildProperties;
+	private final ClusterFactory clusterFactory = new ClusterFactory();
 
 	private static final List<String> LOOK_AND_FEEL_ORDER_OF_PREF = Arrays.asList(
 			"com.sun.java.swing.plaf.gtk.GTKLookAndFeel",
@@ -372,5 +374,9 @@ public class Main extends JFrame {
 
 	public void unRegisterComboModel(ParallelChartFrameComboModel comboModel) {
 		this.comboModels.remove(comboModel);
+	}
+
+	public ClusterFactory getClusterFactory() {
+		return clusterFactory;
 	}
 }

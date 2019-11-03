@@ -23,6 +23,7 @@ package org.xdat.gui.dialogs;
 import org.xdat.Main;
 import org.xdat.actionListeners.clusterDialog.ClusterDialogActionListener;
 import org.xdat.data.DataSheet;
+import org.xdat.gui.tables.ClusterTableModel;
 import org.xdat.gui.tables.ColorEditor;
 import org.xdat.gui.tables.ColorRenderer;
 import org.xdat.gui.tables.GenericTableColumnModel;
@@ -90,16 +91,12 @@ public class ClusterDialog extends JDialog {
 		activeCol.setResizable(true);
 		cm.addColumn(activeCol);
 
-		this.dataSheet.getClusterSet().createBuffer();
-		this.clusterTable = new JTable(dataSheet.getClusterSet(), cm); // removing
-																		// this
-																		// fixes
-																		// the
-																		// issue
+		ClusterTableModel tableModel = this.dataSheet.getClusterSet().createTableModel(mainWindow.getClusterFactory());
+		this.clusterTable = new JTable(tableModel, cm);
 		JScrollPane scrollPane = new JScrollPane(this.clusterTable);
 
 		// add action listener
-		ClusterDialogActionListener cmd = new ClusterDialogActionListener(mainWindow, this);
+		ClusterDialogActionListener cmd = new ClusterDialogActionListener(mainWindow, this, tableModel);
 		addButton.addActionListener(cmd);
 		removeButton.addActionListener(cmd);
 		cancelButton.addActionListener(cmd);
