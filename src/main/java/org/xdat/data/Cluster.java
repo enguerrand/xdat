@@ -64,6 +64,7 @@ public class Cluster implements Serializable {
 	public void setActiveDesignColor(Color activeDesignColor) {
 		this.activeDesignColor = activeDesignColor;
 		this.activeDesignColorNoAlpha = new Color(this.activeDesignColor.getRed(), this.activeDesignColor.getGreen(), this.activeDesignColor.getBlue());
+		this.fireColorChanged();
 	}
 
 	public int getLineThickness() {
@@ -80,7 +81,7 @@ public class Cluster implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
-		this.notifyClusterListenersOfNewName(name);
+		this.fireNameChanged();
 	}
 
 	public boolean isActive() {
@@ -112,7 +113,7 @@ public class Cluster implements Serializable {
 	
 	public void addClusterListener(ClusterListener l){
 		if(this.clusterListeners==null){
-			this.clusterListeners = new ArrayList<ClusterListener>();
+			this.clusterListeners = new ArrayList<>();
 		}
 		this.clusterListeners.add(l);
 	}
@@ -126,9 +127,15 @@ public class Cluster implements Serializable {
 		}
 	}
 	
-	public void notifyClusterListenersOfNewName(String newName){
+	private void fireNameChanged(){
 		for(ClusterListener l : this.clusterListeners){
-			l.onNameChanged(this, newName);
+			l.onNameChanged(this);
+		}
+	}
+
+	private void fireColorChanged(){
+		for(ClusterListener l : this.clusterListeners){
+			l.onColorChanged(this);
 		}
 	}
 }

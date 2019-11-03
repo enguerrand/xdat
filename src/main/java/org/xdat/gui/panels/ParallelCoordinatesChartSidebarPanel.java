@@ -222,8 +222,15 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 
 			ClusterListener listener = new ClusterListener() {
 				@Override
-				public void onNameChanged(Cluster source, String newName) {
-					updateElementNames(newName, clusterNameTextField, clusterColorButton, removeClusterButton, applyClusterButton, clusterAlphaSlider, clusterActiveCheckbox);
+				public void onNameChanged(Cluster source) {
+					updateElementNames(source.getName(), clusterNameTextField, clusterColorButton, removeClusterButton, applyClusterButton, clusterAlphaSlider, clusterActiveCheckbox);
+					revalidate();
+					repaint();
+				}
+
+				@Override
+				public void onColorChanged(Cluster source) {
+					updateElementColor(clusterColorButton, source.getActiveDesignColor(getChart().isUseAlpha()));
 					revalidate();
 					repaint();
 				}
@@ -261,6 +268,10 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 		applyClusterButton.setName(name);
 		clusterAlphaSlider.setName(name);
 		clusterActiveCheckbox.setName(name);
+	}
+
+	private void updateElementColor(ColorChoiceButton clusterColorButton, Color color) {
+		clusterColorButton.setCurrentColor(color);
 	}
 
 	private void handleUpdateUpdatedClusterName(JTextField source, Cluster cluster, String newName) {
