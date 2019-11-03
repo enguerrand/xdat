@@ -21,6 +21,8 @@
 package org.xdat.chart;
 
 import java.awt.Color;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.xdat.UserPreferences;
 import org.xdat.data.AxisType;
@@ -53,13 +55,11 @@ public class ScatterPlot2D extends Plot {
 	private Color decorationsColor = Color.BLACK;
 	private boolean autofitX = true;
 	private boolean autofitY = true;
-	private double minX = 0;
-	private double maxX = 1;
-	private double minY = 0;
-	private double maxY = 1;
 	private int ticCountX = 2;
 	private int ticCountY = 2;
 	private int ticSize = 5;
+	private final Map<String, Double> minValues = new HashMap<>();
+	private final Map<String, Double> maxValues = new HashMap<>();
 	private int axisLabelFontSizeX = 20;
 	private int axisLabelFontSizeY = 20;
 	private int ticLabelFontSizeX = 12;
@@ -74,6 +74,9 @@ public class ScatterPlot2D extends Plot {
 		} else if (dataSheet.getParameterCount() > 0) {
 			this.parameterForXAxis = dataSheet.getParameter(0);
 			this.parameterForYAxis = dataSheet.getParameter(0);
+		}
+		for (int i = 0; i < dataSheet.getParameterCount(); i++) {
+			autofitParam(dataSheet.getParameter(i));
 		}
 
 		resetDisplaySettingsToDefault();
@@ -157,32 +160,6 @@ public class ScatterPlot2D extends Plot {
 		this.decorationsColor = decorationsColor;
 	}
 
-	private void autofitX(DataSheet dataSheet) {
-		this.minX = Double.POSITIVE_INFINITY;
-		this.maxX = Double.NEGATIVE_INFINITY;
-		Parameter param = parameterForXAxis;
-		for (int i = 0; i < dataSheet.getDesignCount(); i++) {
-			double x = dataSheet.getDesign(i).getDoubleValue(param);
-			if (x > this.maxX)
-				this.maxX = x;
-			if (x < this.minX)
-				this.minX = x;
-		}
-	}
-
-	private void autofitY(DataSheet dataSheet) {
-		this.minY = Double.POSITIVE_INFINITY;
-		this.maxY = Double.NEGATIVE_INFINITY;
-		Parameter param = parameterForYAxis;
-		for (int i = 0; i < dataSheet.getDesignCount(); i++) {
-			double y = dataSheet.getDesign(i).getDoubleValue(param);
-			if (y > this.maxY)
-				this.maxY = y;
-			if (y < this.minY)
-				this.minY = y;
-		}
-	}
-
 	public boolean isAutofit(AxisType axisType) {
 		switch (axisType) {
 			case X: return autofitX;
@@ -204,63 +181,42 @@ public class ScatterPlot2D extends Plot {
 		}
 	}
 
-	public void autofit(AxisType axisType, DataSheet dataSheet) {
-		switch (axisType) {
-			case X:
-				autofitX(dataSheet);
-				break;
-			case Y:
-				autofitY(dataSheet);
-				break;
-			default:
-				throw new IllegalArgumentException("Unknown axis type "+axisType);
-		}
+	public void autofit(AxisType axisType) {
+		Parameter parameter = getParameterForAxis(axisType);
+		autofitParam(parameter);
+	}
+
+	private void autofitParam(Parameter parameter) {
+		setMin(parameter, parameter.getMinValue());
+		setMax(parameter, parameter.getMaxValue());
 	}
 
 	public void setMin(AxisType axisType, double value) {
-		switch (axisType) {
-			case X:
-				this.minX = value;
-				break;
-			case Y:
-				this.minY = value;
-				break;
-			default:
-				throw new IllegalArgumentException("Unknown axis type "+axisType);
-		}
+        Parameter parameter = getParameterForAxis(axisType);
+		setMin(parameter, value);
+	}
+
+	private void setMin(Parameter parameter, double value) {
+		this.minValues.put(parameter.getName(), value);
 	}
 
 	public double getMin(AxisType axisType) {
-		switch (axisType) {
-			case X:
-				return minX;
-			case Y:
-				return minY;
-			default: throw new IllegalArgumentException("Unknown axis type "+axisType);
-		}
+        Parameter parameter = getParameterForAxis(axisType);
+        return this.minValues.get(parameter.getName());
 	}
 
 	public void setMax(AxisType axisType, double value) {
-		switch (axisType) {
-			case X:
-				this.maxX = value;
-				break;
-			case Y:
-				this.maxY = value;
-				break;
-			default:
-				throw new IllegalArgumentException("Unknown axis type "+axisType);
-		}
+        Parameter parameter = getParameterForAxis(axisType);
+		setMax(parameter, value);
+	}
+
+	private void setMax(Parameter parameter, double value) {
+		this.maxValues.put(parameter.getName(), value);
 	}
 
 	public double getMax(AxisType axisType) {
-		switch (axisType) {
-			case X:
-				return maxX;
-			case Y:
-				return maxY;
-			default: throw new IllegalArgumentException("Unknown axis type "+axisType);
-		}
+        Parameter parameter = getParameterForAxis(axisType);
+		return this.maxValues.get(parameter.getName());
 	}
 
 	public int getTicSize() {

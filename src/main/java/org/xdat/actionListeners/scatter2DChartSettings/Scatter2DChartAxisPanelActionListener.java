@@ -69,7 +69,7 @@ public class Scatter2DChartAxisPanelActionListener {
 	public void updateAutofitAxis(boolean newState) {
 		this.chart.getScatterPlot2D().setAutofit(this.axisType, newState);
 		if (newState) {
-			this.chart.getScatterPlot2D().autofit(this.axisType, this.mainWindow.getDataSheet());
+			this.chart.getScatterPlot2D().autofit(this.axisType);
 		}
 		this.frame.repaint();
 	}
