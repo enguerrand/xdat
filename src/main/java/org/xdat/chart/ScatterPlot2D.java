@@ -22,7 +22,6 @@ package org.xdat.chart;
 
 import java.awt.Color;
 
-import org.xdat.Main;
 import org.xdat.UserPreferences;
 import org.xdat.data.AxisType;
 import org.xdat.data.DataSheet;
@@ -128,11 +127,7 @@ public class ScatterPlot2D extends Plot {
 		this.selectedDesignColor = selectedDesignColor;
 	}
 
-	private void setParameterForYAxis(Parameter parameterForYAxis) {
-		this.parameterForYAxis = parameterForYAxis;
-	}
-
-	public Parameter getParameterForAxis(AxisType axisType) {
+    public Parameter getParameterForAxis(AxisType axisType) {
 		switch (axisType) {
 			case X:
 				return parameterForXAxis;
@@ -148,8 +143,8 @@ public class ScatterPlot2D extends Plot {
 				this.parameterForXAxis = parameter;
 				break;
 			case Y:
-				setParameterForYAxis(parameter);
-				break;
+                this.parameterForYAxis = parameter;
+                break;
 			default: throw new IllegalArgumentException("Unknown axis type "+axisType);
 		}
 	}

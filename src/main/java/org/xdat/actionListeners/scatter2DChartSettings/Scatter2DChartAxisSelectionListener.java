@@ -53,7 +53,7 @@ public class Scatter2DChartAxisSelectionListener implements ListSelectionListene
 		int selected_row = ((JList) e.getSource()).getSelectedIndex();
 		// System.out.println(selected_row);
 		chart.getScatterPlot2D().setParameterForAxis(axisType, chart.getDataSheet().getParameter(selected_row));
-		this.panel.updateTicCountSpinnerEnabled();
+		this.panel.currentParameterChanged();
 		this.frame.repaint();
 	}
 

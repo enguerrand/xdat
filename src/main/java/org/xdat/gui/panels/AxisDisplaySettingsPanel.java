@@ -155,7 +155,13 @@ public class AxisDisplaySettingsPanel extends JPanel {
 		this.axisWidthSpinner.setValue(axis.getWidth());
 		this.ticSizeSpinner.setValue(axis.getTicLength());
 		this.ticCountSpinner.setValue(axis.getTicCount());
-		this.ticLabelDigitCountSpinner.setValue(axis.getTicLabelDigitCount());
+		if(axis.getParameter().isNumeric()) {
+			this.ticLabelDigitCountSpinner.setEnabled(true);
+			this.ticLabelDigitCountSpinner.setValue(axis.getTicLabelDigitCount());
+		} else {
+			this.ticLabelDigitCountSpinner.setEnabled(false);
+			this.ticLabelDigitCountSpinner.setValue(0);
+		}
 		this.ticLabelFontSizeSpinner.setValue(axis.getTicLabelFontSize());
 		this.axisColorButton.setCurrentColor(axis.getAxisColor());
 		this.axisLabelColorButton.setCurrentColor(axis.getAxisLabelFontColor());
