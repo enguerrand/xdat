@@ -43,7 +43,8 @@ import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.util.Vector;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ChartFrame extends JFrame implements ComponentListener {
 
@@ -52,7 +53,7 @@ public class ChartFrame extends JFrame implements ComponentListener {
 	private Chart chart;
 	private ChartPanel chartPanel;
 	private SidebarPanel sidePanel;
-	private Vector<JDialog> registeredDialog = new Vector<JDialog>(0);
+	private List<JDialog> registeredDialog = new LinkedList<>();
 
 	public ChartFrame(Main mainWindow, Chart chart) throws NoParametersDefinedException {
 		super(chart.getTitle());

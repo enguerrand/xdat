@@ -35,12 +35,13 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.util.Vector;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ParameterSetSelectionDialog extends JDialog {
 
 	static final long serialVersionUID = 2L;
-	private Vector<JCheckBox> checkBoxes = new Vector<JCheckBox>(0, 1);
+	private List<JCheckBox> checkBoxes = new LinkedList<>();
 
 	public ParameterSetSelectionDialog(Main mainWindow, ChartFrame chartFrame) {
 		super(chartFrame, "Select active parameters");

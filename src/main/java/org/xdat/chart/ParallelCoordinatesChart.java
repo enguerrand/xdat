@@ -29,7 +29,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.io.Serializable;
-import java.util.Vector;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A serializable representation of all relevant settings for a Parallel
@@ -67,7 +68,7 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 	private int topMargin = 10;
 	private boolean verticallyOffsetAxisLabels = true;
 	private int axisLabelVerticalDistance = 10;
-	private Vector<Axis> axes = new Vector<Axis>(0, 1);
+	private List<Axis> axes = new LinkedList<>();
 	private int designLabelFontSize;
 	private int lineThickness = 1;
 	private int selectedDesignsLineThickness = 1;
@@ -262,7 +263,7 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 
 	public void moveAxis(int oldIndex, int newIndex) {
 		Axis axis = this.axes.remove(oldIndex);
-		this.axes.insertElementAt(axis, newIndex);
+		this.axes.add(newIndex, axis);
 	}
 
 	public int getAxisHeight() {

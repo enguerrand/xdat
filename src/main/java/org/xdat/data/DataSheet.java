@@ -38,9 +38,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 /**
  * A representation of the data imported from a text file.
@@ -79,11 +81,11 @@ public class DataSheet implements TableModel, Serializable, ListModel {
 
 	static final long serialVersionUID = 8;
 	private ClusterSet clusterSet;
-	private Vector<Design> data = new Vector<Design>(0, 1);
-	private Map<Integer, Design> designIdsMap = new HashMap<Integer, Design>();
-	private Vector<Parameter> parameters = new Vector<Parameter>(0, 1);
-	private transient Vector<TableModelListener> listeners = new Vector<TableModelListener>();
-	private transient Vector<ListDataListener> listDataListener = new Vector<ListDataListener>();
+	private List<Design> data = new ArrayList<>();
+	private Map<Integer, Design> designIdsMap = new HashMap<>();
+	private List<Parameter> parameters = new LinkedList<>();
+	private transient List<TableModelListener> listeners = new ArrayList<>();
+	private transient List<ListDataListener> listDataListener = new ArrayList<>();
 	private String delimiter;
 	public DataSheet(String pathToInputFile, boolean dataHasHeaders, Main mainWindow, ProgressMonitor progressMonitor) throws IOException {
 		UserPreferences userPreferences = UserPreferences.getInstance();
@@ -120,9 +122,9 @@ public class DataSheet implements TableModel, Serializable, ListModel {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	private void importData(String pathToInputFile, boolean dataHasHeaders, ProgressMonitor progressMonitor) throws IOException {
-		Vector<Design> buffer = new Vector<Design>(0, 1);
+		List<Design> buffer = new ArrayList<>();
 		if (this.data != null) {
-			buffer = (Vector<Design>) this.data.clone();
+			buffer = new ArrayList<>(this.data);
 		}
 		int lineCount = getLineCount(pathToInputFile);
 		progressMonitor.setMaximum(lineCount);
@@ -215,8 +217,8 @@ public class DataSheet implements TableModel, Serializable, ListModel {
 			throw new InconsistentDataException(pathToInputFile);
 		}
 
-		Vector<Design> buffer = (Vector<Design>) this.data.clone();
-		Map<Integer, Design> idbuffer = (Map<Integer, Design>) ((HashMap<Integer, Design>) this.designIdsMap).clone();
+		List<Design> buffer = new ArrayList<>(this.data);
+		Map<Integer, Design> idbuffer = new HashMap<>(this.designIdsMap);
 		this.data.clear();
 		this.designIdsMap.clear();
 		for (int i = 0; i < this.parameters.size(); i++) {
@@ -374,7 +376,7 @@ public class DataSheet implements TableModel, Serializable, ListModel {
 
 	public void addTableModelListener(TableModelListener l) {
 		if (listeners == null)
-			listeners = new Vector<>();
+			listeners = new ArrayList<>();
 		listeners.add(l);
 	}
 
@@ -385,7 +387,7 @@ public class DataSheet implements TableModel, Serializable, ListModel {
 	public void fireTableChanged(int firstRow, int lastRow, int column, boolean chartRebuildRequired, boolean chartRepaintRequired, boolean dataPanelUpdateRequired, boolean[] axisAutofitRequired, boolean[] axisResetFilterRequired, boolean[] axisApplyFiltersRequired) {
 		DataTableModelEvent e = new DataTableModelEvent(this, firstRow, lastRow, column, chartRebuildRequired, chartRepaintRequired, dataPanelUpdateRequired, axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired);
 		for (int i = 0, n = listeners.size(); i < n; i++) {
-			((TableModelListener) listeners.get(i)).tableChanged(e);
+			listeners.get(i).tableChanged(e);
 		}
 	}
 
@@ -590,7 +592,7 @@ public class DataSheet implements TableModel, Serializable, ListModel {
 
 	public void moveParameter(int oldIndex, int newIndex) {
 		Parameter param = this.parameters.remove(oldIndex);
-		this.parameters.insertElementAt(param, newIndex);
+		this.parameters.add(newIndex, param);
 	}
 
 	private boolean[] initialiseBooleanArray(boolean value) {
@@ -604,7 +606,7 @@ public class DataSheet implements TableModel, Serializable, ListModel {
 	@Override
 	public void addListDataListener(ListDataListener l) {
 		if (listDataListener == null)
-			listDataListener = new Vector<>();
+			listDataListener = new LinkedList<>();
 		listDataListener.add(l);
 
 	}

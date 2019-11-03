@@ -26,37 +26,20 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 import java.awt.Color;
 import java.io.Serializable;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
-/**
- * A collection of several {@link Cluster}s.
- * <p>
- * 
- */
 public class ClusterSet implements Serializable, TableModel {
 
 	static final long serialVersionUID = 1L;
 	private DataSheet dataSheet;
-	private Vector<Cluster> clusters = new Vector<Cluster>(0, 1);
+	private List<Cluster> clusters = new LinkedList<Cluster>();
 
-	/**
-	 * A buffer of clusters that is used while the user is editing this
-	 * ClusterSet.
-	 * <p>
-	 * While the user edits the ClusterSet all changes are only applied to this
-	 * buffer. The changes are only applied when the user confirms his actions.
-	 * The method {@link #applyChanges()} is used for this purpose.
-	 */
-	private Vector<Cluster> clustersBuffer = new Vector<Cluster>(0, 1);
+	private List<Cluster> clustersBuffer = new LinkedList<>();
 
-	private transient Vector<TableModelListener> listeners = new Vector<TableModelListener>();
+	private transient List<TableModelListener> listeners = new ArrayList<>();
 
-	/**
-	 * Counter which allows to attribute a unique identifier to each Cluster.
-	 * <p>
-	 * This is needed to keep the correct references between the clusters Vector
-	 * and the editing buffer.
-	 */
 	private int uniqueIdentificationNumberCounter = 0;
 
 	public ClusterSet(DataSheet dataSheet) {
@@ -147,12 +130,14 @@ public class ClusterSet implements Serializable, TableModel {
 		}
 	}
 
+	@Override
 	public void addTableModelListener(TableModelListener l) {
 		if (this.listeners == null) // rebuild after deserialization
-			this.listeners = new Vector<TableModelListener>();
+			this.listeners = new ArrayList<>();
 		listeners.add(l);
 	}
 
+	@Override
 	public void removeTableModelListener(TableModelListener l) {
 		if(listeners==null)
 			return;
@@ -282,7 +267,7 @@ public class ClusterSet implements Serializable, TableModel {
 	}
 
 	public void createBuffer() {
-		clustersBuffer.removeAllElements();
+		clustersBuffer.clear();
 		for (int i = 0; i < this.clusters.size(); i++) {
 			this.clustersBuffer.add(this.clusters.get(i).duplicate());
 		}

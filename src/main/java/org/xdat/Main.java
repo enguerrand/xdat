@@ -20,26 +20,6 @@ package org.xdat;
  *
  */
 
-import java.awt.Dimension;
-import java.awt.GraphicsEnvironment;
-import java.awt.HeadlessException;
-import java.io.IOException;
-import java.io.InvalidClassException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
-import java.util.Vector;
-
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.event.ListDataListener;
-
 import org.xdat.actionListeners.scatter2DChartSettings.ParallelChartFrameComboModel;
 import org.xdat.chart.Chart;
 import org.xdat.chart.ParallelCoordinatesChart;
@@ -50,6 +30,24 @@ import org.xdat.gui.dialogs.LicenseDisplayDialog;
 import org.xdat.gui.frames.ChartFrame;
 import org.xdat.gui.menus.mainWIndow.MainMenuBar;
 import org.xdat.gui.panels.DataSheetTablePanel;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.event.ListDataListener;
+import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
+import java.io.IOException;
+import java.io.InvalidClassException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * The Main Class from which the program is started.
@@ -64,9 +62,9 @@ public class Main extends JFrame {
 	private MainMenuBar mainMenuBar;
 	private transient DataSheetTablePanel dataSheetTablePanel;
 	private Session currentSession;
-	private Vector<ChartFrame> chartFrames = new Vector<ChartFrame>(0, 1);
-	private transient Vector<ListDataListener> listDataListener = new Vector<ListDataListener>();
-	private transient Vector<ParallelChartFrameComboModel> comboModels = new Vector<ParallelChartFrameComboModel>(0);
+	private List<ChartFrame> chartFrames = new LinkedList<>();
+	private transient List<ListDataListener> listDataListener = new LinkedList<>();
+	private transient List<ParallelChartFrameComboModel> comboModels = new LinkedList<>();
 	private final BuildProperties buildProperties;
 
 	private static final List<String> LOOK_AND_FEEL_ORDER_OF_PREF = Arrays.asList(
@@ -228,7 +226,7 @@ public class Main extends JFrame {
 			this.removeChartFromComboboxes(this.chartFrames.get(i));
 			this.chartFrames.get(i).dispose();
 		}
-		this.chartFrames.removeAllElements();
+		this.chartFrames.clear();
 		this.currentSession.clearAllCharts();
 	}
 

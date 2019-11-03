@@ -20,21 +20,6 @@
 
 package org.xdat.gui.panels;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.util.Vector;
-
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-
 import org.xdat.Main;
 import org.xdat.UserPreferences;
 import org.xdat.actionListeners.parallelCoordinatesDisplaySettings.AxisDisplaySettingsActionListener;
@@ -46,6 +31,20 @@ import org.xdat.gui.buttons.ColorChoiceButton;
 import org.xdat.gui.buttons.MinMaxSpinnerModel;
 import org.xdat.gui.dialogs.ParallelCoordinatesDisplaySettingsDialog;
 import org.xdat.gui.frames.ChartFrame;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.util.Vector;
 
 /**
  * Panel to modify display settings for Objects of type
@@ -128,7 +127,7 @@ public class AxisDisplaySettingsPanel extends JPanel {
 		ParallelCoordinatesChart chart = (ParallelCoordinatesChart) chartFrame.getChart();
 		buildPanel();
 
-		Vector<String> axes = new Vector<String>(0, 1);
+		Vector<String> axes = new Vector<>(0, 1);
 		for (int i = 0; i < chart.getAxisCount(); i++) {
 			if (chart.getAxis(i).isActive())
 				axes.add(chart.getAxis(i).getName());

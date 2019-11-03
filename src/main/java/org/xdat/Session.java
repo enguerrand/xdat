@@ -29,7 +29,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Vector;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Stores all relevant information of a session.
@@ -55,7 +56,7 @@ public class Session implements Serializable {
 
 	private DataSheet currentDataSheet;
 
-	private Vector<Chart> charts = new Vector<Chart>(0, 1);
+	private List<Chart> charts = new LinkedList<Chart>();
 
 	/**
 	 * Instantiates a new session.
@@ -96,7 +97,7 @@ public class Session implements Serializable {
 	}
 
 	public void clearAllCharts() {
-		this.charts.removeAllElements();
+		this.charts.clear();
 	}
 
 	public DataSheet getCurrentDataSheet() {

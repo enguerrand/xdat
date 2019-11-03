@@ -26,7 +26,8 @@ import org.xdat.gui.frames.ChartFrame;
 
 import javax.swing.AbstractListModel;
 import javax.swing.MutableComboBoxModel;
-import java.util.Vector;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ParallelChartFrameComboModel extends AbstractListModel implements MutableComboBoxModel {
 
@@ -34,7 +35,7 @@ public class ParallelChartFrameComboModel extends AbstractListModel implements M
 	private Main mainWindow;
 	private ChartFrame chartFrame;
 	private ScatterPlot2D plot;
-	private Vector<String> chartNames = new Vector<String>();
+	private List<String> chartNames = new LinkedList<>();
 
 	public ParallelChartFrameComboModel(Main mainWindow, ChartFrame chartFrame, ScatterPlot2D plot) {
 		this.mainWindow = mainWindow;
@@ -88,7 +89,7 @@ public class ParallelChartFrameComboModel extends AbstractListModel implements M
 
 	@Override
 	public void insertElementAt(Object obj, int index) {
-		this.chartNames.insertElementAt(obj.toString(), index);
+		this.chartNames.add(index, obj.toString());
 		this.fireIntervalAdded(this, 0, this.chartNames.size());
 
 	}
