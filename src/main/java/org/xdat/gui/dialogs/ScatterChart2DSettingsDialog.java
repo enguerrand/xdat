@@ -39,6 +39,7 @@ import org.xdat.actionListeners.scatter2DChartSettings.ParallelChartFrameComboMo
 import org.xdat.actionListeners.scatter2DChartSettings.Scatter2DChartDisplaySettingsActionListener;
 import org.xdat.chart.ScatterChart2D;
 import org.xdat.chart.ScatterPlot2D;
+import org.xdat.data.AxisType;
 import org.xdat.gui.buttons.ColorChoiceButton;
 import org.xdat.gui.buttons.MinMaxSpinnerModel;
 import org.xdat.gui.frames.ChartFrame;
@@ -150,8 +151,8 @@ public class ScatterChart2DSettingsDialog extends JDialog {
 		// Panel to select parameters for x- and y-axis
 
 		JPanel axisSettingsPanel = new JPanel(new GridLayout(1, 2));
-		Scatter2DChartAxisPanel xAxisPanel = new Scatter2DChartAxisPanel(mainWindow, chartFrame, scatterChart2D, Scatter2DChartAxisPanel.X_AXIS);
-		Scatter2DChartAxisPanel yAxisPanel = new Scatter2DChartAxisPanel(mainWindow, chartFrame, scatterChart2D, Scatter2DChartAxisPanel.Y_AXIS);
+		Scatter2DChartAxisPanel xAxisPanel = new Scatter2DChartAxisPanel(mainWindow, chartFrame, scatterChart2D, AxisType.X);
+		Scatter2DChartAxisPanel yAxisPanel = new Scatter2DChartAxisPanel(mainWindow, chartFrame, scatterChart2D, AxisType.Y);
 		axisSettingsPanel.add(yAxisPanel);
 		axisSettingsPanel.add(xAxisPanel);
 		mainPanel.add(axisSettingsPanel, BorderLayout.CENTER);

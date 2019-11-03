@@ -25,6 +25,7 @@ import java.awt.Dimension;
 
 import org.xdat.Main;
 import org.xdat.UserPreferences;
+import org.xdat.data.AxisType;
 import org.xdat.data.DataSheet;
 
 /**
@@ -69,14 +70,14 @@ public class ScatterChart2D extends Chart {
 	public void setCurrentSettingsAsDefault() {
 		UserPreferences userPreferences = UserPreferences.getInstance();
 		userPreferences.setScatterChart2DDisplayMode(this.scatterPlot2D.getDisplayedDesignSelectionMode());
-		userPreferences.setScatterChart2DAutofitX(this.scatterPlot2D.isAutofitX());
-		userPreferences.setScatterChart2DAutofitY(this.scatterPlot2D.isAutofitY());
-		userPreferences.setScatterChart2DAxisTitleFontsizeX(this.scatterPlot2D.getAxisLabelFontSizeX());
-		userPreferences.setScatterChart2DAxisTitleFontsizeY(this.scatterPlot2D.getAxisLabelFontSizeY());
-		userPreferences.setScatterChart2DTicCountX(this.scatterPlot2D.getTicCountX());
-		userPreferences.setScatterChart2DTicCountY(this.scatterPlot2D.getTicCountY());
-		userPreferences.setScatterChart2DTicLabelFontsizeX(this.scatterPlot2D.getTicLabelFontSizeX());
-		userPreferences.setScatterChart2DTicLabelFontsizeY(this.scatterPlot2D.getTicLabelFontSizeY());
+		userPreferences.setScatterChart2DAutofitX(this.scatterPlot2D.isAutofit(AxisType.X));
+		userPreferences.setScatterChart2DAutofitY(this.scatterPlot2D.isAutofit(AxisType.Y));
+		userPreferences.setScatterChart2DAxisTitleFontsizeX(this.scatterPlot2D.getAxisLabelFontSize(AxisType.X));
+		userPreferences.setScatterChart2DAxisTitleFontsizeY(this.scatterPlot2D.getAxisLabelFontSize(AxisType.Y));
+		userPreferences.setScatterChart2DTicCountX(this.scatterPlot2D.getTicCount(AxisType.X));
+		userPreferences.setScatterChart2DTicCountY(this.scatterPlot2D.getTicCount(AxisType.Y));
+		userPreferences.setScatterChart2DTicLabelFontsizeX(this.scatterPlot2D.getTicLabelFontSize(AxisType.X));
+		userPreferences.setScatterChart2DTicLabelFontsizeY(this.scatterPlot2D.getTicLabelFontSize(AxisType.Y));
 		userPreferences.setScatterChart2DDataPointSize(this.scatterPlot2D.getDotRadius());
 		userPreferences.setScatterChart2DForegroundColor(this.scatterPlot2D.getDecorationsColor());
 		userPreferences.setScatterChart2DBackgroundColor(this.scatterPlot2D.getBackGroundColor());

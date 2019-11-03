@@ -24,6 +24,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.xdat.chart.ScatterChart2D;
+import org.xdat.data.AxisType;
 import org.xdat.gui.frames.ChartFrame;
 import org.xdat.gui.panels.Scatter2DChartAxisPanel;
 
@@ -32,33 +33,18 @@ import org.xdat.gui.panels.Scatter2DChartAxisPanel;
  * {@link org.xdat.chart.ScatterChart2D}.
  */
 public class Scatter2DChartAxisSelectionListener implements ListSelectionListener {
-	/** the scatter 2d chart */
 	private ScatterChart2D chart;
 
-	/** the scatter 2d chart frame */
 	private ChartFrame frame;
 
-	/** specifies whether changes should be applied to x or y axis */
-	private int axis;
+	private AxisType axisType;
 
-	/** the panel */
 	private Scatter2DChartAxisPanel panel;
 
-	/**
-	 * Instantiates a new axis selection listener for scatter 2d charts
-	 * @param frame
-	 * 		the chart frame
-	 * @param chart
-	 * 		the chart
-	 * @param panel
-	 * 		the axis settings panel
-	 * @param axis
-	 * 		the axis
-	 */
-	public Scatter2DChartAxisSelectionListener(ChartFrame frame, ScatterChart2D chart, Scatter2DChartAxisPanel panel, int axis) {
+	public Scatter2DChartAxisSelectionListener(ChartFrame frame, ScatterChart2D chart, Scatter2DChartAxisPanel panel, AxisType axisType) {
 		this.frame = frame;
 		this.chart = chart;
-		this.axis = axis;
+		this.axisType = axisType;
 		this.panel = panel;
 	}
 
@@ -66,16 +52,8 @@ public class Scatter2DChartAxisSelectionListener implements ListSelectionListene
 	public void valueChanged(ListSelectionEvent e) {
 		int selected_row = ((JList) e.getSource()).getSelectedIndex();
 		// System.out.println(selected_row);
-
-		if (axis == Scatter2DChartAxisPanel.Y_AXIS) {
-			chart.getScatterPlot2D().setParameterForYAxis(chart.getDataSheet().getParameter(selected_row));
-			this.panel.updateTicCountSpinnerEnabled();
-		} else if (axis == Scatter2DChartAxisPanel.X_AXIS) {
-			chart.getScatterPlot2D().setParameterForXAxis(chart.getDataSheet().getParameter(selected_row));
-			this.panel.updateTicCountSpinnerEnabled();
-		} else {
-			throw new RuntimeException("Invalid axis type " + this.axis);
-		}
+		chart.getScatterPlot2D().setParameterForAxis(axisType, chart.getDataSheet().getParameter(selected_row));
+		this.panel.updateTicCountSpinnerEnabled();
 		this.frame.repaint();
 	}
 
