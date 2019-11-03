@@ -20,55 +20,31 @@
 
 package org.xdat.workerThreads;
 
-import java.io.IOException;
-import java.util.Hashtable;
-
-import javax.swing.JOptionPane;
-import javax.swing.ProgressMonitor;
-import javax.swing.SwingWorker;
-
 import org.xdat.Main;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.data.DataSheet;
 import org.xdat.exceptions.InconsistentDataException;
 import org.xdat.gui.frames.ChartFrame;
 
+import javax.swing.JOptionPane;
+import javax.swing.ProgressMonitor;
+import javax.swing.SwingWorker;
+import java.io.IOException;
+import java.util.Hashtable;
+
 /**
  * A thread that runs in the background to create a new datasheet. This takes
  * away this potentially long-running task from the EDT. <br>
  * At the same time a ProgressMonitor is used to show progress, if required.
- * 
+ *
  */
 public class DataSheetUpdateThread extends SwingWorker {
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** The path to the input file to be imported. */
 	private String pathToInputFile;
-
-	/** Specifies, whether the data to be imported has headers. */
 	private boolean dataHasHeaders;
-
-	/** The main window. */
 	private Main mainWindow;
-
-	/** The progress monitor. */
 	private ProgressMonitor progressMonitor;
 
-	/**
-	 * Instantiates a new data sheet creation thread.
-	 * 
-	 * @param pathToInputFile
-	 *            The path to the input file to be imported
-	 * @param dataHasHeaders
-	 *            Specifies, whether the data to be imported has headers
-	 * @param mainWindow
-	 *            The main window
-	 * @param progressMonitor
-	 *            The progress monitor
-	 */
 	public DataSheetUpdateThread(String pathToInputFile, boolean dataHasHeaders, Main mainWindow, ProgressMonitor progressMonitor) {
-		log("constructor called");
 		this.pathToInputFile = pathToInputFile;
 		this.dataHasHeaders = dataHasHeaders;
 		this.mainWindow = mainWindow;
@@ -77,7 +53,6 @@ public class DataSheetUpdateThread extends SwingWorker {
 
 	@Override
 	public Object doInBackground() {
-		// log("do in background invoked from Thread "+Thread.currentThread().getId());
 		try {
 			Hashtable<ChartFrame, double[]> upperFilterValues = new Hashtable<ChartFrame, double[]>();
 			Hashtable<ChartFrame, double[]> lowerFilterValues = new Hashtable<ChartFrame, double[]>();
@@ -89,7 +64,6 @@ public class DataSheetUpdateThread extends SwingWorker {
 					double[] lfValues = new double[c.getAxisCount()];
 					for (int a = 0; a < c.getAxisCount(); a++) {
 						ufValues[a] = c.getAxis(a).getUpperFilter().getValue();
-						log("doInBackground: " + c.getAxis(a).getName() + ": filterGetValue = " + ufValues[a]);
 						lfValues[a] = c.getAxis(a).getLowerFilter().getValue();
 					}
 					upperFilterValues.put(f, ufValues);
@@ -108,7 +82,6 @@ public class DataSheetUpdateThread extends SwingWorker {
 					double[] ufValues = upperFilterValues.get(f);
 					double[] lfValues = lowerFilterValues.get(f);
 					for (int a = 0; a < c.getAxisCount(); a++) {
-						log("doInBackground: " + c.getAxis(a).getName() + ": filterSetValue = " + ufValues[a]);
 						c.getAxis(a).getUpperFilter().setValue(ufValues[a]);
 						c.getAxis(a).getLowerFilter().setValue(lfValues[a]);
 					}
@@ -125,17 +98,5 @@ public class DataSheetUpdateThread extends SwingWorker {
 
 		this.progressMonitor.close();
 		return null;
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (DataSheetUpdateThread.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
 	}
 }

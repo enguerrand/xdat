@@ -20,65 +20,31 @@
 
 package org.xdat.gui.tables;
 
+import org.xdat.Main;
+import org.xdat.customEvents.DataTableModelEvent;
+import org.xdat.data.DataSheet;
+
 import javax.swing.JTable;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableColumnModel;
 
-import org.xdat.Main;
-import org.xdat.customEvents.DataTableModelEvent;
-import org.xdat.data.DataSheet;
-
-/**
- * The Class DataTable. <br>
- * Used to extend the JTable standard implementation of the tableChanged
- * function in combination with the
- * {@link org.xdat.customEvents.DataTableModelEvent}. Based on the boolean
- * switches set in the DataTableModelEvent appropriate functions of the class
- * {@link org.xdat.Main} are called to update the GUI.
- * 
- * @see org.xdat.customEvents.DataTableModelEvent
- */
 public class DataTable extends JTable {
 
-	/** The version tracking unique identifier for Serialization. */
 	static final long serialVersionUID = 1;
-
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** A reference to the mainWindow. */
 	private Main mainWindow;
 
-	/**
-	 * Instantiates a new data table.
-	 * 
-	 * @param dataSheet
-	 *            the dataSheet
-	 * @param cm
-	 *            the column model
-	 * @param mainWindow 
-	 * 				the main window
-	 */
 	public DataTable(DataSheet dataSheet, TableColumnModel cm, Main mainWindow) {
 		super(dataSheet, cm);
 		this.mainWindow = mainWindow;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.JTable#tableChanged(javax.swing.event.TableModelEvent)
-	 */
 	@Override
 	public void tableChanged(TableModelEvent e) {
 		super.tableChanged(e);
 		if (e.getType() == DataTableModelEvent.CUSTOM_TABLE_MODEL_TYPE) {
 			DataTableModelEvent ec = (DataTableModelEvent) e;
-			// log("tableChanged: columnIndex: "+columnIndex+", firstRow = "+e.getFirstRow()+", lastRow = "+e.getLastRow()+", Type = "+e.getType()+", source = "+e.getSource());
-			// log("tableChange: this.mainWindow: "+this.mainWindow);
-			// log("TableModelEventIDs: Allcols:"+TableModelEvent.ALL_COLUMNS+", Delete:"+TableModelEvent.DELETE+", Insert:"+TableModelEvent.INSERT+", Header:"+TableModelEvent.HEADER_ROW+", Update:"+TableModelEvent.UPDATE);
 			boolean[] autofitRequired = ec.getAxisAutofitRequired();
 			boolean[] resetFiltersRequired = ec.getAxisResetFilterRequired();
 			boolean[] applyFiltersRequired = ec.getAxisApplyFiltersRequired();
@@ -94,44 +60,26 @@ public class DataTable extends JTable {
 					}
 				});
 				if (autofitRequired[i]) {
-					// log("tableChanged:  autofitRequired");
 					this.mainWindow.autofitAxisAllChartFrames(i);
 				}
 				if (resetFiltersRequired[i]) {
-					// log("tableChanged:  resetFiltersRequired");
 					this.mainWindow.resetFiltersOnAxisAllChartFrames(i);
 				}
 				if (applyFiltersRequired[i]) {
-					// log("tableChanged:  applyFiltersRequired");
 					this.mainWindow.refilterAllChartFrames(i);
 				}
 			}
 			if (ec.isChartRebuildRequired()) {
-				log("tableChanged: isChartRebuildRequired ");
 				this.mainWindow.rebuildAllChartFrames();
 			}
 			if (ec.isChartRepaintRequired()) {
-				log("tableChanged:isChartRepaintRequired  ");
 				this.mainWindow.repaintAllChartFrames();
 			}
 			if (ec.isDataPanelUpdateRequired()) {
-				log("tableChanged:isDataPanelUpdateRequired  ");
 				this.mainWindow.updateDataPanel();
 			}
 
 			progressMonitor.close();
-		}
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (DataTable.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
 		}
 	}
 }

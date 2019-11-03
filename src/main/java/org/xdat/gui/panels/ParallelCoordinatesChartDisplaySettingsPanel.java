@@ -20,18 +20,6 @@
 
 package org.xdat.gui.panels;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JSpinner;
-
 import org.xdat.Main;
 import org.xdat.UserPreferences;
 import org.xdat.actionListeners.parallelCoordinatesDisplaySettings.ChartSpecificDisplaySettingsDialogActionListener;
@@ -43,106 +31,46 @@ import org.xdat.gui.buttons.MinMaxSpinnerModel;
 import org.xdat.gui.dialogs.ParallelCoordinatesDisplaySettingsDialog;
 import org.xdat.gui.frames.ChartFrame;
 
-/**
- * Panel to modify display settings for a
- * {@link org.xdat.chart.ParallelCoordinatesChart}.
- */
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+
 public class ParallelCoordinatesChartDisplaySettingsPanel extends JPanel {
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0000;
-
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** The main window. */
+	static final long serialVersionUID = 0L;
 	private Main mainWindow;
-
-	/** The dialog on which the panel is located. */
 	private ParallelCoordinatesDisplaySettingsDialog dialog;
-
-	/** The chart frame to which the settings apply. */
 	private ChartFrame chartFrame;
-
-	/** The action listener */
 	private ParallelChartDisplaySettingsActionListener cmd;
-
-	/** Checkbox to set whether axis labels should be vertically offset. */
 	private JCheckBox axisLabelVerticalOffsetCheckbox = new JCheckBox();
-	
-	/** Checkbox to set whether anti aliasing should be used. */
 	private JCheckBox antiasingCheckbox = new JCheckBox();
-
-	/** Checkbox to set whether transparency  should be used. */
 	private JCheckBox alphaCheckbox = new JCheckBox();
-
-	/** The back ground color button. */
 	private ColorChoiceButton backGroundColorButton;
-
-	/** The active design color button. */
 	private ColorChoiceButton activeDesignColorButton;
-
-	/** The selected design color button. */
 	private ColorChoiceButton selectedDesignColorButton;
-
-	/** The filtered design color button. */
 	private ColorChoiceButton filteredDesignColorButton;
-
-	/** The filter color button. */
 	private ColorChoiceButton filterColorButton;
-
-	/** Checkbox to set whether only selected designs should be shown. */
 	private JCheckBox showOnlySelectedDesignsCheckBox = new JCheckBox();
-
-	/** The showfiltered designs true button. */
 	private JRadioButton showfilteredDesignsTrueButton = new JRadioButton("Yes");
-
-	/** The showfiltered designs false button. */
 	private JRadioButton showfilteredDesignsFalseButton = new JRadioButton("No");
-
-	/** The show design IDs true button. */
 	private JRadioButton showDesignIDsTrueButton = new JRadioButton("Yes");
-
-	/** The show design IDs false button. */
 	private JRadioButton showDesignIDsFalseButton = new JRadioButton("No");
-
-	/** The show filtered designs button group. */
 	private ButtonGroup showfilteredDesignsButtonGroup = new ButtonGroup();
-
-	/** The show design IDs button group. */
 	private ButtonGroup showDesignIDsButtonGroup = new ButtonGroup();
-
-	/** The design line thickness spinner. */
 	private JSpinner designLineThicknessSpinner = new JSpinner(new MinMaxSpinnerModel(0, 10));
-
-	/** The selected design line thickness spinner. */
 	private JSpinner selectedDesignLineThicknessSpinner = new JSpinner(new MinMaxSpinnerModel(0, 10));
-
-	/** The design label font size spinner. */
 	private JSpinner designLabelFontSizeSpinner = new JSpinner(new MinMaxSpinnerModel(0, 100));
-
-	/** The filter width spinner. */
 	private JSpinner filterWidthSpinner = new JSpinner(new MinMaxSpinnerModel(1, 30));
-
-	/** The filter height spinner. */
 	private JSpinner filterHeightSpinner = new JSpinner(new MinMaxSpinnerModel(1, 60));
-
-	/** The cancel button. */
 	private JButton cancelButton = new JButton("Cancel");
-
-	/** The ok button. */
 	private JButton okButton = new JButton("Ok");
 
-	/**
-	 * Instantiates a new chart display settings panel the allows editing the
-	 * default settings in the user preferences.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param dialog
-	 *            the dialog on which the panel is located
-	 * 
-	 * @see DefaultDisplaySettingsDialogActionListener
-	 */
 	public ParallelCoordinatesChartDisplaySettingsPanel(Main mainWindow, ParallelCoordinatesDisplaySettingsDialog dialog) {
 		this.mainWindow = mainWindow;
 		this.dialog = dialog;
@@ -168,19 +96,6 @@ public class ParallelCoordinatesChartDisplaySettingsPanel extends JPanel {
 
 	}
 
-	/**
-	 * Instantiates a new chart display settings panel that allows editing a
-	 * particular chart.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param dialog
-	 *            the dialog on which the panel is located
-	 * @param chartFrame
-	 *            the chart which should be modified
-	 * 
-	 * @see ChartSpecificDisplaySettingsDialogActionListener
-	 */
 	public ParallelCoordinatesChartDisplaySettingsPanel(Main mainWindow, ParallelCoordinatesDisplaySettingsDialog dialog, ChartFrame chartFrame) {
 		this.mainWindow = mainWindow;
 		this.dialog = dialog;
@@ -329,12 +244,6 @@ public class ParallelCoordinatesChartDisplaySettingsPanel extends JPanel {
 		okButtonPanel.add(okButton);
 	}
 
-	/**
-	 * Sets the action listener.
-	 * 
-	 * @param cmd
-	 *            the new action listener
-	 */
 	public void setActionListener(ParallelChartDisplaySettingsActionListener cmd) {
 		this.cmd = cmd;
 		backGroundColorButton.addActionListener(cmd);
@@ -348,62 +257,21 @@ public class ParallelCoordinatesChartDisplaySettingsPanel extends JPanel {
 		showDesignIDsFalseButton.addActionListener(cmd);
 	}
 
-	/**
-	 * Tells the panel that the settings should be applied to the user
-	 * preferences.
-	 * 
-	 * @see DefaultDisplaySettingsDialogActionListener
-	 */
 	public void setOkCancelButtonTargetDefaultSettings() {
 		DefaultDisplaySettingsDialogActionListener cmd = new DefaultDisplaySettingsDialogActionListener(dialog);
-		log("setOkCancelButtonTargetDefaultSettings called");
 		cancelButton.addActionListener(cmd);
 		okButton.addActionListener(cmd);
 	}
 
-	/**
-	 * Tells the panel that the settings should be applied to the the chart
-	 * specified in the argument.
-	 * 
-	 * @param chart
-	 *            specifies which chart the settings should be applied to.
-	 * 
-	 * @see ChartSpecificDisplaySettingsDialogActionListener
-	 */
 	public void setOkCancelButtonTargetChart(ParallelCoordinatesChart chart) {
-		log("setOkCancelButtonTargetChart called");
-		cancelButton.addActionListener(new ChartSpecificDisplaySettingsDialogActionListener(this.mainWindow, dialog, chart, chartFrame));
-		okButton.addActionListener(new ChartSpecificDisplaySettingsDialogActionListener(this.mainWindow, dialog, chart, chartFrame));
+		cancelButton.addActionListener(new ChartSpecificDisplaySettingsDialogActionListener(dialog, chart, chartFrame));
+		okButton.addActionListener(new ChartSpecificDisplaySettingsDialogActionListener(dialog, chart, chartFrame));
 	}
 
-	/**
-	 * Gets the chart display settings action listener.
-	 * 
-	 * @return the chart display settings action listener
-	 */
 	public ParallelChartDisplaySettingsActionListener getChartDisplaySettingsActionListener() {
 		return this.cmd;
 	}
 
-	/**
-	 * Gets the show filtered designs selection.
-	 * 
-	 * @return the show filtered designs selection
-	 */
-	public boolean getShowFilteredDesignsSelection() {
-		if (showfilteredDesignsTrueButton.getModel().equals(showfilteredDesignsButtonGroup.getSelection())) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * Sets the show filtered designs selection.
-	 * 
-	 * @param showFilteredDesignsSelection
-	 *            the new show filtered designs selection
-	 */
 	public void setShowFilteredDesignsSelection(boolean showFilteredDesignsSelection) {
 		if (showFilteredDesignsSelection)
 			showfilteredDesignsButtonGroup.setSelected(showfilteredDesignsTrueButton.getModel(), true);
@@ -412,27 +280,7 @@ public class ParallelCoordinatesChartDisplaySettingsPanel extends JPanel {
 
 	}
 
-	/**
-	 * Gets the show design IDs selection.
-	 * 
-	 * @return the show design IDs selection
-	 */
-	public boolean getShowDesignIDsSelection() {
-		if (showfilteredDesignsTrueButton.getModel().equals(showfilteredDesignsButtonGroup.getSelection())) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * Sets the show design IDs selection.
-	 * 
-	 * @param showFilteredDesignsSelection
-	 *            the new show design IDs selection
-	 */
 	public void setShowDesignIDsSelection(boolean showFilteredDesignsSelection) {
-		log("setShowDesignIDsSelection: argument is " + showFilteredDesignsSelection);
 		if (showFilteredDesignsSelection)
 			showDesignIDsButtonGroup.setSelected(showDesignIDsTrueButton.getModel(), true);
 		else
@@ -440,144 +288,60 @@ public class ParallelCoordinatesChartDisplaySettingsPanel extends JPanel {
 
 	}
 
-	/**
-	 * Gets the design label font size spinner.
-	 * 
-	 * @return the design label font size spinner
-	 */
 	public JSpinner getDesignLabelFontSizeSpinner() {
 		return designLabelFontSizeSpinner;
 	}
 
-	/**
-	 * Gets the design line thickness spinner.
-	 * 
-	 * @return the design line thickness spinner
-	 */
 	public JSpinner getDesignLineThicknessSpinner() {
 		return designLineThicknessSpinner;
 	}
 
-	/**
-	 * Gets the selected design line thickness spinner.
-	 * 
-	 * @return the selected design line thickness spinner
-	 */
 	public JSpinner getSelectedDesignLineThicknessSpinner() {
 		return selectedDesignLineThicknessSpinner;
 	}
 
-	/**
-	 * Gets the vertically offset axis label checkbox.
-	 * 
-	 * @return the vertically offset axis label checkbox
-	 */
 	public JCheckBox getAxisLabelVerticalOffsetCheckbox() {
 		return axisLabelVerticalOffsetCheckbox;
 	}
 	
-	/**
-	 * Gets the anti aliasing checkbox.
-	 * 
-	 * @return the anti aliasing checkbox
-	 */
 	public JCheckBox getAntiAliasingCheckbox() {
 		return antiasingCheckbox;
 	}
 
-	/**
-	 * Gets the alpha checkbox.
-	 * 
-	 * @return the alpha checkbox
-	 */
 	public JCheckBox getAlphaCheckbox() {
 		return alphaCheckbox;
 	}
 	
-	/**
-	 * Gets the checkbox that sets whether only selected designs should be
-	 * shown.
-	 * 
-	 * @return the checkbox that sets whether only selected designs should be
-	 *         shown.
-	 */
 	public JCheckBox getShowOnlySelectedDesignsCheckBox() {
 		return showOnlySelectedDesignsCheckBox;
 	}
 
-	/**
-	 * Gets the active design color button.
-	 * 
-	 * @return the active design color button
-	 */
 	public ColorChoiceButton getActiveDesignColorButton() {
 		return activeDesignColorButton;
 	}
 
-	/**
-	 * Gets the selected design color button.
-	 * 
-	 * @return the selected design color button
-	 */
 	public ColorChoiceButton getSelectedDesignColorButton() {
 		return selectedDesignColorButton;
 	}
 
-	/**
-	 * Gets the back ground color button.
-	 * 
-	 * @return the back ground color button
-	 */
 	public ColorChoiceButton getBackGroundColorButton() {
 		return backGroundColorButton;
 	}
 
-	/**
-	 * Gets the filter color button.
-	 * 
-	 * @return the filter color button
-	 */
 	public ColorChoiceButton getFilterColorButton() {
 		return filterColorButton;
 	}
 
-	/**
-	 * Gets the filtered design color button.
-	 * 
-	 * @return the filtered design color button
-	 */
 	public ColorChoiceButton getFilteredDesignColorButton() {
 		return filteredDesignColorButton;
 	}
 
-	/**
-	 * Gets the filter height spinner.
-	 * 
-	 * @return the filter height spinner
-	 */
 	public JSpinner getFilterHeightSpinner() {
 		return filterHeightSpinner;
 	}
 
-	/**
-	 * Gets the filter width spinner.
-	 * 
-	 * @return the filter width spinner
-	 */
 	public JSpinner getFilterWidthSpinner() {
 		return filterWidthSpinner;
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (ParallelCoordinatesChartDisplaySettingsPanel.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
 	}
 
 }

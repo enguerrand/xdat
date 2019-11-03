@@ -84,16 +84,4 @@ public class MainHelpMenuActionListener implements ActionListener {
 			System.out.println(e.getActionCommand());
 		}
 	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (MainHelpMenuActionListener.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
-	}
 }

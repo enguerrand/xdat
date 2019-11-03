@@ -20,11 +20,6 @@
 
 package org.xdat.gui.panels;
 
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-
 import org.xdat.Main;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.chart.ScatterChart2D;
@@ -34,44 +29,23 @@ import org.xdat.data.DataSheet;
 import org.xdat.data.Design;
 import org.xdat.data.Parameter;
 
-/**
- * Panel that is used to display a {@link org.xdat.chart.ScatterChart2D}.
- */
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+
 public class ScatterChart2DPanel extends ChartPanel {
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0001;
-
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** The Main Window */
+	static final long serialVersionUID = 1L;
 	private Main mainWindow;
-
-	/** The y-axis offset */
 	private int yAxisOffset = 0;
-	
-	/**
-	 * Instantiates a new scatter chart 2D panel.
-	 * 
-	 * @param mainWindow
-	 *            the main Window
-	 * @param chart
-	 *            the chart
-	 */
+
 	public ScatterChart2DPanel(Main mainWindow, ScatterChart2D chart) {
 		super(mainWindow.getDataSheet(), chart);
 		this.mainWindow = mainWindow;
-		log("constructor called");
 	}
 
-	/**
-	 * Overridden to implement the painting of the chart.
-	 * 
-	 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
-	 */
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		log("paintComponent called ");
 		ScatterChart2D chart = (ScatterChart2D) this.getChart();
 		ScatterPlot2D plot = chart.getScatterPlot2D();
 
@@ -95,14 +69,6 @@ public class ScatterChart2DPanel extends ChartPanel {
 		}
 	}
 
-	/**
-	 * Draws the lines representing the designs.
-	 * 
-	 * @param g
-	 *            the graphics object
-	 * @param chart 
-	 * 			the chart
-	 */
 	public void drawDesigns(Graphics g, ScatterChart2D chart) {
 		ScatterPlot2D plot = chart.getScatterPlot2D();
 		Parameter paramX = plot.getParameterForAxis(AxisType.X);
@@ -127,7 +93,6 @@ public class ScatterChart2DPanel extends ChartPanel {
 			minX = Double.POSITIVE_INFINITY;
 			maxX = Double.NEGATIVE_INFINITY;
 			for (int i = 0; i < dataSheet.getDesignCount(); i++) {
-				log("drawDesigns find xmin: xValues[i]=" + xValues[i]);
 				xValues[i] = dataSheet.getDesign(i).getDoubleValue(paramX);
 				if (xValues[i] > maxX)
 					maxX = xValues[i];
@@ -154,9 +119,6 @@ public class ScatterChart2DPanel extends ChartPanel {
 
 		double xRange = maxX - minX;
 		double yRange = maxY - minY;
-		log("drawDesigns: maxX=" + maxX);
-		log("drawDesigns: minX=" + minX);
-		log("drawDesigns: xRange=" + xRange);
 		int plotWidth = chart.getWidth() - chart.getScatterPlot2D().getPlotAreaDistanceToLeft(this.yAxisOffset) - chart.getScatterPlot2D().getPlotAreaDistanceToRight();
 		int plotHeight = chart.getHeight() - chart.getScatterPlot2D().getPlotAreaDistanceToTop() - chart.getScatterPlot2D().getPlotAreaDistanceToBottom();
 		int xOrig = chart.getScatterPlot2D().getPlotAreaDistanceToLeft(this.yAxisOffset) - chart.getScatterPlot2D().getDotRadius();
@@ -246,21 +208,7 @@ public class ScatterChart2DPanel extends ChartPanel {
 
 	}
 
-	/**
-	 * Draws the axes.
-	 * 
-	 * @param g
-	 *            the graphics object
-	 * @param chart 
-	 * 				the chart
-	 * @param plot 
-	 * 				the plot
-	 */
 	public void drawAxes(Graphics g, ScatterChart2D chart, ScatterPlot2D plot) {
-
-		log("drawAxes: chart height: " + chart.getHeight());
-		log("drawAxes: chart width: " + chart.getWidth());
-
 		// Frame
 		g.setColor(chart.getBackGroundColor());
 		g.fillRect(0, 0, chart.getWidth(), plot.getPlotAreaDistanceToTop());
@@ -375,7 +323,7 @@ public class ScatterChart2DPanel extends ChartPanel {
 
 		g.setFont(new Font("SansSerif", Font.PLAIN, plot.getAxisLabelFontSize(AxisType.X)));
 		int slenX = g.getFontMetrics().stringWidth(xParameterName);
-		g.drawString(xParameterName, (int) ((chart.getWidth() - slenX) / 2), chart.getHeight() - plot.getMargin() - ScatterPlot2D.AXIS_LABEL_PADDING);
+		g.drawString(xParameterName, ((chart.getWidth() - slenX) / 2), chart.getHeight() - plot.getMargin() - ScatterPlot2D.AXIS_LABEL_PADDING);
 
 		// Y - Axis Label
 		String yParameterName = "";
@@ -394,7 +342,7 @@ public class ScatterChart2DPanel extends ChartPanel {
 		fontAT.rotate(-Math.PI / 2);
 		Font theDerivedFont = origFont.deriveFont(fontAT);
 		g2D.setFont(theDerivedFont);
-		g2D.drawString(yParameterName, plot.getMargin() + ScatterPlot2D.AXIS_LABEL_PADDING + plot.getAxisLabelFontSize(AxisType.Y), (int) ((chart.getHeight() + slenY) / 2));
+		g2D.drawString(yParameterName, plot.getMargin() + ScatterPlot2D.AXIS_LABEL_PADDING + plot.getAxisLabelFontSize(AxisType.Y), ((chart.getHeight() + slenY) / 2));
 		g2D.setFont(origFont);
 
 	}
@@ -408,17 +356,4 @@ public class ScatterChart2DPanel extends ChartPanel {
 			return parameterForAxis.getStringValueOf(ticIndex);
 		}
 	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (ScatterChart2DPanel.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
-	}
-
 }

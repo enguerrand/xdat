@@ -61,7 +61,6 @@ import org.xdat.gui.panels.DataSheetTablePanel;
  */
 public class Main extends JFrame {
 	public static final long serialVersionUID = 10L;
-	public static final boolean printLog = false;
 	private MainMenuBar mainMenuBar;
 	private transient DataSheetTablePanel dataSheetTablePanel;
 	private Session currentSession;
@@ -343,10 +342,6 @@ public class Main extends JFrame {
 		}
 
 		return UserPreferences.getInstance().isLicenseAccepted();
-	}
-
-	public static boolean isLoggingEnabled() {
-		return false;
 	}
 
 	public MainMenuBar getMainMenuBar() {

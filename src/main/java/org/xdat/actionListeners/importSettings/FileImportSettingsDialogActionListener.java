@@ -20,55 +20,30 @@
 
 package org.xdat.actionListeners.importSettings;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-
-import javax.swing.ButtonModel;
-import javax.swing.JFileChooser;
-
 import org.xdat.Main;
 import org.xdat.UserPreferences;
 import org.xdat.gui.dialogs.FileImportSettingsDialog;
 
-/**
- * ActionListener for a {@link FileImportSettingsDialog}.
- */
+import javax.swing.ButtonModel;
+import javax.swing.JFileChooser;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+
 public class FileImportSettingsDialogActionListener implements ActionListener {
 
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** The main window. */
 	Main mainWindow;
-
-	/** The dialog. */
 	private FileImportSettingsDialog dialog;
 
-	/**
-	 * Instantiates a new file import settings dialog action listener.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param dialog
-	 *            the dialog
-	 */
 	public FileImportSettingsDialogActionListener(Main mainWindow, FileImportSettingsDialog dialog) {
-		log("constructor called.");
 		this.mainWindow = mainWindow;
 		this.dialog = dialog;
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
 	public void actionPerformed(ActionEvent e) {
 		String actionCommand = e.getActionCommand();
-		if (actionCommand == "...") {
+		if (actionCommand.equals("...")) {
 			String filepath;
 			JFileChooser chooser = new JFileChooser();
 			if (UserPreferences.getInstance().getCurrentDir() != null) {
@@ -82,7 +57,7 @@ public class FileImportSettingsDialogActionListener implements ActionListener {
 				dialog.getUseThisTextField().setText(filepath);
 			}
 
-		} else if (actionCommand == "Ok") {
+		} else if (actionCommand.equals("Ok")) {
 			ButtonModel fileBrowsingSelectedModel = this.dialog.getFileBrowsingButtonGroup().getSelection();
 			if (fileBrowsingSelectedModel.equals(dialog.getUseHomeRadioButton().getModel())) {
 				UserPreferences.getInstance().setDirToImportFrom(UserPreferences.IMPORT_FROM_HOMEDIR);
@@ -118,22 +93,8 @@ public class FileImportSettingsDialogActionListener implements ActionListener {
 				UserPreferences.getInstance().setLocale(UserPreferences.LOCALE_US);
 			}
 			this.dialog.dispose();
-		} else if (actionCommand == "Cancel") {
+		} else if (actionCommand.equals("Cancel")) {
 			this.dialog.dispose();
-		} else {
-			log(e.getActionCommand());
-		}
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (FileImportSettingsDialogActionListener.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
 		}
 	}
 }

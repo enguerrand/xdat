@@ -20,10 +20,12 @@
 
 package org.xdat.gui.dialogs;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
+import org.xdat.Main;
+import org.xdat.actionListeners.clusterDialog.ClusterDialogActionListener;
+import org.xdat.data.DataSheet;
+import org.xdat.gui.tables.ColorEditor;
+import org.xdat.gui.tables.ColorRenderer;
+import org.xdat.gui.tables.GenericTableColumnModel;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -32,44 +34,22 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
-
-import org.xdat.Main;
-import org.xdat.actionListeners.clusterDialog.ClusterDialogActionListener;
-import org.xdat.data.DataSheet;
-import org.xdat.gui.tables.ColorEditor;
-import org.xdat.gui.tables.ColorRenderer;
-import org.xdat.gui.tables.GenericTableColumnModel;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 
 /**
  * A dialog to edit {@link org.xdat.data.Cluster}s.
  */
 public class ClusterDialog extends JDialog {
 
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0001;
-
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** The data sheet. */
+	static final long serialVersionUID = 1L;
 	private DataSheet dataSheet;
-
-	/** The cluster table. */
 	private JTable clusterTable;
 
-	/**
-	 * Instantiates a new cluster dialog.
-	 * 
-	 * @param parent
-	 *            the parent
-	 * @param mainWindow
-	 *            the main window
-	 * @param dataSheet
-	 *            the data sheet
-	 */
 	public ClusterDialog(JFrame parent, Main mainWindow, DataSheet dataSheet) {
 		super(parent, "Data Clustering");
-		log("constructor called.");
 		this.setModal(true);
 		this.dataSheet = dataSheet;
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -146,32 +126,10 @@ public class ClusterDialog extends JDialog {
 		this.setVisible(true);
 	}
 
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (ClusterDialog.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
-	}
-
-	/**
-	 * Gets the cluster table.
-	 * 
-	 * @return the cluster table
-	 */
 	public JTable getClusterTable() {
 		return clusterTable;
 	}
 
-	/**
-	 * Gets the data sheet.
-	 * 
-	 * @return the data sheet
-	 */
 	public DataSheet getDataSheet() {
 		return dataSheet;
 	}

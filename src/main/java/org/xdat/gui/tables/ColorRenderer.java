@@ -75,9 +75,6 @@ public class ColorRenderer extends JLabel implements TableCellRenderer {
 	/** The version tracking unique identifier for Serialization. */
 	static final long serialVersionUID = 0000;
 
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
 	/** The unselected border. */
 	Border unselectedBorder = null;
 
@@ -106,7 +103,6 @@ public class ColorRenderer extends JLabel implements TableCellRenderer {
 	 * .swing.JTable, java.lang.Object, boolean, boolean, int, int)
 	 */
 	public Component getTableCellRendererComponent(JTable table, Object color, boolean isSelected, boolean hasFocus, int row, int column) {
-		log("getTableCellRendererComponent: object = " + color.toString());
 		Color newColor = (Color) color;
 		setBackground(newColor);
 		// if (isBordered) {
@@ -127,17 +123,5 @@ public class ColorRenderer extends JLabel implements TableCellRenderer {
 
 		setToolTipText("RGB value: " + newColor.getRed() + ", " + newColor.getGreen() + ", " + newColor.getBlue());
 		return this;
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (ColorRenderer.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
 	}
 }

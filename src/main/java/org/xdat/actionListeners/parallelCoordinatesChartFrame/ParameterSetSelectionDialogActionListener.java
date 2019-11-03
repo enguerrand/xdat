@@ -20,51 +20,26 @@
 
 package org.xdat.actionListeners.parallelCoordinatesChartFrame;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import org.xdat.Main;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.gui.dialogs.ParameterSetSelectionDialog;
 import org.xdat.gui.frames.ChartFrame;
 
-/**
- * ActionListener for a {@link ParameterSetSelectionDialog}.
- */
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 public class ParameterSetSelectionDialogActionListener implements ActionListener {
 
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** The chart frame. */
 	private ChartFrame chartFrame;
-
-	/** The dialog. */
 	private ParameterSetSelectionDialog dialog;
 
-	/**
-	 * Instantiates a new parameter set selection dialog action listener.
-	 * 
-	 * @param chartFrame
-	 *            the chart frame
-	 * @param dialog
-	 *            the dialog
-	 */
 	public ParameterSetSelectionDialogActionListener(ChartFrame chartFrame, ParameterSetSelectionDialog dialog) {
 		this.chartFrame = chartFrame;
 		this.dialog = dialog;
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
 	public void actionPerformed(ActionEvent e) {
 		String actionCommand = e.getActionCommand();
-		log("Action Command = " + actionCommand);
 		if (actionCommand.equals("Select All")) {
 			for (int i = 0; i < dialog.getCheckBoxCount(); i++) {
 				dialog.getCheckBox(i).setSelected(true);
@@ -90,17 +65,5 @@ public class ParameterSetSelectionDialogActionListener implements ActionListener
 		this.chartFrame.getChartPanel().setSize(this.chartFrame.getChartPanel().getPreferredSize());
 		this.chartFrame.validate();
 		this.chartFrame.repaint();
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (ParameterSetSelectionDialogActionListener.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
 	}
 }

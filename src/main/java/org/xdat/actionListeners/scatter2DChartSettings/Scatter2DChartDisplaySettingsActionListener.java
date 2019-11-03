@@ -134,16 +134,4 @@ public class Scatter2DChartDisplaySettingsActionListener implements ActionListen
 		}
 		frame.repaint();
 	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (Scatter2DChartDisplaySettingsActionListener.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
-	}
 }

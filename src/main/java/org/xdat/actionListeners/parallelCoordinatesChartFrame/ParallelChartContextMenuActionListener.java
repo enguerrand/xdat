@@ -20,51 +20,24 @@
 
 package org.xdat.actionListeners.parallelCoordinatesChartFrame;
 
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import org.xdat.Main;
 import org.xdat.chart.Axis;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.data.DataSheet;
 import org.xdat.data.Design;
 import org.xdat.gui.frames.ChartFrame;
-import org.xdat.gui.panels.ParallelCoordinatesChartPanel;
 import org.xdat.gui.tables.DataSheetTableColumnModel;
 
-/**
- * ActionListener that is used for the context menu on the
- * {@link ParallelCoordinatesChartPanel}.
- * 
- */
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 public class ParallelChartContextMenuActionListener implements ActionListener {
 
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** The main Window. */
 	private Main mainWindow;
-
-	/** The chart Frame. */
 	private ChartFrame chartFrame;
-
-	/**
-	 * The Axis currently being edited.
-	 */
 	private Axis axis;
 
-	/**
-	 * Instantiates a new context menu for an axis on a parallel coordinates
-	 * chart.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param chartFrame
-	 *            the chart frame
-	 * @param axis
-	 *            the axis
-	 */
 	public ParallelChartContextMenuActionListener(Main mainWindow, ChartFrame chartFrame, Axis axis) {
 		this.mainWindow = mainWindow;
 		this.chartFrame = chartFrame;
@@ -72,12 +45,6 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
 	public void actionPerformed(ActionEvent e) {
 		String actionCommand = e.getActionCommand();
 		if (actionCommand.equals("setCurrentFilterAsNewRange")) {
@@ -186,7 +153,6 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 						int r = 165 + (int) (50. * (1. - ratio));
 						int g = (int) (48. * (1. - ratio));
 						int b = 38 + (int) (1. * (1. - ratio));
-						log("9 " + r + "," + g + "," + b);
 
 						currentDesign.setAxisGradientColor(new Color(r, g, b, alpha));
 					} else if (ratio > 0.8) {
@@ -194,7 +160,6 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 						int r = 215 + (int) (29. * (1. - ratio));
 						int g = 48 + (int) (61. * (1. - ratio));
 						int b = 39 + (int) (28. * (1. - ratio));
-						log("8 " + r + "," + g + "," + b);
 
 						currentDesign.setAxisGradientColor(new Color(r, g, b, alpha));
 					} else if (ratio > 0.7) {
@@ -202,7 +167,6 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 						int r = 244 + (int) (9. * (1. - ratio));
 						int g = 109 + (int) (65. * (1. - ratio));
 						int b = 67 + (int) (30. * (1. - ratio));
-						log("7 " + r + "," + g + "," + b);
 
 						currentDesign.setAxisGradientColor(new Color(r, g, b, alpha));
 					} else if (ratio > 0.6) {
@@ -210,7 +174,6 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 						int r = 253 + (int) (1. * (1. - ratio));
 						int g = 174 + (int) (50. * (1. - ratio));
 						int b = 97 + (int) (47. * (1. - ratio));
-						log("6 " + r + "," + g + "," + b);
 
 						currentDesign.setAxisGradientColor(new Color(r, g, b, alpha));
 					} else if (ratio > 0.5) {
@@ -218,21 +181,18 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 						int r = 254 + (int) (1. * (1. - ratio));
 						int g = 224 + (int) (31. * (1. - ratio));
 						int b = 144 + (int) (47. * (1. - ratio));
-						log("5 " + r + "," + g + "," + b);
 						currentDesign.setAxisGradientColor(new Color(r, g, b, alpha));
 					} else if (ratio > 0.4) {
 						ratio = (ratio * 10.) - 4;
 						int r = 255 - (int) (31. * ratio);
 						int g = 255 - (int) (12. * ratio);
 						int b = 191 + (int) (57. * (1. - ratio));
-						log("4 " + r + "," + g + "," + b);
 						currentDesign.setAxisGradientColor(new Color(r, g, b, alpha));
 					} else if (ratio > 0.3) {
 						ratio = (ratio * 10.) - 3.;
 						int r = 224 - (int) (53. * ratio);
 						int g = 243 - (int) (26. * ratio);
 						int b = 248 - (int) (15. * ratio);
-						log("3 " + r + "," + g + "," + b);
 
 						currentDesign.setAxisGradientColor(new Color(r, g, b, alpha));
 					} else if (ratio > 0.2) {
@@ -240,7 +200,6 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 						int r = 171 - (int) (55. * ratio);
 						int g = 217 - (int) (44. * ratio);
 						int b = 233 - (int) (24. * ratio);
-						log("2 " + r + "," + g + "," + b);
 
 						currentDesign.setAxisGradientColor(new Color(r, g, b, alpha));
 					} else if (ratio > 0.1) {
@@ -248,7 +207,6 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 						int r = 116 - (int) (67. * ratio);
 						int g = 173 - (int) (56. * ratio);
 						int b = 209 - (int) (29. * ratio);
-						log("1 " + r + "," + g + "," + b);
 
 						currentDesign.setAxisGradientColor(new Color(r, g, b, alpha));
 					} else {
@@ -256,7 +214,6 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 						int r = 69 - (int) (20. * ratio);
 						int g = 117 - (int) (63. * ratio);
 						int b = 180 - (int) (31. * ratio);
-						log("0 " + r + "," + g + "," + b);
 
 						currentDesign.setAxisGradientColor(new Color(r, g, b, alpha));
 					}
@@ -275,17 +232,4 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 			System.out.println(e.getActionCommand());
 		}
 	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (ParallelChartContextMenuActionListener.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
-	}
-
 }

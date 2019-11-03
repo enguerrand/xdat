@@ -19,37 +19,16 @@
  */
 package org.xdat.actionListeners.licenseDialog;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import org.xdat.Main;
 import org.xdat.UserPreferences;
 import org.xdat.gui.dialogs.LicenseDisplayDialog;
 
-/**
- * ActionListener for {@link org.xdat.gui.dialogs.LicenseDisplayDialog}.
- */
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 public class LicenseDisplayDialogActionListener implements ActionListener {
-
-	/** Flag to enable debug message printing for this class. */
-	private static final boolean printLog = false;
-
-	/** The license display dialog. */
 	private LicenseDisplayDialog dialog;
-
-	/** The {@link org.xdat.UserPreferences}. */
 	private UserPreferences preferences;
-
-	/**
-	 * Instantiates a new license display dialog action listener.
-	 * 
-	 * @param dialog
-	 *            the dialog
-	 * @param preferences
-	 *            the user preferences
-	 */
 	public LicenseDisplayDialogActionListener(LicenseDisplayDialog dialog, UserPreferences preferences) {
-		log("constructor called.");
 		this.preferences = preferences;
 		this.dialog = dialog;
 	}
@@ -66,18 +45,6 @@ public class LicenseDisplayDialogActionListener implements ActionListener {
 			dialog.dispose();
 		} else {
 			System.out.println(e.getActionCommand());
-		}
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (LicenseDisplayDialogActionListener.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
 		}
 	}
 }

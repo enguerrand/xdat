@@ -20,131 +20,36 @@
 
 package org.xdat.actionListeners.parallelCoordinatesDisplaySettings;
 
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JColorChooser;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.xdat.Main;
 import org.xdat.UserPreferences;
 import org.xdat.chart.Axis;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.gui.panels.AxisDisplaySettingsPanel;
 
-/**
- * ActionListener that is used for the controls on the
- * {@link AxisDisplaySettingsPanel}.
- * <p>
- * Remembers changes made by the user and applies them when the user confirms by
- * pressing ok on the dialog.
- * <p>
- * When the Axis that is currently being edited changes the user is asked
- * whether he wants to save the changes to the current Axis. This is a
- * workaround to avoid having to store each setting along with the information
- * for which Axis it was made. Ideally all settings should be memorized and
- * applied when the user closes the dialog with the Ok button.
- */
+import javax.swing.JColorChooser;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 public class AxisDisplaySettingsActionListener implements ActionListener, ChangeListener {
 
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** The display settings dialog. */
 	private JDialog dialog;
-
-	/**
-	 * The axis color.
-	 * 
-	 * @see org.xdat.chart.Axis#getAxisColor()
-	 */
 	private Color axisColor;
-
-	/**
-	 * The axis label color.
-	 * 
-	 * @see org.xdat.chart.Axis#getAxisLabelFontColor()
-	 */
 	private Color axisLabelColor;
-
-	/**
-	 * The tic label color.
-	 * 
-	 * @see org.xdat.chart.Axis#getTicLabelFontSize()
-	 */
 	private Color ticLabelColor;
-
-	/**
-	 * Specifies whether the Filters are inverted.
-	 * 
-	 * @see org.xdat.chart.Filter
-	 * @see org.xdat.chart.Axis#isFilterInverted()
-	 */
 	private boolean invertFilter;
-
-	/**
-	 * Specifies whether the Axis is inverted.
-	 * 
-	 * @see org.xdat.chart.Axis#isAxisInverted()
-	 */
 	private boolean invertAxis;
-
-	/**
-	 * Specifies whether Axes should be autofitted.
-	 * 
-	 * @see org.xdat.chart.Axis
-	 * */
 	private boolean autoFitAxis;
-
-	/**
-	 * The panel on which the display settings controls are located.
-	 * 
-	 * @see org.xdat.chart.Axis#isAutoFit()
-	 */
 	private AxisDisplaySettingsPanel panel;
-
-	/**
-	 * The chart for which the settings are edited.
-	 * <p>
-	 * Only applies if constructor
-	 * {@link AxisDisplaySettingsActionListener#AxisDisplaySettingsActionListener(JDialog, AxisDisplaySettingsPanel, ParallelCoordinatesChart)}
-	 * was used.
-	 */
 	private ParallelCoordinatesChart parallelCoordinatesChart;
-
-	/**
-	 * The Axis currently being edited. Only applies if constructor
-	 * {@link AxisDisplaySettingsActionListener#AxisDisplaySettingsActionListener(JDialog, AxisDisplaySettingsPanel, ParallelCoordinatesChart)}
-	 * was used.
-	 */
 	private Axis currentAxis;
-
-	/**
-	 * Remembers when the spinner value was modified.
-	 * <p>
-	 * This is needed to decide whether settings were modified and require a
-	 * save operation when the user closes the dialog or changes the Axis to be
-	 * edited.
-	 */
 	private boolean spinnerValueChanged = false;
 
-	/**
-	 * Instantiates a new axis display settings action listener for editing the
-	 * default settings.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param dialog
-	 *            the dialog
-	 * @param panel
-	 *            the panel
-	 */
 	public AxisDisplaySettingsActionListener(Main mainWindow, JDialog dialog, AxisDisplaySettingsPanel panel) {
-		log("constructor for default settings called");
 		this.panel = panel;
 		this.dialog = dialog;
 		axisColor = UserPreferences.getInstance().getParallelCoordinatesAxisColor();
@@ -155,19 +60,7 @@ public class AxisDisplaySettingsActionListener implements ActionListener, Change
 
 	}
 
-	/**
-	 * Instantiates a new axis display settings action listener for a specific
-	 * Chart.
-	 * 
-	 * @param dialog
-	 *            the dialog
-	 * @param panel
-	 *            the panel
-	 * @param chart
-	 *            the chart
-	 */
 	public AxisDisplaySettingsActionListener(JDialog dialog, AxisDisplaySettingsPanel panel, ParallelCoordinatesChart chart) {
-		log("constructor for chart specific settings called");
 		this.dialog = dialog;
 		this.panel = panel;
 		this.parallelCoordinatesChart = chart;
@@ -175,12 +68,8 @@ public class AxisDisplaySettingsActionListener implements ActionListener, Change
 
 	}
 
-	/**
-	 * Read settings from Axis to initialise the settings in the memory.
-	 */
 	private void readSettings() {
 		Axis axis = parallelCoordinatesChart.getAxis(panel.getAxisChoiceCombo().getSelectedItem().toString());
-		log("readSettings: reading axis " + axis.getName());
 		this.currentAxis = axis;
 		axisColor = axis.getAxisColor();
 		axisLabelColor = axis.getAxisLabelFontColor();
@@ -191,23 +80,10 @@ public class AxisDisplaySettingsActionListener implements ActionListener, Change
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent
-	 * )
-	 */
 	public void stateChanged(ChangeEvent e) {
 		this.spinnerValueChanged = true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
 	public void actionPerformed(ActionEvent e) {
 		String actionCommand = e.getActionCommand();
 		if (actionCommand == "Axis Color") {
@@ -240,8 +116,6 @@ public class AxisDisplaySettingsActionListener implements ActionListener, Change
 			this.autoFitAxis = false;
 			this.panel.setAxisRangeFieldsEnabled(true);
 		} else if (e.getActionCommand().equals("comboBoxChanged")) {
-			log(" current axis 1 is " + this.currentAxis.getName());
-			log(" selected axis 1 is " + panel.getAxisChoiceCombo().getSelectedItem().toString());
 
 			// Workaround solution. TODO: Implement memorization of all settings
 			// for all Axes.
@@ -252,8 +126,6 @@ public class AxisDisplaySettingsActionListener implements ActionListener, Change
 					this.dialog.repaint();
 			}
 			readSettings();
-			log(" current axis 2 is " + this.currentAxis.getName());
-			log(" selected axis 2 is " + panel.getAxisChoiceCombo().getSelectedItem().toString());
 
 			this.panel.setStates(this.parallelCoordinatesChart.getAxis(panel.getAxisChoiceCombo().getSelectedItem().toString()));
 			this.spinnerValueChanged = false;
@@ -263,60 +135,22 @@ public class AxisDisplaySettingsActionListener implements ActionListener, Change
 		}
 	}
 
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (AxisDisplaySettingsActionListener.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
-	}
-
-	/**
-	 * Gets the axis color.
-	 * 
-	 * @return the axis color
-	 */
 	public Color getAxisColor() {
 		return axisColor;
 	}
 
-	/**
-	 * Gets the axis label color.
-	 * 
-	 * @return the axis label color
-	 */
 	public Color getAxisLabelColor() {
 		return axisLabelColor;
 	}
 
-	/**
-	 * Checks if filters are inverted.
-	 * 
-	 * @return true, if filters are inverted.
-	 */
 	public boolean isInvertFilter() {
 		return invertFilter;
 	}
 
-	/**
-	 * Gets the tic label color.
-	 * 
-	 * @return the tic label color
-	 */
 	public Color getTicLabelColor() {
 		return ticLabelColor;
 	}
 
-	/**
-	 * Apply settings.
-	 * 
-	 * @param axis
-	 *            the axis
-	 */
 	public void applySettings(Axis axis) {
 		double upperFilterValue;
 		double lowerFilterValue;
@@ -345,9 +179,7 @@ public class AxisDisplaySettingsActionListener implements ActionListener, Change
 				axis.setMax(panel.getAxisMax());
 		}
 		if (axis.isAxisInverted()) {
-			log("applySettings: axis is inverted. Upper filter value should be the minimum of " + upperFilterValue + " and " + lowerFilterValue);
 			axis.getUpperFilter().setValue(Math.min(upperFilterValue, lowerFilterValue));
-			log("applySettings: Upper filter set to  " + axis.getUpperFilter().getValue());
 			axis.getLowerFilter().setValue(Math.max(upperFilterValue, lowerFilterValue));
 		} else {
 			axis.getUpperFilter().setValue(Math.max(upperFilterValue, lowerFilterValue));
@@ -357,31 +189,16 @@ public class AxisDisplaySettingsActionListener implements ActionListener, Change
 		this.panel.getChartFrame().repaint();
 	}
 
-	/**
-	 * Checks if is settings changed.
-	 * 
-	 * @return true, if is settings changed
-	 */
 	private boolean isSettingsChanged() {
 		boolean settingsUnChanged = (axisColor == this.currentAxis.getAxisColor() && axisLabelColor == this.currentAxis.getAxisLabelFontColor() && ticLabelColor == this.currentAxis.getAxisLabelFontColor() && invertFilter == this.currentAxis.isFilterInverted() && invertAxis == this.currentAxis.isAxisInverted() && autoFitAxis == this.currentAxis.isAutoFit() && (panel.getAxisMin() == this.currentAxis.getMin() || !this.currentAxis.getParameter().isNumeric()) && (panel.getAxisMax() == this.currentAxis.getMax() || !this.currentAxis.getParameter().isNumeric()));
 
 		return ((!settingsUnChanged) || this.spinnerValueChanged);
 	}
 
-	/**
-	 * Checks if is Axis is inverted.
-	 * 
-	 * @return true, if is Axis is inverted.
-	 */
 	public boolean isInvertAxis() {
 		return invertAxis;
 	}
 
-	/**
-	 * Checks if Axis is autofitted.
-	 * 
-	 * @return true, if Axis is autofitted
-	 */
 	public boolean isAutoFitAxis() {
 		return autoFitAxis;
 	}

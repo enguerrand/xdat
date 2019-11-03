@@ -20,11 +20,10 @@
 
 package org.xdat.chart;
 
-import java.io.Serializable;
-
-import org.xdat.Main;
 import org.xdat.data.DataSheet;
 import org.xdat.data.Parameter;
+
+import java.io.Serializable;
 
 /**
  * Provides the possibility to filter the Designs on a
@@ -47,59 +46,18 @@ import org.xdat.data.Parameter;
  * <li>the Filter is inverted. In this case all designs with values between the
  * two Filters become inactive.
  * </ul>
- * 
- * @see ParallelCoordinatesChart
- * @see Axis
- * @see org.xdat.data.Parameter
- * @see org.xdat.data.Design
  */
 public class Filter implements Serializable {
-
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0002;
-
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** Constant that describes an upper filter. */
+	static final long serialVersionUID = 2L;
 	public static final int UPPER_FILTER = 0;
-
-	/** Constant that described a lower filter. */
 	public static final int LOWER_FILTER = 1;
-
-	/**
-	 * Filter tolerance to compensate round off errors and prevent filtering
-	 * designs that are not supposed to be filtered.
-	 */
 	public static final double FILTER_TOLERANCE = 0.00001;
-
-	/** The data sheet. */
 	private DataSheet dataSheet;
-
-	/** The filter type. Upper or Lower */
 	private int filterType;
-
-	/** The axis to which the Filter belongs. */
 	private Axis axis;
-
-	/** The x position of the Filter on the Chart. */
 	private int xPos;
-
-	/** The filter's value. */
 	private double value;
-
-	/**
-	 * Instantiates a new filter.
-	 * 
-	 * @param dataSheet
-	 *            the data sheet
-	 * @param axis
-	 *            the axis to which the Filter belongs
-	 * @param filterType
-	 *            the filter type: UPPER_FILTER, LOWER_FILTER
-	 */
 	public Filter(DataSheet dataSheet, Axis axis, int filterType) {
-		log("constructor called");
 		this.dataSheet = dataSheet;
 		this.axis = axis;
 		this.filterType = filterType;
@@ -107,75 +65,38 @@ public class Filter implements Serializable {
 		this.reset();
 	}
 
-	/**
-	 * Gets the current value of this Filter.
-	 * 
-	 * @return the current value of this Filter.
-	 */
 	public double getValue() {
 		return this.value;
 	}
 
-	/**
-	 * Sets the current value of this Filter.
-	 * <p>
-	 * Also calls applyToDesigns in order to make sure that the modified Filter
-	 * positions is accounted for in the Filter states of all Designs.
-	 * 
-	 * @param value
-	 *            the new current value of this Filter.
-	 */
 	public void setValue(double value) {
 		this.value = value;
 		apply();
 	}
 
-	/**
-	 * Gets the x position of this Filter on the Chart.
-	 * 
-	 * @return the x position of this Filter on the Chart.
-	 */
 	public int getXPos() {
 		return xPos;
 	}
 
-	/**
-	 * Sets the x position of this Filter on the Chart.
-	 * 
-	 * @param pos
-	 *            the new x position of this Filter on the Chart.
-	 */
 	public void setXPos(int pos) {
 		this.xPos = pos;
 	}
 
-	/**
-	 * Gets the y position of this Filter on the Chart.
-	 * 
-	 * @return the y position of this Filter on the Chart.
-	 */
 	public int getYPos() {
 		if (this.axis.getTicCount() == 1)
 			return this.getAxis().getChart().getAxisTopPos() + (int) (this.getAxis().getChart().getAxisHeight() * 0.5);
 		else {
-			// log("****");
-			// log("getYPos: setting value of filter "+filterType+" to: "+value);
 			double upperLimit = this.axis.getMax();
-			// log("getYPos: upperLimit of filter "+filterType+": "+upperLimit);
 			double lowerLimit = this.axis.getMin();
-			// log("getYPos: lowerLimit of filter "+filterType+": "+lowerLimit);
 			if (value > upperLimit)
 				value = upperLimit;
 			else if (value < lowerLimit)
 				value = lowerLimit;
 			double valueRange = upperLimit - lowerLimit;
 
-			// log("getYPos: valueRange of filter "+filterType+": "+valueRange
-			// );
 			int topPos = this.axis.getChart().getAxisTopPos() - 1;
 			int bottomPos = topPos + this.getAxis().getChart().getAxisHeight() + 1;
 			double posRange = bottomPos - topPos;
-			// log("getYPos: posRange of filter "+filterType+": "+posRange );
 			double ratio;
 			int yPos;
 			if (axis.isAxisInverted()) {
@@ -185,8 +106,6 @@ public class Filter implements Serializable {
 				ratio = (value - lowerLimit) / valueRange;
 				yPos = bottomPos - (int) (posRange * ratio);
 			}
-			// log("getYPos: ratio of filter "+filterType+": "+ratio );
-			// log("getYPos: setting value of filter "+filterType+" to ypos: "+yPos);
 			return yPos;
 		}
 	}
@@ -218,14 +137,6 @@ public class Filter implements Serializable {
 		apply();
 	}
 
-	/**
-	 * Gets the highest position that this Filter may reach.
-	 * <p>
-	 * Used to make sure that a lower Filter is not dragged to a position above
-	 * the upper Filter or outside the Axis range.
-	 * 
-	 * @return the highest reachable position
-	 */
 	public int getHighestPos() {
 		int pos;
 		if (this.getFilterType() == Filter.UPPER_FILTER) {
@@ -238,14 +149,6 @@ public class Filter implements Serializable {
 		return pos - 1;
 	}
 
-	/**
-	 * Gets the lowest position that this Filter may reach.
-	 * <p>
-	 * Used to make sure that a upper Filter is not dragged to a position below
-	 * the lower Filter or outside the Axis range.
-	 * 
-	 * @return the lowest reachable position
-	 */
 	public int getLowestPos() {
 		int pos;
 		if (this.getFilterType() == Filter.UPPER_FILTER) {
@@ -258,20 +161,10 @@ public class Filter implements Serializable {
 		return pos + 1;
 	}
 
-	/**
-	 * Gets the filter type. Upper or lower.
-	 * 
-	 * @return the filter type
-	 */
 	public int getFilterType() {
 		return filterType;
 	}
 
-	/**
-	 * Gets the axis to which the Filter belongs.
-	 * 
-	 * @return the axis to which the Filter belongs.
-	 */
 	public Axis getAxis() {
 		return axis;
 	}
@@ -360,32 +253,16 @@ public class Filter implements Serializable {
 		}
 	}
 
-	/**
-	 * Resets the filter.
-	 */
 	public void reset() {
 		if (this.filterType == UPPER_FILTER && this.axis.isAxisInverted()) {
 			this.setValue(this.axis.getMax());
 		} else if (this.filterType == UPPER_FILTER) {
 			double value = this.axis.getMax();
-			log("reset: maxValue = " + value);
 			this.setValue(value);
 		} else if (this.filterType == LOWER_FILTER && this.axis.isAxisInverted()) {
 			this.setValue(this.axis.getMax());
 		} else {
 			this.setValue(this.axis.getMin());
-		}
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (Filter.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
 		}
 	}
 

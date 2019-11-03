@@ -20,13 +20,6 @@
 
 package org.xdat.actionListeners.mainMenu;
 
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JOptionPane;
-import javax.swing.ProgressMonitor;
-
 import org.xdat.Main;
 import org.xdat.chart.ScatterChart2D;
 import org.xdat.exceptions.NoParametersDefinedException;
@@ -34,35 +27,24 @@ import org.xdat.gui.frames.ChartFrame;
 import org.xdat.gui.menus.mainWIndow.MainChartMenu;
 import org.xdat.workerThreads.ParallelCoordinatesChartCreationThread;
 
+import javax.swing.JOptionPane;
+import javax.swing.ProgressMonitor;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 /**
  * ActionListener for a {@link MainChartMenu}.
  */
 public class MainChartMenuActionListener implements ActionListener {
 
-	/** The main window. */
 	private Main mainWindow;
 
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/**
-	 * Instantiates a new main chart menu action listener.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 */
 	public MainChartMenuActionListener(Main mainWindow) {
-		log("constructor called");
 		this.mainWindow = mainWindow;
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals("Create Parallel Coordinates Chart")) {
 			// log("Create: discrete level count of last parameter is: "+mainWindow.getDataSheet().getParameter(mainWindow.getDataSheet().getParameterCount()-1).getDiscreteLevelCount());
@@ -74,9 +56,7 @@ public class MainChartMenuActionListener implements ActionListener {
 				ParallelCoordinatesChartCreationThread sw = new ParallelCoordinatesChartCreationThread(mainWindow, progressMonitor);
 				sw.execute();
 			}
-		}
-
-		else if (e.getActionCommand().equals("Create Scatter Chart 2D")) {
+		} else if (e.getActionCommand().equals("Create Scatter Chart 2D")) {
 			if (mainWindow.getDataSheet() == null) {
 				JOptionPane.showMessageDialog(mainWindow, "Please create a data sheet first by selecting Data->Import.", "Create Chart", JOptionPane.INFORMATION_MESSAGE);
 			} else {
@@ -93,17 +73,4 @@ public class MainChartMenuActionListener implements ActionListener {
 			System.out.println(e.getActionCommand());
 		}
 	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (MainChartMenuActionListener.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
-	}
-
 }

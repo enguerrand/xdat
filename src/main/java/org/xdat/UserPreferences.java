@@ -20,12 +20,12 @@
 
 package org.xdat;
 
+import org.xdat.chart.ScatterPlot2D;
+
 import java.awt.Color;
 import java.util.Locale;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-
-import org.xdat.chart.ScatterPlot2D;
 
 /**
  * This class stores all user preference settings.
@@ -75,7 +75,6 @@ public class UserPreferences {
 	 * Instantiates a new user preferences object.
 	 */
 	private UserPreferences() {
-		log("constructor called.");
 		this.prefs = Preferences.userNodeForPackage(getClass());
 	}
 	
@@ -1268,17 +1267,5 @@ public class UserPreferences {
 			System.err.println(e.getMessage());
 		}
 		this.setLicenseAccepted(true);
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (UserPreferences.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
 	}
 }

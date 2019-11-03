@@ -36,9 +36,6 @@ public class MainDataRemoveParameterMenuActionListener implements ActionListener
 	/** The main window. */
 	private Main mainWindow;
 
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
 	/**
 	 * Instantiates a new main data remove parameter menu action listener.
 	 * 
@@ -46,7 +43,6 @@ public class MainDataRemoveParameterMenuActionListener implements ActionListener
 	 *            the main window
 	 */
 	public MainDataRemoveParameterMenuActionListener(Main mainWindow) {
-		log("constructor called.");
 		this.mainWindow = mainWindow;
 
 	}
@@ -59,26 +55,12 @@ public class MainDataRemoveParameterMenuActionListener implements ActionListener
 	 */
 	public void actionPerformed(ActionEvent e) {
 		String paramName = e.getActionCommand();
-		log(" Parameter to be removed: " + paramName);
 		Chart[] charts = new Chart[this.mainWindow.getCurrentSession().getChartCount()];
 		for (int i = 0; i < charts.length; i++) {
 			charts[i] = (this.mainWindow.getCurrentSession().getChart(i));
 			if (charts[i].getClass().equals(ParallelCoordinatesChart.class)) {
 				((ParallelCoordinatesChart) charts[i]).removeAxis(paramName);
 			}
-		}
-		log("Removing paramter " + this.mainWindow.getDataSheet().removeParameter(paramName).getName());
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (MainDataRemoveParameterMenuActionListener.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
 		}
 	}
 }

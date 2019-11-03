@@ -20,20 +20,6 @@
 
 package org.xdat.gui.dialogs;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.HeadlessException;
-
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JSpinner;
-
 import org.xdat.Main;
 import org.xdat.actionListeners.scatter2DChartSettings.ParallelChartFrameComboModel;
 import org.xdat.actionListeners.scatter2DChartSettings.Scatter2DChartDisplaySettingsActionListener;
@@ -46,72 +32,42 @@ import org.xdat.gui.frames.ChartFrame;
 import org.xdat.gui.panels.Scatter2DChartAxisPanel;
 import org.xdat.gui.panels.TitledSubPanel;
 
-/**
- * A dialog that allows selecting and unselecting
- * {@link org.xdat.data.Parameter}s.
- */
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+
 public class ScatterChart2DSettingsDialog extends JDialog {
 
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0002;
-
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** The foreground color button */
+	static final long serialVersionUID = 2L;
 	private ColorChoiceButton fgColorButton;
-
-	/** The background color button */
 	private ColorChoiceButton bgColorButton;
-
-	/** The standard design color button */
 	private ColorChoiceButton standardDesignColorButton;
-
-	/** The selected design color button */
 	private ColorChoiceButton selectedDesignColorButton;
-
-	/** The chart frame. */
 	private ChartFrame chartFrame;
 
-	/**
-	 * Instantiates a new Scatter Chart 2D Settings Dialog.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param chartFrame
-	 *            the chart frame
-	 * @param scatterChart2D
-	 *            the 2D scatter chart
-	 */
 	public ScatterChart2DSettingsDialog(Main mainWindow, ChartFrame chartFrame, ScatterChart2D scatterChart2D) {
 		super(chartFrame, scatterChart2D.getTitle() + " Settings");
-		try {
-			this.chartFrame = chartFrame;
-			// this.setResizable(false);
-			chartFrame.registerComponentForRepaint(this);
-			this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-			this.setModal(false);
-			buildPanel(mainWindow, chartFrame, scatterChart2D);
+		this.chartFrame = chartFrame;
+		chartFrame.registerComponentForRepaint(this);
+		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		this.setModal(false);
+		buildPanel(mainWindow, chartFrame, scatterChart2D);
 
-			Dimension parentSize = chartFrame.getSize();
-			int xPos = Math.max(chartFrame.getX()+(int) (0.5 * (parentSize.width - this.getSize().getWidth())), 0);
-			int yPos = Math.max(chartFrame.getY()+((int) (0.5 * (parentSize.height - this.getSize().getHeight()))), 0);
-			setLocation(xPos, yPos);
-			this.setVisible(true);
-		} catch (HeadlessException e) {
-			log(e.getMessage());
-		}
-
+		Dimension parentSize = chartFrame.getSize();
+		int xPos = Math.max(chartFrame.getX()+(int) (0.5 * (parentSize.width - this.getSize().getWidth())), 0);
+		int yPos = Math.max(chartFrame.getY()+((int) (0.5 * (parentSize.height - this.getSize().getHeight()))), 0);
+		setLocation(xPos, yPos);
+		this.setVisible(true);
 	}
 
-	/**
-	 * @param mainWindow
-	 * 			the main window
-	 * @param chartFrame
-	 * 			the chart frame
-	 * @param scatterChart2D
-	 * 			the scatter 2d chart
-	 */
 	public void buildPanel(Main mainWindow, ChartFrame chartFrame, ScatterChart2D scatterChart2D) {
 		Scatter2DChartDisplaySettingsActionListener cmd = new Scatter2DChartDisplaySettingsActionListener(chartFrame, scatterChart2D, this);
 
@@ -222,63 +178,25 @@ public class ScatterChart2DSettingsDialog extends JDialog {
 		this.repaint();
 	}
 
-	/**
-	 * Overridden to unregister itself from frame
-	 */
-
 	@Override
 	public void dispose() {
-		log("dispose");
 		this.chartFrame.unRegisterComponentForRepaint(this);
 		super.dispose();
 	}
 
-	/**
-	 * Getter for the foreground color button
-	 * 
-	 * @return the foreground color button
-	 */
 	public ColorChoiceButton getFgColorButton() {
 		return fgColorButton;
 	}
 
-	/**
-	 * Getter for the background color button
-	 * 
-	 * @return the background color button
-	 */
 	public ColorChoiceButton getBgColorButton() {
 		return bgColorButton;
 	}
 
-	/**
-	 * Getter for the standard design color button
-	 * 
-	 * @return the standard design color button
-	 */
 	public ColorChoiceButton getStandardDesignColorButton() {
 		return standardDesignColorButton;
 	}
 
-	/**
-	 * Getter for the selected design color button
-	 * 
-	 * @return the selected design color button
-	 */
 	public ColorChoiceButton getSelectedDesignColorButton() {
 		return selectedDesignColorButton;
 	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (ScatterChart2DSettingsDialog.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
-	}
-
 }

@@ -20,22 +20,21 @@
 
 package org.xdat.actionListeners.scatter2DChartFrame;
 
+import org.xdat.Main;
+import org.xdat.UserPreferences;
+import org.xdat.chart.ScatterChart2D;
+import org.xdat.gui.dialogs.ScatterChart2DSettingsDialog;
+import org.xdat.gui.frames.ChartFrame;
+
+import javax.imageio.ImageIO;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-
-import javax.imageio.ImageIO;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-
-import org.xdat.Main;
-import org.xdat.UserPreferences;
-import org.xdat.chart.ScatterChart2D;
-import org.xdat.gui.dialogs.ScatterChart2DSettingsDialog;
-import org.xdat.gui.frames.ChartFrame;
 
 /**
  * ActionListener that is used for a
@@ -78,12 +77,9 @@ public class Scatter2DChartFrameOptionsMenuActionListener implements ActionListe
 	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	public void actionPerformed(ActionEvent e) {
-		log("constructor called");
 		if (e.getActionCommand().equals("Settings")) {
 			new ScatterChart2DSettingsDialog(mainWindow, chartFrame, chart);
-		}
-
-		else if (e.getActionCommand().equals("Reset to Default")) {
+		} else if (e.getActionCommand().equals("Reset to Default")) {
 			this.chart.resetDisplaySettingsToDefault();
 			this.chartFrame.repaint();
 		} else if (e.getActionCommand().equals("Export to png")) {
@@ -114,18 +110,6 @@ public class Scatter2DChartFrameOptionsMenuActionListener implements ActionListe
 
 		else {
 			System.out.println(e.getActionCommand());
-		}
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (Scatter2DChartFrameOptionsMenuActionListener.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
 		}
 	}
 }

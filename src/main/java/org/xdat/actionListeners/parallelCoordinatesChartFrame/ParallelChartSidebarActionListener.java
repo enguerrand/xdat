@@ -48,63 +48,19 @@ import org.xdat.gui.panels.ParallelCoordinatesChartSidebarPanel;
  * {@link org.xdat.chart.ParallelCoordinatesChart}.
  */
 public class ParallelChartSidebarActionListener implements ActionListener, ChangeListener {
-
-	/**
-	 * Flag to enable debug message printing for this class.
-	 */
-	static final boolean printLog = false;
-
-	/**
-	 * The user preferences.
-	 */
-	private UserPreferences userPreferences;
-
-	/**
-	 * The panel on which the settings controls are located.
-	 */
 	private ParallelCoordinatesChartSidebarPanel sidePanel;
-	
-	/**
-	 * The main Window
-	 */
 	private Main mainWindow;
-
-	/**
-	 * The parallel Coordinates Chart panel
-	 */
 	private ParallelCoordinatesChartPanel chartPanel;
 
-	/**
-	 * The active design color.
-	 * 
-	 * @see org.xdat.chart.ParallelCoordinatesChart#getDefaultDesignColor(boolean)
-	 */
 	private Color activeDesignColor;
 
-	/**
-	 * Instantiates a new chart dside panel action listener 
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param panel
-	 *            the panel
-	 *  @param chartPanel
-	 *  			the chart panel
-	 */
 	public ParallelChartSidebarActionListener(Main mainWindow, ParallelCoordinatesChartSidebarPanel panel, ParallelCoordinatesChartPanel chartPanel) {
-		this.userPreferences = UserPreferences.getInstance();
 		this.mainWindow = mainWindow;
 		this.sidePanel = panel;
 		this.chartPanel = chartPanel;
 		this.activeDesignColor = ((ParallelCoordinatesChart) chartPanel.getChart()).getDefaultDesignColor(true,  chartPanel.getChart().isUseAlpha());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
 	public void actionPerformed(ActionEvent e) {
 		String actionCommand = e.getActionCommand();
 		ParallelCoordinatesChart chart = (ParallelCoordinatesChart) chartPanel.getChart();
@@ -181,8 +137,6 @@ public class ParallelChartSidebarActionListener implements ActionListener, Chang
 				sidePanel.getClusterAlphaSlider(cluster).setValue(newColor.getAlpha());
 				chartPanel.repaint();
 			}
-		} else {
-			log(e.getActionCommand());
 		}
 	}
 
@@ -212,20 +166,6 @@ public class ParallelChartSidebarActionListener implements ActionListener, Chang
 					chartPanel.repaint();
 				}
 			}
-		} else {
-			log("ParallelChartSidebarActionListener: " + e.toString());
-		}
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (ParallelChartSidebarActionListener.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
 		}
 	}
 

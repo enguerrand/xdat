@@ -20,8 +20,12 @@
 
 package org.xdat.gui.panels;
 
-import java.awt.GridLayout;
-import java.util.List;
+import org.xdat.Main;
+import org.xdat.data.DataSheet;
+import org.xdat.gui.tables.DataSheetTableColumnModel;
+import org.xdat.gui.tables.DataTable;
+import org.xdat.gui.tables.DataTableCellEditor;
+import org.xdat.gui.tables.DataTableSelectionModel;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JPanel;
@@ -31,51 +35,22 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
+import java.awt.GridLayout;
+import java.util.List;
 
-import org.xdat.Main;
-import org.xdat.data.DataSheet;
-import org.xdat.gui.tables.DataSheetTableColumnModel;
-import org.xdat.gui.tables.DataTable;
-import org.xdat.gui.tables.DataTableCellEditor;
-import org.xdat.gui.tables.DataTableSelectionModel;
-
-/**
- * The Panel on which the {@link org.xdat.data.DataSheet} table is displayed.
- */
 public class DataSheetTablePanel extends JPanel {
+	static final long serialVersionUID = 1L;
 
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0001;
-
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** A reference to the mainWindow. */
 	private Main mainWindow;
-
-	/** The data table. */
 	private DataTable dataTable;
 
-	/**
-	 * Instantiates a new data sheet table panel.
-	 * 
-	 * @param mainWindow
-	 *            the data sheet
-	 */
 	public DataSheetTablePanel(Main mainWindow) {
 		super();
 		this.mainWindow = mainWindow;
-		log("constructor called");
-
 		this.setLayout(new GridLayout(1, 1));
-
-		// add runs table
 		initialiseDataSheetTableModel();
 	}
 
-	/**
-	 * Initialises the table model.
-	 */
 	public void initialiseDataSheetTableModel() {
 		DataSheet dataSheet = this.mainWindow.getCurrentSession().getCurrentDataSheet();
 		if (dataSheet != null) {
@@ -116,9 +91,6 @@ public class DataSheetTablePanel extends JPanel {
 
 	}
 
-	/**
-	 * Updates the table model.
-	 */
 	public void updateRunsTableModel() {
 		DataSheet dataSheet = this.mainWindow.getCurrentSession().getCurrentDataSheet();
 		if (dataSheet != null) {
@@ -142,31 +114,10 @@ public class DataSheetTablePanel extends JPanel {
 		}
 	}
 
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (DataSheetTablePanel.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
-	}
-
-	/**
-	 * Gets the data table.
-	 * 
-	 * @return the data table
-	 */
 	public JTable getDataTable() {
 		return dataTable;
 	}
 	
-	/**
-	 * Programmatically sets the selection of rows on the data table
-	 * @param selection the new selection
-	 */
 	public void setSelectedRows(List<Integer> selection){
 		dataTable.clearSelection();
 		for(Integer s : selection){

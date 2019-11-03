@@ -20,59 +20,31 @@
 
 package org.xdat.gui.menus.parallelCoordinatesChart;
 
-import java.awt.Event;
-import java.awt.event.KeyEvent;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-
 import org.xdat.Main;
 import org.xdat.actionListeners.parallelCoordinatesChartFrame.ChartFrameAddDesignToClusterMenuActionListener;
 import org.xdat.data.ClusterSet;
 import org.xdat.gui.frames.ChartFrame;
 
-/**
- * Menu for a {@link org.xdat.gui.frames.ChartFrame} to add a
- * {@link org.xdat.data.Design} to a {@link org.xdat.data.Cluster}.
- */
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import java.awt.event.KeyEvent;
+
 public class ParallelCoordinatesChartFrameAddDesignToClusterMenu extends JMenu implements MenuListener {
 
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0002;
-
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** The main window. */
+	static final long serialVersionUID = 2L;
 	private Main mainWindow;
-
-	/** The chart frame. */
 	private ChartFrame chartFrame;
 
-	/**
-	 * Instantiates a new chartFrame menu from within which a design can be
-	 * added to a cluster.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param chartFrame
-	 *            the chart frame
-	 */
 	public ParallelCoordinatesChartFrameAddDesignToClusterMenu(Main mainWindow, ChartFrame chartFrame) {
 		super("Add filtered designs to cluster");
-		log("constructor called.");
 		this.mainWindow = mainWindow;
 		this.chartFrame = chartFrame;
 		this.setMnemonic(KeyEvent.VK_A);
 		this.addMenuListener(this);
 	}
 
-	/**
-	 * Update {@link org.xdat.data.Cluster} list.
-	 */
 	private void updateClusterList() {
 		this.removeAll();
 		ChartFrameAddDesignToClusterMenuActionListener cmd = new ChartFrameAddDesignToClusterMenuActionListener(mainWindow, chartFrame);
@@ -92,19 +64,6 @@ public class ParallelCoordinatesChartFrameAddDesignToClusterMenu extends JMenu i
 		}
 	}
 
-	/**
-	 * Sets the ctrl accelerator.
-	 * 
-	 * @param mi
-	 *            the menu item
-	 * @param acc
-	 *            the accelerator
-	 */
-	private void setCtrlAccelerator(JMenuItem mi, char acc) {
-		KeyStroke ks = KeyStroke.getKeyStroke(acc, Event.CTRL_MASK);
-		mi.setAccelerator(ks);
-	}
-
 	@Override
 	public void menuCanceled(MenuEvent e) {
 	}
@@ -116,17 +75,5 @@ public class ParallelCoordinatesChartFrameAddDesignToClusterMenu extends JMenu i
 	@Override
 	public void menuSelected(MenuEvent e) {
 		updateClusterList();
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (ParallelCoordinatesChartFrameAddDesignToClusterMenu.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
 	}
 }

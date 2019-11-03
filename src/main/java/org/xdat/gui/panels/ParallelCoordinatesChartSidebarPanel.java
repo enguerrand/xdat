@@ -20,6 +20,26 @@
 
 package org.xdat.gui.panels;
 
+import org.xdat.Main;
+import org.xdat.actionListeners.parallelCoordinatesChartFrame.ParallelChartSidebarActionListener;
+import org.xdat.chart.ParallelCoordinatesChart;
+import org.xdat.data.Cluster;
+import org.xdat.data.ClusterListener;
+import org.xdat.data.ClusterSet;
+import org.xdat.gui.buttons.ColorChoiceButton;
+import org.xdat.gui.frames.ChartFrame;
+
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -29,119 +49,29 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JTextField;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import org.xdat.Main;
-import org.xdat.UserPreferences;
-import org.xdat.actionListeners.parallelCoordinatesChartFrame.ParallelChartSidebarActionListener;
-import org.xdat.chart.ParallelCoordinatesChart;
-import org.xdat.data.Cluster;
-import org.xdat.data.ClusterListener;
-import org.xdat.data.ClusterSet;
-import org.xdat.gui.buttons.ColorChoiceButton;
-import org.xdat.gui.frames.ChartFrame;
-
-/**
- * Panel to modify display settings for a
- * {@link org.xdat.chart.ParallelCoordinatesChart}.
- */
 public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
-	/**
-	 * The version tracking unique identifier for Serialization.
-	 */
-	static final long serialVersionUID = 0000;
 
-	/**
-	 * Flag to enable debug message printing for this class.
-	 */
+	static final long serialVersionUID = 0L;
 	static final boolean printLog = false;
-
-	/**
-	 * The cluster name label fields color when the name is being edited
-	 */
 	private static final Color CLUSTER_NAME_TEXT_FIELD_EDITING_COLOR = new Color(255, 205, 51);
-
-	/**
-	 * The cluster name label fields color when the name is not being edited
-	 */
 	private static final Color CLUSTER_NAME_TEXT_FIELD_STANDARD_COLOR = new Color(230, 230, 230);
-
-	/**
-	 * The action listener
-	 */
 	private ParallelChartSidebarActionListener cmd;
-
-	/**
-	 * The active design color button.
-	 */
 	private ColorChoiceButton activeDesignColorButton;
-
-	/**
-	 * The active design alphaSlider .
-	 */
 	private JSlider activeDesignAlphaSlider;
-
-	/**
-	 * The new Cluster button.
-	 */
 	private JButton newClusterButton;
-
-	/**
-	 * The Cluster scrollPane.
-	 */
 	private JScrollPane clusterScrollPane;
-	/**
-	 * The Cluster panel.
-	 */
-
 	private JPanel clusterPanel;
+	private Map<Cluster, JSlider> clusterAlphaSliders;
+	private Map<ClusterListener, Cluster> clusterListeners;
 
-	/**
-	 * The alpha sliders.
-	 */
-	private HashMap<Cluster, JSlider> clusterAlphaSliders;
-
-	/**
-	 * Keeps track of all registered cluster listeners. (Needed for cleanup)
-	 */
-	private Hashtable<ClusterListener, Cluster> clusterListeners;
-
-	/**
-	 * Instantiates a new side panel that allows editing the chart display
-	 * settings.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param chartFrame
-	 *            the chart frame
-	 * @param chartPanel
-	 *            the chart panel
-	 * @param chart
-	 *            the chart to which this side panel belongs
-	 */
 	public ParallelCoordinatesChartSidebarPanel(Main mainWindow, ChartFrame chartFrame, ChartPanel chartPanel, ParallelCoordinatesChart chart) {
 		super(mainWindow, chartFrame, chartPanel, chart);
 	}
 
-	/**
-	 * Builds the panel.
-	 */
 	@Override
 	protected void buildPanel(JPanel parentPanel) {
 		// create components
@@ -200,50 +130,14 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 		this.validate();
 	}
 
-	/**
-	 * Sets the action listener.
-	 * 
-	 * @param cmd
-	 *            the new action listener
-	 */
-	public void setActionListener(ParallelChartSidebarActionListener cmd) {
-		this.cmd = cmd;
-	}
-
-	/**
-	 * Gets the chart display settings action listener.
-	 * 
-	 * @return the chart display settings action listener
-	 */
-	public ParallelChartSidebarActionListener getChartDisplaySettingsActionListener() {
-		return this.cmd;
-	}
-
-	/**
-	 * Gets the active design color button.
-	 * 
-	 * @return the active design color button
-	 */
 	public ColorChoiceButton getActiveDesignColorButton() {
 		return activeDesignColorButton;
 	}
 
-	/**
-	 * Gets the active design alpha slider
-	 * 
-	 * @return the slider
-	 */
 	public JSlider getActiveDesignAlphaSlider() {
 		return activeDesignAlphaSlider;
 	}
 
-	/**
-	 * Getse the alpha slider for a cluster
-	 * 
-	 * @param cluster
-	 *            the cluster for which the slider should be returned
-	 * @return the slider
-	 */
 	public JSlider getClusterAlphaSlider(Cluster cluster) {
 		if (this.clusterAlphaSliders.containsKey(cluster)) {
 			return this.clusterAlphaSliders.get(cluster);
@@ -251,12 +145,6 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 		return null;
 	}
 
-	/**
-	 * Updates the list of clusters
-	 * 
-	 * @param clusterSet
-	 *            the cluster set that holds the clusters
-	 */
 	public void updateClusterList(ClusterSet clusterSet) {
 		int clusterCount = clusterSet.getClusterCount();
 
@@ -350,15 +238,6 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 		this.repaint();
 	}
 
-	/**
-	 * Registers an anonymous change listener with the slider to update the
-	 * color button
-	 * 
-	 * @param colorButton
-	 *            the color button to be updated upon slider change
-	 * @param clusterAlphaSlider
-	 *            the slider to listen to
-	 */
 	private void linkColorButtonToSlider(final ColorChoiceButton colorButton, final JSlider clusterAlphaSlider) {
 		clusterAlphaSlider.addChangeListener(new ChangeListener() {
 			@Override
@@ -373,24 +252,6 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 		});
 	}
 
-	/**
-	 * Updates the names of GUI elements upon a cluster name change
-	 * 
-	 * @param cluster
-	 *            The cluster
-	 * @param clusterNameLabel
-	 *            The label
-	 * @param clusterColorButton
-	 *            The color choice button
-	 * @param removeClusterButton
-	 *            the remove button
-	 * @param applyClusterButton
-	 *            the apply button
-	 * @param clusterAlphaSlider
-	 *            the alpha slider
-	 * @param clusterActiveCheckbox
-	 *            the active check box
-	 */
 	private void updateElementNames(String name, JTextField clusterNameLabel, JButton clusterColorButton, JButton removeClusterButton, JButton applyClusterButton, JSlider clusterAlphaSlider, JCheckBox clusterActiveCheckbox) {
 		if (!clusterNameLabel.getText().equals(name)) {
 			clusterNameLabel.setText(name);
@@ -402,16 +263,6 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 		clusterActiveCheckbox.setName(name);
 	}
 
-	/**
-	 * Updates cluster names when the corresponding text field changes
-	 * 
-	 * @param source
-	 *            the text field that changed
-	 * @param cluster
-	 *            the cluster to which the text field is attached
-	 * @param newName
-	 *            the new cluster name
-	 */
 	private void handleUpdateUpdatedClusterName(JTextField source, Cluster cluster, String newName) {
 		if (newName == null || newName.isEmpty()) {
 			JOptionPane.showMessageDialog(this, "Invalid cluster name: \"" + newName + "\"", "Error on renaming cluster", JOptionPane.ERROR_MESSAGE);
@@ -423,9 +274,6 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 		cluster.setName(newName);
 	}
 
-	/**
-	 * Is called before building the panel for the first time
-	 */
 	@Override
 	protected void initialize() {
 		clusterScrollPane = new JScrollPane();
@@ -435,24 +283,6 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 		this.cmd = new ParallelChartSidebarActionListener(getMainWindow(), this, (ParallelCoordinatesChartPanel) getChartPanel());
 	}
 
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (ParallelCoordinatesChartSidebarPanel.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
-	}
-
-	/**
-	 * Enables / disables all alpha sliders
-	 * 
-	 * @param enabled
-	 *            the new enabled state
-	 */
 	public void setAlphaSlidersEnabled(boolean enabled) {
 		this.activeDesignAlphaSlider.setEnabled(enabled);
 		for (JSlider slider : this.clusterAlphaSliders.values()) {

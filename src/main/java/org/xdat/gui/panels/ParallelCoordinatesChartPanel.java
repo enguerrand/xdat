@@ -20,6 +20,18 @@
 
 package org.xdat.gui.panels;
 
+import org.xdat.Main;
+import org.xdat.chart.Axis;
+import org.xdat.chart.Filter;
+import org.xdat.chart.ParallelCoordinatesChart;
+import org.xdat.data.DataSheet;
+import org.xdat.data.Design;
+import org.xdat.data.Parameter;
+import org.xdat.exceptions.NoAxisFoundException;
+import org.xdat.gui.frames.ChartFrame;
+import org.xdat.gui.menus.parallelCoordinatesChart.ParallelCoordinatesContextMenu;
+import org.xdat.gui.tables.DataSheetTableColumnModel;
+
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
@@ -41,44 +53,20 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.xdat.Main;
-import org.xdat.chart.Axis;
-import org.xdat.chart.Filter;
-import org.xdat.chart.ParallelCoordinatesChart;
-import org.xdat.data.DataSheet;
-import org.xdat.data.Design;
-import org.xdat.data.Parameter;
-import org.xdat.exceptions.NoAxisFoundException;
-import org.xdat.gui.frames.ChartFrame;
-import org.xdat.gui.menus.parallelCoordinatesChart.ParallelCoordinatesContextMenu;
-import org.xdat.gui.tables.DataSheetTableColumnModel;
-
 public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMotionListener, MouseListener, MouseWheelListener {
-	static final long serialVersionUID = 0005;
-
-	static final boolean printLog = false;
-
+	static final long serialVersionUID = 5L;
 	private Main mainWindow;
-
 	private ChartFrame chartFrame;
-
 	private ParallelCoordinatesChart chart;
-
 	private BufferedImage bufferedImage;
-
 	private Filter draggedFilter;
 	private Axis draggedAxis;
-
 	private int dragStartX;
 	private int dragStartY;
 	private int dragCurrentX;
 	private int dragOffsetY;
 	private boolean dragSelecting = false;
-
-	/** Stores all designs under the cursor to display them in their selection color */
 	private HashSet<Integer> hoverList;
-
-	/** Stores all lines in a map with references to their respective ids */
 	private Map<int[], HashSet<Integer>> lineMap;
 
 	public ParallelCoordinatesChartPanel(Main mainWindow, ChartFrame chartFrame, ParallelCoordinatesChart chart) {
@@ -90,12 +78,11 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		this.addMouseMotionListener(this);
 		this.addMouseWheelListener(this);
 
-		this.lineMap = new LinkedHashMap<int[], HashSet<Integer>>();
-		this.hoverList = new HashSet<Integer>();
+		this.lineMap = new LinkedHashMap<>();
+		this.hoverList = new HashSet<>();
 	}
 
 	public void paintComponent(Graphics g) {
-		long begin = System.currentTimeMillis();
 		Graphics cg;
 		BufferedImage canvas;
 		if(this.chart.isAntiAliasing() || this.chart.isUseAlpha() ){
@@ -128,7 +115,6 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 			this.drawDesigns(cg);
 			this.drawAxes(cg);
 		}
-		log("Painting took "+(System.currentTimeMillis()-begin)+" ms");
 
 		if(canvas != null){
 			g.drawImage(canvas, 0, 0, null);
@@ -533,9 +519,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 					this.draggedAxis = this.getAxisAtLocation(dragStartX);
 					setCursor(new Cursor(Cursor.MOVE_CURSOR));
 				} catch (NoAxisFoundException e1) {
-					if (this.printLog) {
-						e1.printStackTrace();
-					}
+					e1.printStackTrace();
 				}
 			} else if (e.getButton() == 1) {
 				this.hoverList.clear();
@@ -725,12 +709,6 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		Graphics g = this.bufferedImage.createGraphics();
 		this.paintComponent(g);
 		g.dispose();
-	}
-
-	private void log(String message) {
-		if (ParallelCoordinatesChartPanel.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
 	}
 
 }

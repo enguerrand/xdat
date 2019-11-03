@@ -20,12 +20,6 @@
 
 package org.xdat.gui.dialogs;
 
-import java.awt.BorderLayout;
-import java.awt.HeadlessException;
-
-import javax.swing.JDialog;
-import javax.swing.JTabbedPane;
-
 import org.xdat.Main;
 import org.xdat.actionListeners.parallelCoordinatesDisplaySettings.AxisDisplaySettingsActionListener;
 import org.xdat.actionListeners.parallelCoordinatesDisplaySettings.ParallelChartDisplaySettingsActionListener;
@@ -35,36 +29,17 @@ import org.xdat.gui.frames.ChartFrame;
 import org.xdat.gui.panels.AxisDisplaySettingsPanel;
 import org.xdat.gui.panels.ParallelCoordinatesChartDisplaySettingsPanel;
 
-/**
- * Dialog to modify display settings for a
- * {@link org.xdat.chart.ParallelCoordinatesChart}s, its axes or the
- * {@link org.xdat.UserPreferences} for these display settings
- */
+import javax.swing.JDialog;
+import javax.swing.JTabbedPane;
+import java.awt.BorderLayout;
+import java.awt.HeadlessException;
+
 public class ParallelCoordinatesDisplaySettingsDialog extends JDialog {
 
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0002;
-
-	/** Flag to enable debug message printing for this class. */
-	private static final boolean printLog = false;
-
-	/** The main window. */
+	static final long serialVersionUID = 2L;
 	private Main mainWindow;
-
-	/** The chart display settings panel. */
 	private ParallelCoordinatesChartDisplaySettingsPanel chartDisplaySettingsPanel;
-
-	/** The axis display settings panel. */
 	private AxisDisplaySettingsPanel axisDisplaySettingsPanel;
-
-	/**
-	 * Instantiates a new display settings dialog.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @throws HeadlessException
-	 *             the headless exception
-	 */
 	public ParallelCoordinatesDisplaySettingsDialog(Main mainWindow) throws HeadlessException {
 		super(mainWindow, "Parallel Coord Settings", true);
 		this.mainWindow = mainWindow;
@@ -81,18 +56,6 @@ public class ParallelCoordinatesDisplaySettingsDialog extends JDialog {
 		this.setVisible(true);
 	}
 
-	/**
-	 * Instantiates a new display settings dialog.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param chart
-	 *            the chart
-	 * @param chartFrame
-	 *            the chart frame
-	 * @throws HeadlessException
-	 *             the headless exception
-	 */
 	public ParallelCoordinatesDisplaySettingsDialog(Main mainWindow, ParallelCoordinatesChart chart, ChartFrame chartFrame) throws HeadlessException {
 		super(chartFrame, "Display Settings");
 		this.setModal(true);
@@ -108,16 +71,10 @@ public class ParallelCoordinatesDisplaySettingsDialog extends JDialog {
 		chartDisplaySettingsPanel.setOkCancelButtonTargetChart(chart);
 		axisDisplaySettingsPanel.setOkCancelButtonTargetChart(chart);
 
-		log("preferred size : " + this.getPreferredSize().width + ", " + this.getPreferredSize().getHeight());
 		this.setVisible(true);
-
 	}
 
-	/**
-	 * Builds the dialog.
-	 */
 	private void buildDialog() {
-		log("constructor called");
 		this.addWindowListener(new WindowClosingAdapter(false));
 		this.setResizable(false);
 
@@ -141,34 +98,11 @@ public class ParallelCoordinatesDisplaySettingsDialog extends JDialog {
 		this.setLocation(left, top);
 	}
 
-	/**
-	 * Gets the axis display settings panel.
-	 * 
-	 * @return the axis display settings panel
-	 */
 	public AxisDisplaySettingsPanel getAxisDisplaySettingsPanel() {
 		return axisDisplaySettingsPanel;
 	}
 
-	/**
-	 * Gets the chart display settings panel.
-	 * 
-	 * @return the chart display settings panel
-	 */
 	public ParallelCoordinatesChartDisplaySettingsPanel getChartDisplaySettingsPanel() {
 		return chartDisplaySettingsPanel;
 	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private static final void log(String message) {
-		if (ParallelCoordinatesDisplaySettingsDialog.printLog && Main.isLoggingEnabled()) {
-			System.out.println("DisplaySettingsDialog." + message);
-		}
-	}
-
 }

@@ -20,6 +20,15 @@
 
 package org.xdat.actionListeners.parallelCoordinatesChartFrame;
 
+import org.xdat.Main;
+import org.xdat.UserPreferences;
+import org.xdat.chart.ParallelCoordinatesChart;
+import org.xdat.gui.dialogs.ParallelCoordinatesDisplaySettingsDialog;
+import org.xdat.gui.frames.ChartFrame;
+
+import javax.imageio.ImageIO;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,64 +36,21 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import javax.imageio.ImageIO;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-
-import org.xdat.Main;
-import org.xdat.UserPreferences;
-import org.xdat.chart.ParallelCoordinatesChart;
-import org.xdat.gui.dialogs.ParallelCoordinatesDisplaySettingsDialog;
-import org.xdat.gui.frames.ChartFrame;
-import org.xdat.gui.menus.parallelCoordinatesChart.ParallelCoordinatesChartFrameOptionsMenu;
-
-/**
- * ActionListener that is used for a
- * {@link ParallelCoordinatesChartFrameOptionsMenu}.
- */
 public class ChartFrameOptionsMenuActionListener implements ActionListener {
 
-	/** The main window. */
 	private Main mainWindow;
-
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** The chart. */
 	private ParallelCoordinatesChart chart;
-
-	/** The chart frame. */
 	private ChartFrame chartFrame;
-
-	/**
-	 * Instantiates a new chart frame options menu action listener.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param chart
-	 *            the chart
-	 * @param chartFrame
-	 *            the chart frame
-	 */
 	public ChartFrameOptionsMenuActionListener(Main mainWindow, ParallelCoordinatesChart chart, ChartFrame chartFrame) {
 		this.mainWindow = mainWindow;
 		this.chart = chart;
 		this.chartFrame = chartFrame;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
 	public void actionPerformed(ActionEvent e) {
-		log("constructor called");
 		if (e.getActionCommand().equals("Display Settings")) {
 			new ParallelCoordinatesDisplaySettingsDialog(this.mainWindow, this.chart, this.chartFrame);
-		}
-
-		else if (e.getActionCommand().equals("Reset to Default")) {
+		} else if (e.getActionCommand().equals("Reset to Default")) {
 			this.chart.resetDisplaySettingsToDefault();
 			this.chartFrame.repaint();
 		} else if (e.getActionCommand().equals("Export to png")) {
@@ -111,22 +77,8 @@ public class ChartFrameOptionsMenuActionListener implements ActionListener {
 					JOptionPane.showMessageDialog(this.chartFrame, "IOException on saving image: " + exc.getMessage(), "Export to Image", JOptionPane.OK_OPTION);
 				}
 			}
-		}
-
-		else {
+		} else {
 			System.out.println(e.getActionCommand());
-		}
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (ChartFrameOptionsMenuActionListener.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
 		}
 	}
 }

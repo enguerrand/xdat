@@ -33,9 +33,6 @@ import org.xdat.gui.menus.parallelCoordinatesChart.ParallelCoordinatesChartFrame
  */
 public class ChartFrameClusteringMenuActionListener implements ActionListener {
 
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
 	/** The main window. */
 	private Main mainWindow;
 
@@ -63,22 +60,9 @@ public class ChartFrameClusteringMenuActionListener implements ActionListener {
 	 */
 	public void actionPerformed(ActionEvent e) {
 		String actionCommand = e.getActionCommand();
-		log("Action Command = " + actionCommand);
 		if (actionCommand.equals("Edit Clusters")) {
 			new ClusterDialog(this.chartFrame, this.mainWindow, mainWindow.getDataSheet());
 		}
 
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (ChartFrameClusteringMenuActionListener.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
 	}
 }

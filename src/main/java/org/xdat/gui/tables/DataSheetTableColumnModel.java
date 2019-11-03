@@ -103,16 +103,4 @@ public class DataSheetTableColumnModel extends DefaultTableColumnModel {
 	public void removeColumn(TableColumn arg0) {
 
 	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (DataSheetTableColumnModel.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
-	}
 }

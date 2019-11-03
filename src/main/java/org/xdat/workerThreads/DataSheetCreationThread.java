@@ -20,14 +20,13 @@
 
 package org.xdat.workerThreads;
 
-import java.io.IOException;
+import org.xdat.Main;
+import org.xdat.data.DataSheet;
 
 import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
-
-import org.xdat.Main;
-import org.xdat.data.DataSheet;
+import java.io.IOException;
 
 /**
  * A thread that runs in the background to create a new datasheet. This takes
@@ -36,8 +35,6 @@ import org.xdat.data.DataSheet;
  * 
  */
 public class DataSheetCreationThread extends SwingWorker {
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
 
 	/** The path to the input file to be imported. */
 	private String pathToInputFile;
@@ -72,18 +69,14 @@ public class DataSheetCreationThread extends SwingWorker {
 
 	@Override
 	public Object doInBackground() {
-		log("do in background invoked from Thread " + Thread.currentThread().getId());
 		try {
 			DataSheet dataSheet = new DataSheet(this.pathToInputFile, this.dataHasHeaders, this.mainWindow, this.progressMonitor);
 
-			log("do in background: data sheet created.");
 			if (this.progressMonitor.isCanceled()) {
-				log("do in background: progress monitor is cancelled.");
 				// this.mainWindow.setDataSheet(null);
 				// this.mainWindow.getMainMenuBar().setItemsRequiringDataSheetEnabled(false);
 				this.mainWindow.repaint();
 			} else {
-				log("do in background: progress monitor is completed.");
 				this.mainWindow.setDataSheet(dataSheet);
 				this.mainWindow.getMainMenuBar().setItemsRequiringDataSheetEnabled(true);
 			}
@@ -93,17 +86,5 @@ public class DataSheetCreationThread extends SwingWorker {
 		}
 		this.progressMonitor.close();
 		return null;
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (DataSheetCreationThread.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
 	}
 }

@@ -20,52 +20,24 @@
 
 package org.xdat.actionListeners.clusterDialog;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import org.xdat.Main;
 import org.xdat.gui.dialogs.ClusterDialog;
 
-/**
- * ActionListener for a {@link ClusterDialog}.
- * 
- */
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 public class ClusterDialogActionListener implements ActionListener {
-
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** The main window. */
 	private Main mainWindow;
-
-	/** The dialog. */
 	private ClusterDialog dialog;
 
-	/**
-	 * Instantiates a new cluster dialog action listener.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param dialog
-	 *            the dialog
-	 */
 	public ClusterDialogActionListener(Main mainWindow, ClusterDialog dialog) {
 		this.mainWindow = mainWindow;
 		this.dialog = dialog;
-
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
 	public void actionPerformed(ActionEvent e) {
 		String actionCommand = e.getActionCommand();
-		log("Action Command = " + actionCommand);
 		if (actionCommand.equals("Add")) {
-			log(" adding cluster to buffer.");
 			this.dialog.getDataSheet().getClusterSet().addClusterToBuffer();
 		} else if (actionCommand.equals("Remove")) {
 			int[] selectedRows = this.dialog.getClusterTable().getSelectedRows();
@@ -88,18 +60,6 @@ public class ClusterDialogActionListener implements ActionListener {
 			}
 			dialog.setVisible(false);
 			dialog.dispose();
-		}
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (ClusterDialogActionListener.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
 		}
 	}
 }

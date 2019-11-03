@@ -20,77 +20,32 @@
 
 package org.xdat.actionListeners.parallelCoordinatesDisplaySettings;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import org.xdat.Main;
-import org.xdat.UserPreferences;
 import org.xdat.chart.Axis;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.gui.dialogs.ParallelCoordinatesDisplaySettingsDialog;
 import org.xdat.gui.frames.ChartFrame;
-import org.xdat.gui.panels.ParallelCoordinatesChartDisplaySettingsPanel;
 import org.xdat.gui.panels.ParallelCoordinatesChartSidebarPanel;
 
-/**
- * ActionListener for the Ok button of a
- * {@link ParallelCoordinatesChartDisplaySettingsPanel} that was instantiated
- * using the constructor form
- * {@link ParallelCoordinatesChartDisplaySettingsPanel}.
- * <p>
- * When a ChartDisplaySettingsPanel is instantiated with a ChartFrame object as
- * the last argument, the settings made in the panel are applied to that
- * specific Chart, rather than to the default settings in the
- * {@link UserPreferences}. In order to do this correctly when the Ok button is
- * pressed, the button must use this dedicated ActionListener.
- * 
- * @see DefaultDisplaySettingsDialogActionListener
- */
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 public class ChartSpecificDisplaySettingsDialogActionListener implements ActionListener {
 
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** The dialog. */
 	private ParallelCoordinatesDisplaySettingsDialog dialog;
-
-	/** The chart. */
 	private ParallelCoordinatesChart chart;
-
-	/** The chart frame. */
 	private ChartFrame chartFrame;
 
-	/**
-	 * Instantiates a new chart specific display settings dialog action
-	 * listener.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param dialog
-	 *            the dialog
-	 * @param chart
-	 *            the chart
-	 * @param chartFrame
-	 *            the chart frame
-	 */
-	public ChartSpecificDisplaySettingsDialogActionListener(Main mainWindow, ParallelCoordinatesDisplaySettingsDialog dialog, ParallelCoordinatesChart chart, ChartFrame chartFrame) {
+	public ChartSpecificDisplaySettingsDialogActionListener(ParallelCoordinatesDisplaySettingsDialog dialog, ParallelCoordinatesChart chart, ChartFrame chartFrame) {
 		this.chart = chart;
 		this.dialog = dialog;
 		this.chartFrame = chartFrame;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
 	public void actionPerformed(ActionEvent e) {
 		String actionCommand = e.getActionCommand();
-		if (actionCommand == "Ok") {
+		if (actionCommand.equals("Ok")) {
 			Axis axis = this.chart.getAxis(this.dialog.getAxisDisplaySettingsPanel().getAxisChoiceCombo().getSelectedItem().toString());
 
-			log(" Ok pressed");
 			chart.setVerticallyOffsetAxisLabels(this.dialog.getChartDisplaySettingsPanel().getAxisLabelVerticalOffsetCheckbox().isSelected());
 			chart.setAntiAliasing(this.dialog.getChartDisplaySettingsPanel().getAntiAliasingCheckbox().isSelected());
 			chart.setUseAlpha(this.dialog.getChartDisplaySettingsPanel().getAlphaCheckbox().isSelected());
@@ -133,24 +88,10 @@ public class ChartSpecificDisplaySettingsDialogActionListener implements ActionL
 			this.chartFrame.getChartPanel().setSize(this.chartFrame.getChartPanel().getPreferredSize());
 			this.chartFrame.repaint();
 			this.dialog.dispose();
-		} else if (actionCommand == "Cancel") {
+		} else if (actionCommand.equals("Cancel")) {
 			this.dialog.dispose();
-		} else if (actionCommand == "Yes" || actionCommand == "No") {
-			// Do nothing
 		} else {
 			System.out.println("ChartSpecificDisplaySettingsDialogActionListener: " + e.getActionCommand());
-		}
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (ChartSpecificDisplaySettingsDialogActionListener.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
 		}
 	}
 }

@@ -20,54 +20,21 @@
 
 package org.xdat.actionListeners.parallelCoordinatesDisplaySettings;
 
+import org.xdat.UserPreferences;
+import org.xdat.gui.dialogs.ParallelCoordinatesDisplaySettingsDialog;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import org.xdat.Main;
-import org.xdat.UserPreferences;
-import org.xdat.gui.dialogs.ParallelCoordinatesDisplaySettingsDialog;
-import org.xdat.gui.panels.ParallelCoordinatesChartDisplaySettingsPanel;
-
-/**
- * ActionListener for the Ok button of a
- * {@link ParallelCoordinatesChartDisplaySettingsPanel} that was instantiated
- * using the constructor form
- * {@link ParallelCoordinatesChartDisplaySettingsPanel}.
- * <p>
- * When a ChartDisplaySettingsPanel is instantiated without a ChartFrame object
- * as the last argument, the settings made in the panel are applied to the
- * default settings in the {@link UserPreferences}. In order to do this
- * correctly when the Ok button is pressed, the button must use this dedicated
- * ActionListener.
- * 
- * @see ChartSpecificDisplaySettingsDialogActionListener
- */
 public class DefaultDisplaySettingsDialogActionListener implements ActionListener {
 
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** The dialog. */
 	private ParallelCoordinatesDisplaySettingsDialog dialog;
 
-	/**
-	 * Instantiates a new default display settings dialog action listener.
-	 * 
-	 * @param dialog
-	 *            the DisplaySettingsDialog
-	 */
 	public DefaultDisplaySettingsDialogActionListener(ParallelCoordinatesDisplaySettingsDialog dialog) {
 		this.dialog = dialog;
-		log(" Constructor: Tic label color = " + UserPreferences.getInstance().getParallelCoordinatesAxisTicLabelFontColor().toString());
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
 	public void actionPerformed(ActionEvent e) {
 		String actionCommand = e.getActionCommand();
 		if (actionCommand.equals("Ok")) {
@@ -103,24 +70,9 @@ public class DefaultDisplaySettingsDialogActionListener implements ActionListene
 			UserPreferences.getInstance().setParallelCoordinatesAxisTicCount((Integer) this.dialog.getAxisDisplaySettingsPanel().getTicCountSpinner().getValue());
 			UserPreferences.getInstance().setParallelCoordinatesAxisTicLabelDigitCount((Integer) this.dialog.getAxisDisplaySettingsPanel().getTicLabelDigitCountSpinner().getValue());
 			UserPreferences.getInstance().setParallelCoordinatesAxisTicLabelFontSize((Integer) this.dialog.getAxisDisplaySettingsPanel().getTicLabelFontSizeSpinner().getValue());
-			log(" OK: Tic label color = " + UserPreferences.getInstance().getParallelCoordinatesAxisTicLabelFontColor().toString());
 			this.dialog.dispose();
 		} else if (actionCommand.equals("Cancel")) {
 			this.dialog.dispose();
-		} else {
-			System.out.println("ChartDisplaySettingsActionListener: " + e.getActionCommand());
-		}
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (DefaultDisplaySettingsDialogActionListener.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
 		}
 	}
 }

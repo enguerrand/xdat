@@ -19,55 +19,26 @@
  */
 package org.xdat.actionListeners.parallelCoordinatesChartFrame;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import org.xdat.Main;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.data.Cluster;
 import org.xdat.data.DataSheet;
-import org.xdat.data.Design;
 import org.xdat.gui.frames.ChartFrame;
-import org.xdat.gui.menus.parallelCoordinatesChart.ParallelCoordinatesChartFrameAddDesignToClusterMenu;
 
-/**
- * ActionListener for the
- * {@link ParallelCoordinatesChartFrameAddDesignToClusterMenu} to add a
- * {@link Design} to a {@link Cluster}.
- */
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 public class ChartFrameAddDesignToClusterMenuActionListener implements ActionListener {
 
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** The main window. */
 	private Main mainWindow;
-
-	/** The chart frame. */
 	private ChartFrame chartFrame;
-
-	/**
-	 * Instantiates this class.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param chartFrame
-	 *            the chart frame
-	 */
 	public ChartFrameAddDesignToClusterMenuActionListener(Main mainWindow, ChartFrame chartFrame) {
 		this.mainWindow = mainWindow;
 		this.chartFrame = chartFrame;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
 	public void actionPerformed(ActionEvent e) {
 		String actionCommand = e.getActionCommand();
-		log("Action Command = " + actionCommand);
 		DataSheet dataSheet = chartFrame.getChart().getDataSheet();
 		Cluster cluster = dataSheet.getClusterSet().getCluster(actionCommand);
 		ParallelCoordinatesChart chart = (ParallelCoordinatesChart) chartFrame.getChart();
@@ -81,18 +52,6 @@ public class ChartFrameAddDesignToClusterMenuActionListener implements ActionLis
 		for (int i = 0; i < this.mainWindow.getChartFrameCount(); i++) {
 			this.mainWindow.getChartFrame(i).validate();
 			this.mainWindow.getChartFrame(i).repaint();
-		}
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (ChartFrameAddDesignToClusterMenuActionListener.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
 		}
 	}
 }

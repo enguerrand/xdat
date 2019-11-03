@@ -45,10 +45,7 @@ public class ParallelCoordinatesChartFrameSelectParametersMenu extends JMenu imp
 	private Main mainWindow;
 
 	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0001;
-
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
+	static final long serialVersionUID = 1L;
 
 	/** The actionlistener. */
 	private ChartFrameSelectParametersMenuActionListener cmd;
@@ -68,7 +65,6 @@ public class ParallelCoordinatesChartFrameSelectParametersMenu extends JMenu imp
 	 */
 	public ParallelCoordinatesChartFrameSelectParametersMenu(Main mainWindow, ChartFrame chartFrame, ParallelCoordinatesChart chart) {
 		super("Parameters");
-		log("constructor invoked.");
 		this.addMenuListener(this);
 		this.mainWindow = mainWindow;
 		this.chart = chart;
@@ -121,31 +117,6 @@ public class ParallelCoordinatesChartFrameSelectParametersMenu extends JMenu imp
 			checkBoxMenuItems[i].setState(this.chart.getAxis(this.mainWindow.getDataSheet().getParameter(i).getName()).isActive());
 
 			this.add(checkBoxMenuItems[i]);
-		}
-	}
-
-	/**
-	 * Sets the ctrl accelerator.
-	 * 
-	 * @param mi
-	 *            the menu item
-	 * @param acc
-	 *            the accelerator
-	 */
-	private void setCtrlAccelerator(JMenuItem mi, char acc) {
-		KeyStroke ks = KeyStroke.getKeyStroke(acc, Event.CTRL_MASK);
-		mi.setAccelerator(ks);
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (ParallelCoordinatesChartFrameSelectParametersMenu.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
 		}
 	}
 
