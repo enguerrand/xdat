@@ -19,16 +19,15 @@
  */
 package org.xdat.gui.tables;
 
+import org.xdat.data.DataSheet;
+
+import javax.swing.DefaultCellEditor;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import java.awt.Event;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.EventObject;
-
-import javax.swing.DefaultCellEditor;
-import javax.swing.JTextField;
-
-import org.xdat.Main;
-import org.xdat.data.DataSheet;
 
 /**
  * The Class DataTableCellEditor. <br>
@@ -52,8 +51,8 @@ public class DataTableCellEditor extends DefaultCellEditor {
 	@Override
 	public boolean isCellEditable(EventObject anEvent) {
 		if (anEvent.getClass() == KeyEvent.class && ((KeyEvent) anEvent).getKeyCode() == (Event.ESCAPE)) {
-			if (anEvent.getSource().getClass().equals(DataTable.class)) {
-				DataTable srcTable = (DataTable) anEvent.getSource();
+			if (anEvent.getSource().getClass().equals(JTable.class)) {
+				JTable srcTable = (JTable) anEvent.getSource();
 				srcTable.getSelectionModel().clearSelection();
 			}
 			return false;

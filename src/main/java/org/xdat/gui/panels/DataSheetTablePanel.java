@@ -23,7 +23,7 @@ package org.xdat.gui.panels;
 import org.xdat.Main;
 import org.xdat.data.DataSheet;
 import org.xdat.gui.tables.DataSheetTableColumnModel;
-import org.xdat.gui.tables.DataTable;
+import org.xdat.gui.tables.DataSheetTableModel;
 import org.xdat.gui.tables.DataTableCellEditor;
 import org.xdat.gui.tables.DataTableSelectionModel;
 
@@ -42,7 +42,7 @@ public class DataSheetTablePanel extends JPanel {
 	static final long serialVersionUID = 1L;
 
 	private Main mainWindow;
-	private DataTable dataTable;
+	private JTable dataTable;
 
 	public DataSheetTablePanel(Main mainWindow) {
 		super();
@@ -74,7 +74,8 @@ public class DataSheetTablePanel extends JPanel {
 				cm.addColumn(cols[colIndex]);
 			}
 
-			this.dataTable = new DataTable(dataSheet, cm, this.mainWindow);
+			DataSheetTableModel dataSheetTableModel = new DataSheetTableModel(dataSheet);
+			this.dataTable = new JTable(dataSheetTableModel, cm);
 			this.dataTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 			this.dataTable.setShowGrid(true);
 			this.dataTable.setColumnSelectionAllowed(false);
@@ -118,7 +119,7 @@ public class DataSheetTablePanel extends JPanel {
 		return dataTable;
 	}
 	
-	public void setSelectedRows(List<Integer> selection){
+	void setSelectedRows(List<Integer> selection){
 		dataTable.clearSelection();
 		for(Integer s : selection){
 			dataTable.getSelectionModel().addSelectionInterval(s, s);

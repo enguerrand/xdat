@@ -73,8 +73,6 @@ public class DataSheetCreationThread extends SwingWorker {
 			DataSheet dataSheet = new DataSheet(this.pathToInputFile, this.dataHasHeaders, this.mainWindow, this.progressMonitor);
 
 			if (this.progressMonitor.isCanceled()) {
-				// this.mainWindow.setDataSheet(null);
-				// this.mainWindow.getMainMenuBar().setItemsRequiringDataSheetEnabled(false);
 				this.mainWindow.repaint();
 			} else {
 				this.mainWindow.setDataSheet(dataSheet);

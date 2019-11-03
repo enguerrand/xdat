@@ -25,6 +25,7 @@ import org.xdat.chart.Chart;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.data.ClusterFactory;
 import org.xdat.data.DataSheet;
+import org.xdat.data.DatasheetListener;
 import org.xdat.exceptions.NoParametersDefinedException;
 import org.xdat.gui.WindowClosingAdapter;
 import org.xdat.gui.dialogs.LicenseDisplayDialog;
@@ -36,6 +37,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -50,14 +52,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * The Main Class from which the program is started.
- * <p>
- * Is also used to store some global references that are needed by other
- * classes, such as for example references to Swing components. Most of the data
- * is stored in the {@link Session} and the {@link UserPreferences} classes
- * though. References to instances of both classes are kept in this class.
- */
 public class Main extends JFrame {
 	public static final long serialVersionUID = 10L;
 	private MainMenuBar mainMenuBar;
@@ -68,6 +62,7 @@ public class Main extends JFrame {
 	private transient List<ParallelChartFrameComboModel> comboModels = new LinkedList<>();
 	private final BuildProperties buildProperties;
 	private final ClusterFactory clusterFactory = new ClusterFactory();
+	private final DatasheetListener datasheetListener;
 
 	private static final List<String> LOOK_AND_FEEL_ORDER_OF_PREF = Arrays.asList(
 			"com.sun.java.swing.plaf.gtk.GTKLookAndFeel",
@@ -78,6 +73,43 @@ public class Main extends JFrame {
 	public Main() {
 		super("xdat   -   Untitled");
 		this.buildProperties = new BuildProperties();
+		this.datasheetListener = new DatasheetListener() {
+			@Override
+			public void onChartFramesRepaintRequired() {
+				repaintAllChartFrames();
+			}
+
+			@Override
+			public void onDataPanelUpdateRequired() {
+				updateDataPanel();
+			}
+
+			@Override
+			public void onDataChanged(boolean[] autoFitRequired, boolean[] filterResetRequired, boolean[] applyFiltersRequired) {
+				final ProgressMonitor progressMonitor = new ProgressMonitor(Main.this, "", "Rebuilding charts", 0, getDataSheet().getParameterCount() - 1);
+				progressMonitor.setMillisToPopup(0);
+
+				for (int i = 0; i < getDataSheet().getParameterCount(); i++) {
+					final int progress = i;
+					if (progressMonitor.isCanceled()) {
+						break;
+					}
+					SwingUtilities.invokeLater(() ->
+							progressMonitor.setProgress(progress));
+					if (autoFitRequired[i]) {
+						autofitAxisAllChartFrames(i);
+					}
+					if (filterResetRequired[i]) {
+						resetFiltersOnAxisAllChartFrames(i);
+					}
+					if (applyFiltersRequired[i]) {
+						refilterAllChartFrames(i);
+					}
+				}
+
+				progressMonitor.close();
+			}
+		};
 		if (!this.checkLicense()) {
 			this.dispose();
 			return;
@@ -103,7 +135,6 @@ public class Main extends JFrame {
 		setLocation((int) (0.25 * screenSize.width), (int) (0.25 * screenSize.height));
 		setSize((int) (0.5 * screenSize.width), (int) (0.5 * screenSize.height));
 		setVisible(true);
-
 	}
 
 	public void initialiseDataPanel() {
@@ -169,9 +200,15 @@ public class Main extends JFrame {
 	}
 
 	public void setDataSheet(DataSheet dataSheet) {
+		DataSheet currentDataSheet = this.currentSession.getCurrentDataSheet();
+		if(currentDataSheet != null) {
+			currentDataSheet.removeListener(this.datasheetListener);
+		}
 		this.currentSession.setCurrentDataSheet(dataSheet);
 		if (dataSheet == null) {
 			this.remove(this.dataSheetTablePanel);
+		} else {
+			dataSheet.addListener(this.datasheetListener);
 		}
 		this.initialiseDataPanel();
 		this.repaint();
@@ -253,18 +290,14 @@ public class Main extends JFrame {
 	}
 
 	public void repaintAllChartFrames() {
-		repaintAllChartFrames(new ArrayList<ChartFrame>());
+		repaintAllChartFrames(new ArrayList<>());
 	}
 
 	private void repaintAllChartFrames(final List<ChartFrame> exclusionList) {
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-				for (ChartFrame cf : chartFrames) {
-					if (!exclusionList.contains(cf)) {
-						cf.repaint();
-					}
+		SwingUtilities.invokeLater(() -> {
+			for (ChartFrame cf : chartFrames) {
+				if (!exclusionList.contains(cf)) {
+					cf.repaint();
 				}
 			}
 		});

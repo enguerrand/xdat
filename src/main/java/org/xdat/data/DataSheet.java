@@ -23,7 +23,6 @@ package org.xdat.data;
 import org.xdat.Main;
 import org.xdat.UserPreferences;
 import org.xdat.chart.ParallelCoordinatesChart;
-import org.xdat.customEvents.DataTableModelEvent;
 import org.xdat.exceptions.InconsistentDataException;
 
 import javax.swing.JOptionPane;
@@ -31,9 +30,7 @@ import javax.swing.ListModel;
 import javax.swing.ProgressMonitor;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.TableModel;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
@@ -43,6 +40,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * A representation of the data imported from a text file.
@@ -77,15 +75,16 @@ import java.util.Map;
  * {@link DataSheet#updateData(String, boolean, ProgressMonitor) } is called this
  * information is lost.
  */
-public class DataSheet implements TableModel, Serializable, ListModel {
+public class DataSheet implements Serializable, ListModel {
 
 	static final long serialVersionUID = 8;
 	private ClusterSet clusterSet;
 	private List<Design> data = new ArrayList<>();
 	private Map<Integer, Design> designIdsMap = new HashMap<>();
 	private List<Parameter> parameters = new LinkedList<>();
-	private transient List<TableModelListener> listeners = new ArrayList<>();
+	private transient List<TableModelListener> tableModelListeners = new ArrayList<>();
 	private transient List<ListDataListener> listDataListener = new ArrayList<>();
+	private transient List<DatasheetListener> listeners = new ArrayList<>();
 	private String delimiter;
 	public DataSheet(String pathToInputFile, boolean dataHasHeaders, Main mainWindow, ProgressMonitor progressMonitor) throws IOException {
 		UserPreferences userPreferences = UserPreferences.getInstance();
@@ -104,23 +103,6 @@ public class DataSheet implements TableModel, Serializable, ListModel {
 		}
 	}
 
-	/**
-	 * Fills the DataSheet with data from a given file and assigns Parameter
-	 * names.r
-	 * <p>
-	 * If dataHasHeaders is true, the Parameter names are read from the first
-	 * line. Otherwise the parameter names are created automatically.
-	 * 
-	 * @param pathToInputFile
-	 *            the path to the input file
-	 * @param dataHasHeaders
-	 *            specifies whether the data has headers to read the Parameter
-	 *            names from.
-	 * @param progressMonitor
-	 *            the progress monitor.
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 */
 	private void importData(String pathToInputFile, boolean dataHasHeaders, ProgressMonitor progressMonitor) throws IOException {
 		List<Design> buffer = new ArrayList<>();
 		if (this.data != null) {
@@ -175,31 +157,6 @@ public class DataSheet implements TableModel, Serializable, ListModel {
 		}
 	}
 
-	/**
-	 * Updates the DataSheet with Data from a given file and assigns Parameter
-	 * names.
-	 * <p>
-	 * If dataHasHeaders is true, the Parameter names are read from the first
-	 * line. Otherwise the parameter names are created automatically.
-	 * <p>
-	 * The difference of updating vs. importing is that all Charts are kept.
-	 * This requires the new data to have the same number of parameters as the
-	 * previous one. Otherwise the InconsistentDataException is thrown.
-	 * <p>
-	 * 
-	 * @param pathToInputFile
-	 *            the path to the input file
-	 * @param dataHasHeaders
-	 *            specifies whether the data has headers to read the Parameter
-	 *            names from.
-	 * @param progressMonitor
-	 *            the progress monitor.
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 * @throws InconsistentDataException
-	 *             if the user tries to import data that does not have the same
-	 *             number of columns as the current DataSheet.
-	 */
 	public void updateData(String pathToInputFile, boolean dataHasHeaders, ProgressMonitor progressMonitor) throws IOException, InconsistentDataException {
 		int lineCount = getLineCount(pathToInputFile);
 		progressMonitor.setMaximum(lineCount);
@@ -273,7 +230,9 @@ public class DataSheet implements TableModel, Serializable, ListModel {
 				this.parameters.get(i).getMaxValue();
 			}
 		}
-		fireTableChanged(0, this.data.size(), -1, false, true, true, initialiseBooleanArray(true), initialiseBooleanArray(true), initialiseBooleanArray(true));
+		fireListeners(l -> l.onDataChanged(initialiseBooleanArray(true), initialiseBooleanArray(true), initialiseBooleanArray(true)));
+		fireListeners(DatasheetListener::onChartFramesRepaintRequired);
+		fireListeners(DatasheetListener::onDataPanelUpdateRequired);
 
 	}
 
@@ -310,88 +269,36 @@ public class DataSheet implements TableModel, Serializable, ListModel {
 		}
 	}
 
-	public Class<?> getColumnClass(int arg0) {
-		return String.class;
-	}
-
-	public int getColumnCount() {
-		return parameters.size();
-	}
-
-	public int getRowCount() {
-		return data.size();
-	}
-
-	public String getColumnName(int columnIndex) {
-		return parameters.get(columnIndex).getName();
-	}
-
-	public Object getValueAt(int rowIndex, int columnIndex) {
-		if (columnIndex == 0) {
-			return this.data.get(rowIndex).getId();
-		} else {
-			return this.data.get(rowIndex).getStringValue(parameters.get(columnIndex - 1));
-		}
-	}
-
 	public void setValueAt(Object arg0, int rowIndex, int columnIndex) {
-		boolean previousNumeric = this.parameters.get(columnIndex - 1).isNumeric();
-		String previousValue = this.getValueAt(rowIndex, columnIndex).toString();
+		Parameter parameter = this.parameters.get(columnIndex - 1);
+		boolean previousNumeric = parameter.isNumeric();
+		String previousValue = this.getDesign(rowIndex).getStringValue(parameter);
 		boolean[] axisAutofitRequired = initialiseBooleanArray(false);
 		boolean[] axisResetFilterRequired = initialiseBooleanArray(false);
 		boolean[] axisApplyFiltersRequired = initialiseBooleanArray(false);
 		try {
 			this.data.get(rowIndex).setValue(parameters.get(columnIndex - 1), arg0.toString());
 			if (!previousNumeric) {
-				this.parameters.get(columnIndex - 1).checkOccurrenceInDiscreteLevel(previousValue); // make
-																									// sure
-																									// no
-																									// unused
-																									// levels
-																									// remain
+				parameter.checkOccurrenceInDiscreteLevel(previousValue);
 			}
 
 			NumberParser.parseNumber(arg0.toString());
 
 			if (!previousNumeric) {
-				this.parameters.get(columnIndex - 1).checkIfNumeric();
+				parameter.checkIfNumeric();
 				axisAutofitRequired[columnIndex - 1] = true;
 				axisResetFilterRequired[columnIndex - 1] = true;
 			}
 
 		} catch (ParseException e1) {
-			this.parameters.get(columnIndex - 1).setNumeric(false);
+			parameter.setNumeric(false);
 		}
 		axisApplyFiltersRequired[columnIndex - 1] = true;
-		fireTableChanged(rowIndex, rowIndex, columnIndex - 1, false, true, false, axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired);
+		fireListeners(l -> l.onDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired));
+		fireListeners(DatasheetListener::onChartFramesRepaintRequired);
 	}
 
-	public boolean isCellEditable(int rowIndex, int columnIndex) {
-		if (columnIndex == 0) {
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	public void addTableModelListener(TableModelListener l) {
-		if (listeners == null)
-			listeners = new ArrayList<>();
-		listeners.add(l);
-	}
-
-	public void removeTableModelListener(TableModelListener l) {
-		listeners.remove(l);
-	}
-
-	public void fireTableChanged(int firstRow, int lastRow, int column, boolean chartRebuildRequired, boolean chartRepaintRequired, boolean dataPanelUpdateRequired, boolean[] axisAutofitRequired, boolean[] axisResetFilterRequired, boolean[] axisApplyFiltersRequired) {
-		DataTableModelEvent e = new DataTableModelEvent(this, firstRow, lastRow, column, chartRebuildRequired, chartRepaintRequired, dataPanelUpdateRequired, axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired);
-		for (int i = 0, n = listeners.size(); i < n; i++) {
-			listeners.get(i).tableChanged(e);
-		}
-	}
-
-	private int getLineCount(String pathToInputFile) throws FileNotFoundException, IOException {
+	private int getLineCount(String pathToInputFile) throws IOException {
 		BufferedReader f;
 		f = new BufferedReader(new FileReader(pathToInputFile));
 		int lineCount = 0;
@@ -407,19 +314,6 @@ public class DataSheet implements TableModel, Serializable, ListModel {
 
 	public Design getDesignByID(int id) {
 		return this.designIdsMap.get(id);
-	}
-
-	public void addDesign(Design design) {
-		this.data.add(design);
-		this.designIdsMap.put(design.getId(), design);
-		boolean[] axisAutofitRequired = initialiseBooleanArray(false);
-		boolean[] axisResetFilterRequired = initialiseBooleanArray(false);
-		boolean[] axisApplyFiltersRequired = initialiseBooleanArray(true);
-
-		// TODO find out if the new design makes a numeric parameter discrete
-		// and set booleans appropriately
-
-		fireTableChanged(this.getDesignCount() - 1, this.getDesignCount() - 1, -1, false, true, false, axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired);
 	}
 
 	public void removeDesigns(int[] designsToRemove) {
@@ -442,30 +336,21 @@ public class DataSheet implements TableModel, Serializable, ListModel {
 						String string = removedDesign.getStringValue(this.parameters.get(j));
 						NumberParser.parseNumber(string);
 					} catch (ParseException e1) {
-						this.parameters.get(j).checkOccurrenceInDiscreteLevel(removedDesign.getStringValue(this.parameters.get(j))); // make
-																																		// sure
-																																		// no
-																																		// unused
-																																		// levels
-																																		// remain
+						this.parameters.get(j).checkOccurrenceInDiscreteLevel(removedDesign.getStringValue(this.parameters.get(j)));
 						this.parameters.get(j).checkIfNumeric();
 					}
 				}
 			}
 		}
 
-		for (int i = 0; i < this.parameters.size(); i++) // if previously
-															// non-numeric
-															// parameters are
-															// now numeric
-															// autofit the axis
-		{
+		for (int i = 0; i < this.parameters.size(); i++) {
 			axisAutofitRequired[i] = discrete[i] && this.parameters.get(i).isNumeric();
 			axisApplyFiltersRequired[i] = true;
-
 		}
 
-		fireTableChanged(designsToRemove[0], designsToRemove[designsToRemove.length - 1], -1, false, true, true, axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired);
+		fireListeners(l -> l.onDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired));
+		fireListeners(DatasheetListener::onChartFramesRepaintRequired);
+		fireListeners(DatasheetListener::onDataPanelUpdateRequired);
 	}
 
 	public int getParameterCount() {
@@ -509,11 +394,8 @@ public class DataSheet implements TableModel, Serializable, ListModel {
 				for (int j = 0; j < this.data.size(); j++) {
 					this.data.get(j).removeParameter(removedParam);
 				}
-				boolean[] axisAutofitRequired = initialiseBooleanArray(false);
-				boolean[] axisResetFilterRequired = initialiseBooleanArray(false);
-				boolean[] axisApplyFiltersRequired = initialiseBooleanArray(false);
-
-				this.fireTableChanged(0, this.data.size() - 1, i, false, true, true, axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired);
+				fireListeners(DatasheetListener::onChartFramesRepaintRequired);
+				fireListeners(DatasheetListener::onDataPanelUpdateRequired);
 				return removedParam;
 			}
 		}
@@ -580,10 +462,6 @@ public class DataSheet implements TableModel, Serializable, ListModel {
 		return clusterSet;
 	}
 
-	public void setClusterSet(ClusterSet clusterSet) {
-		this.clusterSet = clusterSet;
-	}
-
 	public void evaluateBoundsForAllDesigns(ParallelCoordinatesChart chart) {
 		for (int i = 0; i < this.getDesignCount(); i++) {
 			this.data.get(i).evaluateBounds(chart);
@@ -624,6 +502,19 @@ public class DataSheet implements TableModel, Serializable, ListModel {
 	@Override
 	public void removeListDataListener(ListDataListener l) {
 		listDataListener.remove(l);
+	}
 
+	public void addListener(DatasheetListener l) {
+		this.listeners.add(l);
+	}
+
+	public void removeListener(DatasheetListener l) {
+		this.listeners.remove(l);
+	}
+
+	public void fireListeners(Consumer<DatasheetListener> action) {
+		for (DatasheetListener listener : this.listeners) {
+			action.accept(listener);
+		}
 	}
 }
