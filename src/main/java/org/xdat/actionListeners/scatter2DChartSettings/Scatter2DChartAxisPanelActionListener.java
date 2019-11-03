@@ -84,6 +84,11 @@ public class Scatter2DChartAxisPanelActionListener {
 		frame.repaint();
 	}
 
+	public void ticLabelDigitCountUpdated(int value) {
+	    this.chart.getScatterPlot2D().getParameterForAxis(this.axisType).setTicLabelDigitCount(value);
+	    frame.repaint();
+    }
+
 	public void axisLabelFontsizeUpdated(int value) {
 		this.chart.getScatterPlot2D().setAxisLabelFontSize(this.axisType, value);
 		frame.repaint();

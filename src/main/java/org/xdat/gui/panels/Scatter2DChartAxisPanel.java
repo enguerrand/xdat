@@ -31,6 +31,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.xdat.Main;
 import org.xdat.actionListeners.scatter2DChartSettings.Scatter2DChartAxisPanelActionListener;
@@ -95,7 +97,8 @@ public class Scatter2DChartAxisPanel extends JPanel {
 		JLabel axisMaxLabel = new JLabel("Axis maximum   ");
 		JLabel axisLabelFontSizeLabel = new JLabel("Axis Title Fontsize  ");
 		JLabel nrOfTicsLabel = new JLabel("Number of Tics  ");
-		JLabel ticLabelFontSizeLabel = new JLabel("Tic Label Font Size  ");
+		JLabel ticLabelFontSizeLabel =   new JLabel("Tic Label Font Size  ");
+		JLabel ticLabelDigitCountLabel = new JLabel("Tic Label Digit Count  ");
 
 		labelPanel.add(autoFitAxisLabel);
 		labelPanel.add(axisMinLabel);
@@ -103,6 +106,7 @@ public class Scatter2DChartAxisPanel extends JPanel {
 		labelPanel.add(axisLabelFontSizeLabel);
 		labelPanel.add(nrOfTicsLabel);
 		labelPanel.add(ticLabelFontSizeLabel);
+		labelPanel.add(ticLabelDigitCountLabel);
 
 		JSpinner axisLabelFontSizeSpinner = new JSpinner(new MinMaxSpinnerModel(0, 100));
 		axisLabelFontSizeSpinner.addChangeListener(changeEvent ->
@@ -116,12 +120,16 @@ public class Scatter2DChartAxisPanel extends JPanel {
 		ticCountSpinner.setValue(chart.getScatterPlot2D().getTicCount(axisType));
 		ticLabelFontSizeSpinner.setValue(chart.getScatterPlot2D().getTicLabelFontSize(axisType));
 
+		JSpinner ticLabelDigitCountSpinner = new JSpinner(new MinMaxSpinnerModel(0, 20));
+		ticLabelDigitCountSpinner.setValue(chart.getScatterPlot2D().getParameterForAxis(this.axisType).getTicLabelDigitCount());
+
 		controlsPanel.add(autoFitAxisCheckbox);
 		controlsPanel.add(this.axisMinTextField);
 		controlsPanel.add(this.axisMaxTextField);
 		controlsPanel.add(axisLabelFontSizeSpinner);
 		controlsPanel.add(ticCountSpinner);
 		controlsPanel.add(ticLabelFontSizeSpinner);
+		controlsPanel.add(ticLabelDigitCountSpinner);
 
 		autoFitAxisCheckbox.addActionListener(actionEvent -> {
 			boolean newState = autoFitAxisCheckbox.isSelected();
@@ -138,6 +146,9 @@ public class Scatter2DChartAxisPanel extends JPanel {
 			autoFitAxisCheckbox.setSelected(false);
 			this.setTextFieldsEnabled(true);
 		}
+
+		ticLabelDigitCountSpinner.addChangeListener(changeEvent ->
+				cmd.ticLabelDigitCountUpdated((Integer) ticLabelDigitCountSpinner.getValue()));
 	}
 
 	private void setTextFieldsEnabled(boolean enabled) {

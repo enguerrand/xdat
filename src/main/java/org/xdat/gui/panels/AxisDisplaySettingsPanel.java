@@ -54,76 +54,36 @@ import org.xdat.gui.frames.ChartFrame;
  */
 public class AxisDisplaySettingsPanel extends JPanel {
 	static final long serialVersionUID = 0000;
-
-	static final boolean printLog = false;
-
 	private Main mainWindow;
-
 	private ParallelCoordinatesDisplaySettingsDialog dialog;
-
 	private UserPreferences userPreferences;
-
 	private AxisDisplaySettingsActionListener cmd;
-
 	private TitledSubPanel contentPanel = new TitledSubPanel("");
-
 	private ColorChoiceButton axisColorButton;
-
 	private ColorChoiceButton axisLabelColorButton;
-
 	private JSpinner axisLabelFontSizeSpinner = new JSpinner(new MinMaxSpinnerModel(0, 100));
-
 	private JSpinner axisWidthSpinner = new JSpinner(new MinMaxSpinnerModel(0, 1000));
-
 	private JSpinner ticSizeSpinner = new JSpinner(new MinMaxSpinnerModel(0, 100));
-
 	private JSpinner ticCountSpinner = new JSpinner(new MinMaxSpinnerModel(1, 500));
-
 	private JSpinner ticLabelDigitCountSpinner = new JSpinner(new MinMaxSpinnerModel(0, 20));
-
 	private ColorChoiceButton ticLabelColorButton;
-
 	private JSpinner ticLabelFontSizeSpinner = new JSpinner(new MinMaxSpinnerModel(0, 100));
-
 	private JRadioButton invertFilterTrueButton = new JRadioButton("Yes");
-
 	private JRadioButton invertFilterFalseButton = new JRadioButton("No");
-
 	private JRadioButton invertAxisTrueButton = new JRadioButton("Yes");
-
 	private JRadioButton invertAxisFalseButton = new JRadioButton("No");
-
 	private JRadioButton autoFitAxisTrueButton = new JRadioButton("Yes");
-
 	private JRadioButton autoFitAxisFalseButton = new JRadioButton("No");
-
 	private JTextField axisMinTextField = new JTextField();
-
 	private JTextField axisMaxTextField = new JTextField();
-
 	private ButtonGroup invertFilterButtonGroup = new ButtonGroup();
-
 	private ButtonGroup invertAxisButtonGroup = new ButtonGroup();
-
 	private ButtonGroup autoFitAxisButtonGroup = new ButtonGroup();
-
 	private JComboBox axisChoiceCombo;
-
 	private JButton cancelButton = new JButton("Cancel");
-
 	private JButton okButton = new JButton("Ok");
-
 	private ChartFrame chartFrame;
 
-	/**
-	 * Instantiates a new axis display settings panel that is used to modify the
-	 * user preferences.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param dialog
-	 *            the dialog on which the panel is located
-	 */
 	public AxisDisplaySettingsPanel(Main mainWindow, ParallelCoordinatesDisplaySettingsDialog dialog) {
 		this.mainWindow = mainWindow;
 		this.userPreferences = UserPreferences.getInstance();
@@ -191,7 +151,6 @@ public class AxisDisplaySettingsPanel extends JPanel {
 		this.setInvertFilterSelection(axis.isFilterInverted());
 		this.setInvertAxisSelection(axis.isAxisInverted());
 		this.setAutoFitAxisSelection(axis.isAutoFit());
-		log("setStates: setting InvertAxisSelection to " + axis.isAxisInverted());
 		this.axisLabelFontSizeSpinner.setValue(axis.getAxisLabelFontSize());
 		this.axisWidthSpinner.setValue(axis.getWidth());
 		this.ticSizeSpinner.setValue(axis.getTicLength());
@@ -210,10 +169,7 @@ public class AxisDisplaySettingsPanel extends JPanel {
 		} else {
 			this.autoFitAxisFalseButton.setEnabled(false);
 			this.autoFitAxisTrueButton.setEnabled(false);
-
-			log("setStates: setting min text field to " + axis.getParameter().getStringValueOf(axis.getMin()));
 			this.axisMinTextField.setText(axis.getParameter().getStringValueOf(axis.getMin()));
-			log("setStates: setting max text field to " + axis.getParameter().getStringValueOf(axis.getMax()));
 			this.axisMaxTextField.setText(axis.getParameter().getStringValueOf(axis.getMax()));
 
 		}
@@ -351,13 +307,11 @@ public class AxisDisplaySettingsPanel extends JPanel {
 
 	public void setOkCancelButtonTargetDefaultSettings() {
 		DefaultDisplaySettingsDialogActionListener cmd = new DefaultDisplaySettingsDialogActionListener(dialog);
-		log("setOkCancelButtonTargetDefaultSettings called");
 		cancelButton.addActionListener(cmd);
 		okButton.addActionListener(cmd);
 	}
 
 	public void setOkCancelButtonTargetChart(ParallelCoordinatesChart chart) {
-		log("setOkCancelButtonTargetChart called");
 		cancelButton.addActionListener(new ChartSpecificDisplaySettingsDialogActionListener(this.mainWindow, dialog, chart, chartFrame));
 		okButton.addActionListener(new ChartSpecificDisplaySettingsDialogActionListener(this.mainWindow, dialog, chart, chartFrame));
 	}
@@ -416,12 +370,6 @@ public class AxisDisplaySettingsPanel extends JPanel {
 			return true;
 		} else {
 			return false;
-		}
-	}
-
-	private void log(String message) {
-		if (AxisDisplaySettingsPanel.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
 		}
 	}
 

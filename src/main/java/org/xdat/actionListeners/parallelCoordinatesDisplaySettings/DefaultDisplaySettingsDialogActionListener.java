@@ -70,7 +70,7 @@ public class DefaultDisplaySettingsDialogActionListener implements ActionListene
 	 */
 	public void actionPerformed(ActionEvent e) {
 		String actionCommand = e.getActionCommand();
-		if (actionCommand == "Ok") {
+		if (actionCommand.equals("Ok")) {
 			UserPreferences.getInstance().setParallelCoordinatesVerticallyOffsetAxisLabels(this.dialog.getChartDisplaySettingsPanel().getAxisLabelVerticalOffsetCheckbox().isSelected());
 			UserPreferences.getInstance().setAntiAliasing(this.dialog.getChartDisplaySettingsPanel().getAntiAliasingCheckbox().isSelected());
 			UserPreferences.getInstance().setUseAlpha(this.dialog.getChartDisplaySettingsPanel().getAlphaCheckbox().isSelected());
@@ -105,10 +105,8 @@ public class DefaultDisplaySettingsDialogActionListener implements ActionListene
 			UserPreferences.getInstance().setParallelCoordinatesAxisTicLabelFontSize((Integer) this.dialog.getAxisDisplaySettingsPanel().getTicLabelFontSizeSpinner().getValue());
 			log(" OK: Tic label color = " + UserPreferences.getInstance().getParallelCoordinatesAxisTicLabelFontColor().toString());
 			this.dialog.dispose();
-		} else if (actionCommand == "Cancel") {
+		} else if (actionCommand.equals("Cancel")) {
 			this.dialog.dispose();
-		} else if (actionCommand == "Yes" || actionCommand == "No") {
-			// Do nothing
 		} else {
 			System.out.println("ChartDisplaySettingsActionListener: " + e.getActionCommand());
 		}

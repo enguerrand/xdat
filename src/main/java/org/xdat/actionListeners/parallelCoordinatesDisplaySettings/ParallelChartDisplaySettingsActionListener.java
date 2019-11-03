@@ -31,88 +31,18 @@ import org.xdat.Main;
 import org.xdat.UserPreferences;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.gui.panels.ParallelCoordinatesChartDisplaySettingsPanel;
-
-/**
- * ActionListener for a {@link ParallelCoordinatesChartDisplaySettingsPanel}
- * that allows to modify the Display Settings of a
- * {@link ParallelCoordinatesChart}.
- */
 public class ParallelChartDisplaySettingsActionListener implements ActionListener {
-
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-	
-	/** The display settings dialog. */
 	private JDialog dialog;
-
-	/** The user preferences. */
 	private UserPreferences userPreferences;
-
-	/** The panel on which the settings controls are located. */
 	private ParallelCoordinatesChartDisplaySettingsPanel panel;
-
-	/**
-	 * The Chart background color.
-	 * 
-	 * @see ParallelCoordinatesChart#getBackGroundColor()
-	 */
 	private Color backGroundColor;
-
-	/**
-	 * The active design color.
-	 * 
-	 * @see ParallelCoordinatesChart#getDefaultDesignColor(boolean)
-	 */
 	private Color activeDesignColor;
-
-	/**
-	 * The selected design color.
-	 * 
-	 * @see ParallelCoordinatesChart#getSelectedDesignColor()
-	 */
 	private Color selectedDesignColor;
-
-	/**
-	 * The filtered design color.
-	 * 
-	 * @see ParallelCoordinatesChart#getDefaultDesignColor(boolean)
-	 */
 	private Color filteredDesignColor;
-
-	/**
-	 * The filter color.
-	 * 
-	 * @see ParallelCoordinatesChart#getFilterColor()
-	 */
 	private Color filterColor;
-
-	/**
-	 * The show filtered designs flag.
-	 * 
-	 * @see ParallelCoordinatesChart#isShowFilteredDesigns()
-	 */
 	private boolean showFilteredDesigns;
-
-	/**
-	 * The show design IDs flag.
-	 * 
-	 * @see ParallelCoordinatesChart#isShowDesignIDs()
-	 */
 	private boolean showDesignIDs;
-	
-	/**
-	 * Instantiates a new chart display settings action listener to edit default
-	 * settings.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param panel
-	 *            the panel
-	 * @param dialog 
-	 * 			the dialog
-	 */
 	public ParallelChartDisplaySettingsActionListener(Main mainWindow, ParallelCoordinatesChartDisplaySettingsPanel panel, JDialog dialog) {
-		log("constructor called for default settings.");
 		this.dialog = dialog;
 		this.userPreferences = UserPreferences.getInstance();
 		this.panel = panel;
@@ -139,7 +69,6 @@ public class ParallelChartDisplaySettingsActionListener implements ActionListene
 	 * 			the dialog
 	 */
 	public ParallelChartDisplaySettingsActionListener(Main mainWindow, ParallelCoordinatesChartDisplaySettingsPanel panel, ParallelCoordinatesChart chart, JDialog dialog) {
-		log("constructor called for chart specific settings.");
 		this.dialog = dialog;
 		this.userPreferences = UserPreferences.getInstance();
 		this.panel = panel;
@@ -152,126 +81,69 @@ public class ParallelChartDisplaySettingsActionListener implements ActionListene
 		this.showDesignIDs = chart.isShowDesignIDs();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
 	public void actionPerformed(ActionEvent e) {
 		String actionCommand = e.getActionCommand();
-		if (actionCommand == "Background Color") {
+		if (actionCommand.equals("Background Color")) {
 			Color newColor = JColorChooser.showDialog(dialog, "Background Color", this.backGroundColor);
 			if (newColor != null)
 				this.backGroundColor = newColor;
 			this.panel.getBackGroundColorButton().setCurrentColor(this.backGroundColor);
 
-		} else if (actionCommand == "Active Design Color") {
+		} else if (actionCommand.equals("Active Design Color")) {
 			Color newColor = JColorChooser.showDialog(dialog, "Active Design Color", this.activeDesignColor);
 			if (newColor != null)
 				this.activeDesignColor = newColor;
 			this.panel.getActiveDesignColorButton().setCurrentColor(this.activeDesignColor);
-		} else if (actionCommand == "Selected Design Color") {
+		} else if (actionCommand.equals("Selected Design Color")) {
 			Color newColor = JColorChooser.showDialog(dialog, "Selected Design Color", this.selectedDesignColor);
 			if (newColor != null)
 				this.selectedDesignColor = newColor;
 			this.panel.getSelectedDesignColorButton().setCurrentColor(this.selectedDesignColor);
-		} else if (actionCommand == "Filtered Design Color") {
+		} else if (actionCommand.equals("Filtered Design Color")) {
 			Color newColor = JColorChooser.showDialog(dialog, "Filtered Design Color", this.filteredDesignColor);
 			if (newColor != null)
 				this.filteredDesignColor = newColor;
 			this.panel.getFilteredDesignColorButton().setCurrentColor(this.filteredDesignColor);
-		} else if (actionCommand == "Filter Color") {
+		} else if (actionCommand.equals("Filter Color")) {
 			Color newColor = JColorChooser.showDialog(dialog, "Filter Color", this.filterColor);
 			if (newColor != null)
 				this.filterColor = newColor;
 			this.panel.getFilterColorButton().setCurrentColor(this.filterColor);
-		} else if (actionCommand == "showfilteredDesignsTrue") {
+		} else if (actionCommand.equals("showfilteredDesignsTrue")) {
 			this.showFilteredDesigns = true;
-		} else if (actionCommand == "showfilteredDesignsFalse") {
+		} else if (actionCommand.equals("showfilteredDesignsFalse")) {
 			this.showFilteredDesigns = false;
-		} else if (actionCommand == "showDesignIDsTrue") {
+		} else if (actionCommand.equals("showDesignIDsTrue")) {
 			this.showDesignIDs = true;
-		} else if (actionCommand == "showDesignIDsFalse") {
+		} else if (actionCommand.equals("showDesignIDsFalse")) {
 			this.showDesignIDs = false;
-		} else if (actionCommand == "Yes" || actionCommand == "No") {
-			// Do nothing
-		} else {
-			log(e.getActionCommand());
 		}
 	}
 
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (ParallelChartDisplaySettingsActionListener.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
-	}
-
-	/**
-	 * Gets the active design color.
-	 * 
-	 * @return the active design color
-	 */
 	public Color getActiveDesignColor() {
 		return activeDesignColor;
 	}
 
-	/**
-	 * Gets the selected design color.
-	 * 
-	 * @return the selected design color
-	 */
 	public Color getSelectedDesignColor() {
 		return selectedDesignColor;
 	}
 
-	/**
-	 * Gets the back ground color.
-	 * 
-	 * @return the back ground color
-	 */
 	public Color getBackGroundColor() {
 		return backGroundColor;
 	}
 
-	/**
-	 * Gets the filter color.
-	 * 
-	 * @return the filter color
-	 */
 	public Color getFilterColor() {
 		return filterColor;
 	}
 
-	/**
-	 * Gets the filtered design color.
-	 * 
-	 * @return the filtered design color
-	 */
 	public Color getFilteredDesignColor() {
 		return filteredDesignColor;
 	}
 
-	/**
-	 * Checks if design IDs are shown.
-	 * 
-	 * @return true, if design IDs are shown.
-	 */
 	public boolean isShowDesignIDs() {
 		return showDesignIDs;
 	}
 
-	/**
-	 * Checks if filtered designs are shown.
-	 * 
-	 * @return true, if filtered designs are shown.
-	 */
 	public boolean isShowFilteredDesigns() {
 		return showFilteredDesigns;
 	}
