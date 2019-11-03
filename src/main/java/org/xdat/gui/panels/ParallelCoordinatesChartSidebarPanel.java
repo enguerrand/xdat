@@ -49,7 +49,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -278,8 +278,8 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 	protected void initialize() {
 		clusterScrollPane = new JScrollPane();
 		clusterScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-		clusterListeners = new Hashtable<ClusterListener, Cluster>();
-		clusterAlphaSliders = new LinkedHashMap<Cluster, JSlider>(10);
+		clusterListeners = new HashMap<>();
+		clusterAlphaSliders = new LinkedHashMap<>(10);
 		this.cmd = new ParallelChartSidebarActionListener(getMainWindow(), this, (ParallelCoordinatesChartPanel) getChartPanel());
 	}
 

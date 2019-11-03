@@ -38,7 +38,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
@@ -80,7 +80,7 @@ public class DataSheet implements TableModel, Serializable, ListModel {
 	static final long serialVersionUID = 8;
 	private ClusterSet clusterSet;
 	private Vector<Design> data = new Vector<Design>(0, 1);
-	private Map<Integer, Design> designIdsMap = new Hashtable<Integer, Design>();
+	private Map<Integer, Design> designIdsMap = new HashMap<Integer, Design>();
 	private Vector<Parameter> parameters = new Vector<Parameter>(0, 1);
 	private transient Vector<TableModelListener> listeners = new Vector<TableModelListener>();
 	private transient Vector<ListDataListener> listDataListener = new Vector<ListDataListener>();
@@ -216,7 +216,7 @@ public class DataSheet implements TableModel, Serializable, ListModel {
 		}
 
 		Vector<Design> buffer = (Vector<Design>) this.data.clone();
-		Map<Integer, Design> idbuffer = (Map<Integer, Design>) ((Hashtable<Integer, Design>) this.designIdsMap).clone();
+		Map<Integer, Design> idbuffer = (Map<Integer, Design>) ((HashMap<Integer, Design>) this.designIdsMap).clone();
 		this.data.clear();
 		this.designIdsMap.clear();
 		for (int i = 0; i < this.parameters.size(); i++) {

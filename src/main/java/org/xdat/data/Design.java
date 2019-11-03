@@ -28,14 +28,13 @@ import java.awt.Color;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 
 public class Design implements Serializable {
 
 	static final long serialVersionUID = 4L;
-	private Hashtable<Parameter, String> stringParameterValues = new Hashtable<Parameter, String>(0, 1);
-	private Hashtable<Parameter, Float> numericalParameterValues = new Hashtable<Parameter, Float>(0, 1);
+	private Map<Parameter, String> stringParameterValues = new HashMap<Parameter, String>(0, 1);
+	private Map<Parameter, Float> numericalParameterValues = new HashMap<Parameter, Float>(0, 1);
 	private int id;
 	private Cluster cluster;
 	private Map<Filter, Boolean> activationMap = new HashMap<>();

@@ -30,7 +30,8 @@ import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 import java.io.IOException;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A thread that runs in the background to create a new datasheet. This takes
@@ -54,8 +55,8 @@ public class DataSheetUpdateThread extends SwingWorker {
 	@Override
 	public Object doInBackground() {
 		try {
-			Hashtable<ChartFrame, double[]> upperFilterValues = new Hashtable<ChartFrame, double[]>();
-			Hashtable<ChartFrame, double[]> lowerFilterValues = new Hashtable<ChartFrame, double[]>();
+			Map<ChartFrame, double[]> upperFilterValues = new HashMap<>();
+			Map<ChartFrame, double[]> lowerFilterValues = new HashMap<>();
 			for (int i = 0; i < mainWindow.getChartFrameCount(); i++) {
 				ChartFrame f = mainWindow.getChartFrame(i);
 				if (f.getChart().getClass().equals(ParallelCoordinatesChart.class)) {
