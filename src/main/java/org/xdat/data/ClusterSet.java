@@ -23,6 +23,8 @@ package org.xdat.data;
 import org.xdat.gui.tables.ClusterTableModel;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -76,5 +78,37 @@ public class ClusterSet implements Serializable {
 
     public List<Cluster> getClusters() {
         return clusters;
+    }
+
+    void applyClustersBuffer(List<Cluster> clustersBuffer) {
+        List<Cluster> removedClusters = new ArrayList<>();
+        List<Cluster> changedClusters = new ArrayList<>();
+        List<Cluster> addedClusters = new ArrayList<>();
+        Iterator<Cluster> iterator = this.clusters.iterator();
+        while(iterator.hasNext()){
+            Cluster next = iterator.next();
+            if(!clustersBuffer.contains(next)) {
+                removedClusters.add(next);
+                iterator.remove();
+            }
+        }
+
+        for (Cluster bufferedCluster : clustersBuffer) {
+            Cluster existing = this.clusters.stream()
+                    .filter(b -> b.equals(bufferedCluster))
+                    .findAny()
+                    .orElse(null);
+            if (existing == null) {
+                Cluster added = bufferedCluster.duplicate();
+                this.clusters.add(added);
+                addedClusters.add(added);
+            } else {
+                boolean changed = bufferedCluster.copySettingsTo(existing);
+                if (changed) {
+                    changedClusters.add(existing);
+                }
+            }
+        }
+        this.dataSheet.onClustersUpdated(changedClusters, addedClusters, removedClusters);
     }
 }

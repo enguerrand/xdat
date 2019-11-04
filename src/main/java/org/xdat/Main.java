@@ -75,7 +75,7 @@ public class Main extends JFrame {
 		this.buildProperties = new BuildProperties();
 		this.datasheetListener = new DatasheetListener() {
 			@Override
-			public void onChartFramesRepaintRequired() {
+			public void onClustersChanged() {
 				repaintAllChartFrames();
 			}
 
@@ -108,6 +108,8 @@ public class Main extends JFrame {
 				}
 
 				progressMonitor.close();
+
+				repaintAllChartFrames();
 			}
 		};
 		if (!this.checkLicense()) {

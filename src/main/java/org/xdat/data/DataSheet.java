@@ -231,7 +231,6 @@ public class DataSheet implements Serializable, ListModel {
 			}
 		}
 		fireListeners(l -> l.onDataChanged(initialiseBooleanArray(true), initialiseBooleanArray(true), initialiseBooleanArray(true)));
-		fireListeners(DatasheetListener::onChartFramesRepaintRequired);
 		fireListeners(DatasheetListener::onDataPanelUpdateRequired);
 
 	}
@@ -295,7 +294,6 @@ public class DataSheet implements Serializable, ListModel {
 		}
 		axisApplyFiltersRequired[columnIndex - 1] = true;
 		fireListeners(l -> l.onDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired));
-		fireListeners(DatasheetListener::onChartFramesRepaintRequired);
 	}
 
 	private int getLineCount(String pathToInputFile) throws IOException {
@@ -349,7 +347,6 @@ public class DataSheet implements Serializable, ListModel {
 		}
 
 		fireListeners(l -> l.onDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired));
-		fireListeners(DatasheetListener::onChartFramesRepaintRequired);
 		fireListeners(DatasheetListener::onDataPanelUpdateRequired);
 	}
 
@@ -387,22 +384,7 @@ public class DataSheet implements Serializable, ListModel {
 		throw new IllegalArgumentException("Parameter " + parameterName + " not found");
 	}
 
-	public Parameter removeParameter(String parameterName) {
-		for (int i = 0; i < this.parameters.size(); i++) {
-			if (parameterName.equals(this.parameters.get(i).getName())) {
-				Parameter removedParam = this.parameters.remove(i);
-				for (int j = 0; j < this.data.size(); j++) {
-					this.data.get(j).removeParameter(removedParam);
-				}
-				fireListeners(DatasheetListener::onChartFramesRepaintRequired);
-				fireListeners(DatasheetListener::onDataPanelUpdateRequired);
-				return removedParam;
-			}
-		}
-		throw new IllegalArgumentException("Parameter " + parameterName + " not found");
-	}
-
-	public boolean parameterExists(Parameter param) {
+    public boolean parameterExists(Parameter param) {
 		return this.parameters.contains(param);
 	}
 
@@ -512,9 +494,27 @@ public class DataSheet implements Serializable, ListModel {
 		this.listeners.remove(l);
 	}
 
-	public void fireListeners(Consumer<DatasheetListener> action) {
+	private void fireListeners(Consumer<DatasheetListener> action) {
 		for (DatasheetListener listener : this.listeners) {
 			action.accept(listener);
 		}
+	}
+
+	public void applyClustersBuffer(List<Cluster> clusters) {
+		this.clusterSet.applyClustersBuffer(clusters);
+	}
+
+	void onClustersUpdated(List<Cluster> changed, List<Cluster> added, List<Cluster> removed) {
+		for (Cluster removedCluster : removed) {
+			for (int j = 0; j < getDesignCount(); j++) {
+				if (removedCluster.equals(getDesign(j).getCluster())) {
+					getDesign(j).setCluster(null);
+				}
+			}
+		}
+		if (changed.isEmpty() && added.isEmpty() && removed.isEmpty()) {
+			return;
+		}
+		fireListeners(DatasheetListener::onClustersChanged);
 	}
 }

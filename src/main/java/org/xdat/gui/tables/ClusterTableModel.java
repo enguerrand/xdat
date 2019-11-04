@@ -157,6 +157,10 @@ public class ClusterTableModel extends AbstractTableModel {
         return unique;
     }
 
+    public List<Cluster> getClustersBuffer() {
+        return clustersBuffer;
+    }
+
     public void applyBuffer(List<Cluster> clusters, DataSheet dataSheet) {
         for (int i = clusters.size() - 1; i >= 0; i--) {
             boolean clusterRemoved = true;

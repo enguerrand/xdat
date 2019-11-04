@@ -26,6 +26,7 @@ import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A group of {@link org.xdat.data.Design}s that can be displayed in a
@@ -100,11 +101,19 @@ public class Cluster implements Serializable {
 		return duplication;
 	}
 
-	public void copySettingsTo(Cluster cluster) {
+	public boolean copySettingsTo(Cluster cluster) {
+		boolean changed = !Objects.equals(cluster.name, this.name) ||
+				cluster.active != this.active ||
+				!Objects.equals(cluster.activeDesignColor, this.activeDesignColor) ||
+				cluster.lineThickness != this.lineThickness;
+		if (!changed) {
+			return false;
+		}
 		cluster.setName(this.name);
 		cluster.setActive(this.active);
 		cluster.setActiveDesignColor(this.activeDesignColor);
 		cluster.setLineThickness(this.lineThickness);
+		return true;
 	}
 
 	public int getUniqueId() {
@@ -138,4 +147,17 @@ public class Cluster implements Serializable {
 			l.onColorChanged(this);
 		}
 	}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Cluster cluster = (Cluster) o;
+        return uniqueId == cluster.uniqueId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uniqueId);
+    }
 }

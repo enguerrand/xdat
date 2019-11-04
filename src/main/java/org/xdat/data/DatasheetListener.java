@@ -20,7 +20,7 @@
 package org.xdat.data;
 
 public interface DatasheetListener {
-    void onChartFramesRepaintRequired();
+    void onClustersChanged();
     void onDataPanelUpdateRequired();
     void onDataChanged(boolean[] autoFitRequired, boolean[] filterResetRequired, boolean[] applyFiltersRequired);
 }
