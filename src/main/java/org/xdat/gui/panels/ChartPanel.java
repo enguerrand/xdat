@@ -21,7 +21,6 @@
 package org.xdat.gui.panels;
 
 import org.xdat.chart.Chart;
-import org.xdat.data.DataSheet;
 
 import javax.swing.JPanel;
 import java.awt.Dimension;
@@ -30,13 +29,11 @@ import java.awt.Graphics;
 public abstract class ChartPanel extends JPanel {
 	static final long serialVersionUID = 1L;
 	private Chart chart;
-	private DataSheet dataSheet;
 	private int marginTop = 20;
 	private int marginBottom = 80;
 	private int marginLeft = 80;
 	private int marginRight = 20;
-	ChartPanel(DataSheet dataSheet, Chart chart) {
-		this.dataSheet = dataSheet;
+	ChartPanel(Chart chart) {
 		this.chart = chart;
 	}
 
@@ -51,11 +48,6 @@ public abstract class ChartPanel extends JPanel {
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.JComponent#getPreferredSize()
-	 */
 	public Dimension getPreferredSize() {
 		int width = marginLeft + marginRight + chart.getWidth();
 		int height = marginTop + marginBottom + chart.getHeight();
@@ -71,9 +63,4 @@ public abstract class ChartPanel extends JPanel {
 	public Chart getChart() {
 		return this.chart;
 	}
-
-	public DataSheet getDataSheet() {
-		return dataSheet;
-	}
-
 }

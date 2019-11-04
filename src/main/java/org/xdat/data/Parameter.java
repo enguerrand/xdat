@@ -20,15 +20,14 @@
 
 package org.xdat.data;
 
+import org.xdat.exceptions.CorruptDataException;
+
 import java.awt.FontMetrics;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.TreeSet;
-
-import org.xdat.Main;
-import org.xdat.exceptions.CorruptDataException;
 
 /**
  * A Parameter represents a parameter of a {@link org.xdat.data.DataSheet}.
@@ -47,8 +46,7 @@ import org.xdat.exceptions.CorruptDataException;
  */
 public class Parameter implements Serializable {
 	static final long serialVersionUID = 4L;
-	static final boolean printLog = false;
-	private DataSheet dataSheet;
+    private DataSheet dataSheet;
 	private String name;
 	private boolean numeric = true;
 	private boolean atLeastOneNumeric = false;

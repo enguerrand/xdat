@@ -70,7 +70,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 	private Map<int[], HashSet<Integer>> lineMap;
 
 	public ParallelCoordinatesChartPanel(Main mainWindow, ChartFrame chartFrame, ParallelCoordinatesChart chart) {
-		super(mainWindow.getDataSheet(), chart);
+		super(chart);
 		this.mainWindow = mainWindow;
 		this.chartFrame = chartFrame;
 		this.chart = chart;
@@ -200,8 +200,9 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		this.lineMap.clear();
 		boolean useAlpha = chart.isUseAlpha();
 		List<Design> highlightedDesigns = new ArrayList<>();
-		for (int designIndex = 0; designIndex < getDataSheet().getDesignCount(); designIndex++) {
-			Design currentDesign = getDataSheet().getDesign(designIndex);
+		DataSheet dataSheet = mainWindow.getDataSheet();
+		for (int designIndex = 0; designIndex < dataSheet.getDesignCount(); designIndex++) {
+			Design currentDesign = dataSheet.getDesign(designIndex);
 			if (!currentDesign.isInsideBounds(chart)){
 				continue;
 			}
@@ -251,7 +252,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
         for (int i = 0; i < axisCount; i++) {
             int yPosition = axisTopPos;
             if (axisActiveFlags[i]) {
-                Parameter parameter = getDataSheet().getParameter(i);
+                Parameter parameter = this.mainWindow.getDataSheet().getParameter(i);
                 double value = currentDesign.getDoubleValue(parameter);
 
                 int yPositionRelToBottom;

@@ -40,7 +40,7 @@ public class ScatterChart2DPanel extends ChartPanel {
 	private int yAxisOffset = 0;
 
 	public ScatterChart2DPanel(Main mainWindow, ScatterChart2D chart) {
-		super(mainWindow.getDataSheet(), chart);
+		super(chart);
 		this.mainWindow = mainWindow;
 	}
 

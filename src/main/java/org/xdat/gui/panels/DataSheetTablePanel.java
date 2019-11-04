@@ -55,7 +55,7 @@ public class DataSheetTablePanel extends JPanel {
 		DataSheet dataSheet = this.mainWindow.getCurrentSession().getCurrentDataSheet();
 		if (dataSheet != null) {
 			this.removeAll();
-			DataSheetTableColumnModel cm = new DataSheetTableColumnModel(this.mainWindow, dataSheet);
+			DataSheetTableColumnModel cm = new DataSheetTableColumnModel(this.mainWindow);
 			DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer();
 			cellRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 			// DefaultCellEditor cellEditor = new DefaultCellEditor(new
@@ -95,7 +95,7 @@ public class DataSheetTablePanel extends JPanel {
 	public void updateRunsTableModel() {
 		DataSheet dataSheet = this.mainWindow.getCurrentSession().getCurrentDataSheet();
 		if (dataSheet != null) {
-			DataSheetTableColumnModel cm = new DataSheetTableColumnModel(this.mainWindow, dataSheet);
+			DataSheetTableColumnModel cm = new DataSheetTableColumnModel(this.mainWindow);
 			DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer();
 			cellRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 			TableColumn idCol = new TableColumn(0, 30, cellRenderer, new DefaultCellEditor(new JTextField()));

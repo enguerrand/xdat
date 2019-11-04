@@ -20,8 +20,6 @@
 
 package org.xdat.chart;
 
-import org.xdat.data.DataSheet;
-
 import java.awt.Color;
 import java.io.Serializable;
 
@@ -30,18 +28,8 @@ public abstract class Plot implements Serializable {
 	static final long serialVersionUID = 1;
 	private Color backGroundColor = Color.WHITE;
 	private int margin = 10;
-	private DataSheet dataSheet;
 
-	public Plot(DataSheet dataSheet) {
-		this.dataSheet = dataSheet;
-	}
-
-	public DataSheet getDataSheet() {
-		return dataSheet;
-	}
-
-	public void setDataSheet(DataSheet dataSheet) {
-		this.dataSheet = dataSheet;
+	public Plot() {
 	}
 
 	public int getMargin() {

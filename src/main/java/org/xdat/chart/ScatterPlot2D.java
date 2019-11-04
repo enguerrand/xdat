@@ -20,15 +20,15 @@
 
 package org.xdat.chart;
 
-import java.awt.Color;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.xdat.UserPreferences;
 import org.xdat.data.AxisType;
 import org.xdat.data.DataSheet;
 import org.xdat.data.Design;
 import org.xdat.data.Parameter;
+
+import java.awt.Color;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A serializable representation of all relevant settings for a two-dimensional
@@ -66,7 +66,7 @@ public class ScatterPlot2D extends Plot {
 	private int ticLabelFontSizeY = 12;
 
 	ScatterPlot2D(DataSheet dataSheet, boolean showDecorations) {
-		super(dataSheet);
+		super();
 		this.showDecorations = showDecorations;
 		if (dataSheet.getParameterCount() > 1) {
 			this.parameterForXAxis = dataSheet.getParameter(0);

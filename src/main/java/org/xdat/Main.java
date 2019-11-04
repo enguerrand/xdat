@@ -214,6 +214,7 @@ public class Main extends JFrame {
 		}
 		this.initialiseDataPanel();
 		this.repaint();
+		this.rebuildAllChartFrames();
 	}
 
 	public Session getCurrentSession() {

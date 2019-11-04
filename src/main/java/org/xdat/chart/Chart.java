@@ -34,7 +34,7 @@ public abstract class Chart implements Serializable {
 	private Point location;
 	private int id;
 	private Dimension frameSize;
-	private DataSheet dataSheet;
+	private final DataSheet dataSheet;
 	private boolean antiAliasing;
 	private boolean useAlpha;
 	
@@ -59,10 +59,6 @@ public abstract class Chart implements Serializable {
 
 	public DataSheet getDataSheet() {
 		return dataSheet;
-	}
-
-	public void setDataSheet(DataSheet dataSheet) {
-		this.dataSheet = dataSheet;
 	}
 
 	public abstract Color getBackGroundColor();
