@@ -47,11 +47,11 @@ public class Cluster implements Serializable {
 	private Color activeDesignColorNoAlpha;
 	private boolean active = true;
 	private int lineThickness = 1;
-	private int uniqueIdentificationNumber;
+	private int uniqueId;
 	private transient List<ClusterListener> clusterListeners;
-	public Cluster(String name, int uniqueIdentificationNumber) {
+	public Cluster(String name, int uniqueId) {
 		this.name = name;
-		this.uniqueIdentificationNumber = uniqueIdentificationNumber;
+		this.uniqueId = uniqueId;
 		this.activeDesignColor = UserPreferences.getInstance().getParallelCoordinatesActiveDesignDefaultColor();
 		this.activeDesignColorNoAlpha = new Color(this.activeDesignColor.getRed(), this.activeDesignColor.getGreen(), this.activeDesignColor.getBlue());
 		this.clusterListeners = new ArrayList<>();
@@ -93,7 +93,7 @@ public class Cluster implements Serializable {
 	}
 
 	public Cluster duplicate() {
-		Cluster duplication = new Cluster(this.name, this.uniqueIdentificationNumber);
+		Cluster duplication = new Cluster(this.name, this.uniqueId);
 		duplication.setActive(this.active);
 		duplication.setActiveDesignColor(this.activeDesignColor);
 		duplication.setLineThickness(this.lineThickness);
@@ -107,8 +107,8 @@ public class Cluster implements Serializable {
 		cluster.setLineThickness(this.lineThickness);
 	}
 
-	public int getUniqueIdentificationNumber() {
-		return uniqueIdentificationNumber;
+	public int getUniqueId() {
+		return uniqueId;
 	}
 	
 	public void addClusterListener(ClusterListener l){

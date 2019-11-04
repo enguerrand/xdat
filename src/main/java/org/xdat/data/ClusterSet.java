@@ -60,10 +60,6 @@ public class ClusterSet implements Serializable {
 		return this.clusters.size();
 	}
 
-	public void applyChanges(ClusterTableModel tableModel) {
-        tableModel.applyBuffer(this.clusters, this.dataSheet);
-    }
-
     public ClusterTableModel createTableModel(ClusterFactory factory) {
         return new ClusterTableModel(clusters, factory);
     }

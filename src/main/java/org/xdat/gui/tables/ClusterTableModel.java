@@ -162,7 +162,7 @@ public class ClusterTableModel extends AbstractTableModel {
             boolean clusterRemoved = true;
 
             for (int j = this.clustersBuffer.size() - 1; j >= 0; j--) {
-                if (clusters.get(i).getUniqueIdentificationNumber() == this.clustersBuffer.get(j).getUniqueIdentificationNumber()) {
+                if (clusters.get(i).getUniqueId() == this.clustersBuffer.get(j).getUniqueId()) {
                     clusterRemoved = false;
                     this.clustersBuffer.remove(j).copySettingsTo(clusters.get(i));
                     break;

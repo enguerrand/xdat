@@ -23,14 +23,14 @@ package org.xdat.data;
 import java.util.List;
 
 public class ClusterFactory {
-    private int uniqueIdentificationNumberCounter = 0;
+    private int nextUid = 0;
 
     public ClusterFactory() {
     }
 
     public Cluster newCluster(List<Cluster> currentBuffer) {
         String newClusterName = getUniqueClusterName(currentBuffer);
-        Cluster newCluster = new Cluster(newClusterName, uniqueIdentificationNumberCounter++);
+        Cluster newCluster = new Cluster(newClusterName, nextUid++);
         return newCluster;
     }
 
