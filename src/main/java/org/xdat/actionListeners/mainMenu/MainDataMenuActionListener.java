@@ -142,7 +142,7 @@ public class MainDataMenuActionListener implements ActionListener {
 			if (mainWindow.getDataSheet() == null)
 				JOptionPane.showMessageDialog(mainWindow, "Please create a data sheet first by selecting Data->Import.", "Clustering", JOptionPane.INFORMATION_MESSAGE);
 			else
-				new ClusterDialog(mainWindow, mainWindow, mainWindow.getDataSheet());
+				new ClusterDialog(mainWindow, mainWindow);
 
 		} else {
 			System.out.println(e.getActionCommand());

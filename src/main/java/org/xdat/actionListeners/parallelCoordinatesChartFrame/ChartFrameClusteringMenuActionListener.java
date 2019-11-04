@@ -20,13 +20,13 @@
 
 package org.xdat.actionListeners.parallelCoordinatesChartFrame;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import org.xdat.Main;
 import org.xdat.gui.dialogs.ClusterDialog;
 import org.xdat.gui.frames.ChartFrame;
 import org.xdat.gui.menus.parallelCoordinatesChart.ParallelCoordinatesChartFrameClusteringMenu;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * ActionListener for the {@link ParallelCoordinatesChartFrameClusteringMenu}.
@@ -61,7 +61,7 @@ public class ChartFrameClusteringMenuActionListener implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		String actionCommand = e.getActionCommand();
 		if (actionCommand.equals("Edit Clusters")) {
-			new ClusterDialog(this.chartFrame, this.mainWindow, mainWindow.getDataSheet());
+			new ClusterDialog(this.chartFrame, this.mainWindow);
 		}
 
 	}

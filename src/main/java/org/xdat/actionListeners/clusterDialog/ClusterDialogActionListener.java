@@ -22,6 +22,7 @@ package org.xdat.actionListeners.clusterDialog;
 
 import org.xdat.Main;
 import org.xdat.data.Cluster;
+import org.xdat.data.DataSheet;
 import org.xdat.gui.dialogs.ClusterDialog;
 import org.xdat.gui.tables.ClusterTableModel;
 
@@ -59,8 +60,9 @@ public class ClusterDialogActionListener implements ActionListener {
 			}
 
 			List<Cluster> clustersBuffer = this.tableModel.getClustersBuffer();
-			this.dialog.getDataSheet().applyClustersBuffer(clustersBuffer);
-			this.tableModel.applyBuffer(this.dialog.getDataSheet().getClusterSet().getClusters(), this.dialog.getDataSheet());
+            DataSheet dataSheet = this.mainWindow.getDataSheet();
+            dataSheet.applyClustersBuffer(clustersBuffer);
+			this.tableModel.applyBuffer(dataSheet.getClusterSet().getClusters(), dataSheet);
 			for (int i = 0; i < this.mainWindow.getChartFrameCount(); i++) {
 				this.mainWindow.getChartFrame(i).validate();
 				this.mainWindow.getChartFrame(i).repaint();

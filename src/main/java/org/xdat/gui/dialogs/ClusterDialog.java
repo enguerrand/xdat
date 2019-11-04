@@ -22,7 +22,6 @@ package org.xdat.gui.dialogs;
 
 import org.xdat.Main;
 import org.xdat.actionListeners.clusterDialog.ClusterDialogActionListener;
-import org.xdat.data.DataSheet;
 import org.xdat.gui.tables.ClusterTableModel;
 import org.xdat.gui.tables.ColorEditor;
 import org.xdat.gui.tables.ColorRenderer;
@@ -46,13 +45,11 @@ import java.awt.GridLayout;
 public class ClusterDialog extends JDialog {
 
 	static final long serialVersionUID = 1L;
-	private DataSheet dataSheet;
 	private JTable clusterTable;
 
-	public ClusterDialog(JFrame parent, Main mainWindow, DataSheet dataSheet) {
+	public ClusterDialog(JFrame parent, Main mainWindow) {
 		super(parent, "Data Clustering");
 		this.setModal(true);
-		this.dataSheet = dataSheet;
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
 		// create components
@@ -91,7 +88,7 @@ public class ClusterDialog extends JDialog {
 		activeCol.setResizable(true);
 		cm.addColumn(activeCol);
 
-		ClusterTableModel tableModel = this.dataSheet.getClusterSet().createTableModel(mainWindow.getClusterFactory());
+		ClusterTableModel tableModel = mainWindow.getDataSheet().getClusterSet().createTableModel(mainWindow.getClusterFactory());
 		this.clusterTable = new JTable(tableModel, cm);
 		JScrollPane scrollPane = new JScrollPane(this.clusterTable);
 
@@ -126,9 +123,4 @@ public class ClusterDialog extends JDialog {
 	public JTable getClusterTable() {
 		return clusterTable;
 	}
-
-	public DataSheet getDataSheet() {
-		return dataSheet;
-	}
-
 }
