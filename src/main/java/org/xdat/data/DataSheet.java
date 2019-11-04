@@ -36,6 +36,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -152,7 +154,7 @@ public class DataSheet implements Serializable, ListModel {
 		// so it returns the right double values
 		for (int i = 0; i < this.parameters.size(); i++) {
 			if (!this.parameters.get(i).isNumeric()) {
-				this.parameters.get(i).getMaxValue();
+				this.parameters.get(i).updateDiscreteLevels();
 			}
 		}
 	}
@@ -227,7 +229,7 @@ public class DataSheet implements Serializable, ListModel {
 		// so it returns the right double values
 		for (int i = 0; i < this.parameters.size(); i++) {
 			if (!this.parameters.get(i).isNumeric()) {
-				this.parameters.get(i).getMaxValue();
+				this.parameters.get(i).updateDiscreteLevels();
 			}
 		}
 		fireListeners(l -> l.onDataChanged(initialiseBooleanArray(true), initialiseBooleanArray(true), initialiseBooleanArray(true)));
@@ -278,7 +280,7 @@ public class DataSheet implements Serializable, ListModel {
 		try {
 			this.data.get(rowIndex).setValue(parameters.get(columnIndex - 1), arg0.toString());
 			if (!previousNumeric) {
-				parameter.checkOccurrenceInDiscreteLevel(previousValue);
+				parameter.updateDiscreteLevels();
 			}
 
 			NumberParser.parseNumber(arg0.toString());
@@ -334,7 +336,7 @@ public class DataSheet implements Serializable, ListModel {
 						String string = removedDesign.getStringValue(this.parameters.get(j));
 						NumberParser.parseNumber(string);
 					} catch (ParseException e1) {
-						this.parameters.get(j).checkOccurrenceInDiscreteLevel(removedDesign.getStringValue(this.parameters.get(j)));
+						this.parameters.get(j).updateDiscreteLevels();
 						this.parameters.get(j).checkIfNumeric();
 					}
 				}
@@ -516,5 +518,9 @@ public class DataSheet implements Serializable, ListModel {
 			return;
 		}
 		fireListeners(DatasheetListener::onClustersChanged);
+	}
+
+	public Collection<Design> getDesigns() {
+		return Collections.unmodifiableList(this.data);
 	}
 }

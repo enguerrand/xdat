@@ -76,7 +76,7 @@ public class ScatterPlot2D extends Plot {
 			this.parameterForYAxis = dataSheet.getParameter(0);
 		}
 		for (int i = 0; i < dataSheet.getParameterCount(); i++) {
-			autofitParam(dataSheet.getParameter(i));
+			autofitParam(dataSheet, dataSheet.getParameter(i));
 		}
 
 		resetDisplaySettingsToDefault();
@@ -181,14 +181,14 @@ public class ScatterPlot2D extends Plot {
 		}
 	}
 
-	public void autofit(AxisType axisType) {
+	public void autofit(DataSheet dataSheet, AxisType axisType) {
 		Parameter parameter = getParameterForAxis(axisType);
-		autofitParam(parameter);
+		autofitParam(dataSheet, parameter);
 	}
 
-	private void autofitParam(Parameter parameter) {
-		setMin(parameter, parameter.getMinValue());
-		setMax(parameter, parameter.getMaxValue());
+	private void autofitParam(DataSheet dataSheet, Parameter parameter) {
+		setMin(parameter, dataSheet.getMinValueOf(parameter));
+		setMax(parameter, dataSheet.getMinValueOf(parameter));
 	}
 
 	public void setMin(AxisType axisType, double value) {

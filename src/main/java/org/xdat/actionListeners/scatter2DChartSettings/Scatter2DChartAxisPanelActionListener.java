@@ -20,20 +20,14 @@
 
 package org.xdat.actionListeners.scatter2DChartSettings;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.xdat.Main;
 import org.xdat.chart.ScatterChart2D;
-import org.xdat.chart.ScatterPlot2D;
 import org.xdat.data.AxisType;
 import org.xdat.gui.frames.ChartFrame;
 import org.xdat.gui.panels.Scatter2DChartAxisPanel;
+
+import javax.swing.JTextField;
+import java.awt.event.ActionEvent;
 
 /**
  * ActionListener for a {@link Scatter2DChartAxisPanel} that allows to modify
@@ -69,7 +63,7 @@ public class Scatter2DChartAxisPanelActionListener {
 	public void updateAutofitAxis(boolean newState) {
 		this.chart.getScatterPlot2D().setAutofit(this.axisType, newState);
 		if (newState) {
-			this.chart.getScatterPlot2D().autofit(this.axisType);
+			this.chart.getScatterPlot2D().autofit(this.mainWindow.getDataSheet(), this.axisType);
 		}
 		this.frame.repaint();
 	}

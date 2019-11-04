@@ -28,6 +28,7 @@ import java.text.ParseException;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * A Parameter represents a parameter of a {@link org.xdat.data.DataSheet}.
@@ -51,7 +52,7 @@ public class Parameter implements Serializable {
 	private boolean numeric = true;
 	private boolean atLeastOneNumeric = false;
 	private boolean atLeastOneNonNumeric = false;
-	private TreeSet<String> discreteLevels = new TreeSet<String>(new ReverseStringComparator());
+	private TreeSet<String> discreteLevels = new TreeSet<>(new ReverseStringComparator());
     private int ticLabelDigitCount = 3;
 	public Parameter(String name, DataSheet dataSheet) {
 		this.name = name;
@@ -75,26 +76,6 @@ public class Parameter implements Serializable {
 	 */
 	boolean isMixed() {
 		return (this.atLeastOneNonNumeric && this.atLeastOneNumeric);
-	}
-
-	public double getMaxValue() {
-		double max = Double.NEGATIVE_INFINITY;
-		for (int i = 0; i < dataSheet.getDesignCount(); i++) {
-			double value = dataSheet.getDesign(i).getDoubleValue(this);
-			if (value > max)
-				max = value;
-		}
-		return max;
-	}
-
-	public double getMinValue() {
-		double min = Double.POSITIVE_INFINITY;
-		for (int i = 0; i < dataSheet.getDesignCount(); i++) {
-			double value = dataSheet.getDesign(i).getDoubleValue(this);
-			if (value < min)
-				min = value;
-		}
-		return min;
 	}
 
 	public boolean isNumeric() {
@@ -248,32 +229,16 @@ public class Parameter implements Serializable {
 		}
 	}
 
-	/**
-	 * Checks the count of designs for which this parameter is on the discrete
-	 * level defined by the given string argument. If the count is zero, the
-	 * discrete level is removed.
-	 * <p>
-	 * Only applies to non-numeric parameters.
-	 * 
-	 * @param stringValueToCheck
-	 *            the discrete level for which the occurrence count should be
-	 *            returned
-	 */
-	void checkOccurrenceInDiscreteLevel(String stringValueToCheck) {
-		if (this.isNumeric()) {
-			throw new RuntimeException("Parameter " + this.name + " is numeric!");
-		} else {
-			int occurrenceCount = 0;
-			for (int i = 0; i < this.dataSheet.getDesignCount(); i++) {
-				if (this.dataSheet.getDesign(i).getStringValue(this).equalsIgnoreCase(stringValueToCheck)) {
-					occurrenceCount++;
-				}
-			}
-			if (occurrenceCount < 1) {
-				this.discreteLevels.remove(stringValueToCheck);
-			}
-		}
-	}
+	void updateDiscreteLevels(){
+	    if (isNumeric()) {
+	        return;
+        }
+	    this.discreteLevels.clear();
+	    this.discreteLevels.addAll(this.dataSheet.getDesigns()
+                .stream()
+                .map(d -> d.getStringValue(this))
+                .collect(Collectors.toSet()));
+    }
 
 
     public void setTicLabelDigitCount(int value) {
