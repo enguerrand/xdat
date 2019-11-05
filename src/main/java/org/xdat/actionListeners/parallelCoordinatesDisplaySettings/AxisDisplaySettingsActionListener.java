@@ -24,6 +24,7 @@ import org.xdat.Main;
 import org.xdat.UserPreferences;
 import org.xdat.chart.Axis;
 import org.xdat.chart.ParallelCoordinatesChart;
+import org.xdat.data.DataSheet;
 import org.xdat.gui.panels.AxisDisplaySettingsPanel;
 
 import javax.swing.JColorChooser;
@@ -156,6 +157,7 @@ public class AxisDisplaySettingsActionListener implements ActionListener, Change
 	public void applySettings(Axis axis) {
 		double upperFilterValue;
 		double lowerFilterValue;
+		DataSheet dataSheet = this.mainWindow.getDataSheet();
 
 		upperFilterValue = Math.max(axis.getUpperFilter().getValue(), axis.getLowerFilter().getValue());
 		lowerFilterValue = Math.min(axis.getUpperFilter().getValue(), axis.getLowerFilter().getValue());
@@ -163,14 +165,14 @@ public class AxisDisplaySettingsActionListener implements ActionListener, Change
 		axis.setAxisColor(this.axisColor);
 		axis.setWidth((Integer) this.panel.getAxisWidthSpinner().getValue());
 		axis.setAxisLabelFontColor(this.axisLabelColor);
-		axis.setAxisLabelFontSize((Integer) this.panel.getAxisLabelFontSizeSpinner().getValue());
+		axis.setAxisLabelFontSize((Integer) this.panel.getAxisLabelFontSizeSpinner().getValue(), dataSheet);
 		axis.setTicLength((Integer) this.panel.getTicSizeSpinner().getValue());
-		axis.setTicCount((Integer) this.panel.getTicCountSpinner().getValue());
+		axis.setTicCount((Integer) this.panel.getTicCountSpinner().getValue(), dataSheet);
 		axis.setTicLabelDigitCount((Integer) this.panel.getTicLabelDigitCountSpinner().getValue());
 		axis.setTicLabelFontColor(this.ticLabelColor);
 		axis.setTicLabelFontSize((Integer) this.panel.getTicLabelFontSizeSpinner().getValue());
 		axis.setFilterInverted(this.invertFilter);
-		axis.setAxisInverted(this.invertAxis);
+		axis.setAxisInverted(this.invertAxis, dataSheet);
 		axis.setAutoFit(this.autoFitAxis);
 		if (this.autoFitAxis) {
 			axis.autofit(mainWindow.getDataSheet());
@@ -181,11 +183,11 @@ public class AxisDisplaySettingsActionListener implements ActionListener, Change
 				axis.setMax(panel.getAxisMax(), mainWindow.getDataSheet());
 		}
 		if (axis.isAxisInverted()) {
-			axis.getUpperFilter().setValue(Math.min(upperFilterValue, lowerFilterValue));
-			axis.getLowerFilter().setValue(Math.max(upperFilterValue, lowerFilterValue));
+			axis.getUpperFilter().setValue(Math.min(upperFilterValue, lowerFilterValue), dataSheet);
+			axis.getLowerFilter().setValue(Math.max(upperFilterValue, lowerFilterValue), dataSheet);
 		} else {
-			axis.getUpperFilter().setValue(Math.max(upperFilterValue, lowerFilterValue));
-			axis.getLowerFilter().setValue(Math.min(upperFilterValue, lowerFilterValue));
+			axis.getUpperFilter().setValue(Math.max(upperFilterValue, lowerFilterValue), dataSheet);
+			axis.getLowerFilter().setValue(Math.min(upperFilterValue, lowerFilterValue), dataSheet);
 		}
 		this.panel.getChartFrame().getChartPanel().setSize(this.panel.getChartFrame().getChartPanel().getPreferredSize());
 		this.panel.getChartFrame().repaint();

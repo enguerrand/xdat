@@ -47,11 +47,12 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 		String actionCommand = e.getActionCommand();
+        DataSheet dataSheet = this.mainWindow.getDataSheet();
 		if (actionCommand.equals("setCurrentFilterAsNewRange")) {
 			this.axis.setFilterAsNewRange(mainWindow.getDataSheet());
 			this.chartFrame.repaint();
 		} else if (actionCommand.equals("resetFilter")) {
-			this.axis.resetFilters();
+			this.axis.resetFilters(dataSheet);
 			this.chartFrame.repaint();
 		} else if (actionCommand.equals("autofit")) {
 			this.axis.autofit(mainWindow.getDataSheet());
@@ -93,10 +94,10 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 			this.axis.setActive(false);
 			this.chartFrame.repaint();
 		} else if (actionCommand.equals("addTic")) {
-			this.axis.setTicCount(this.axis.getTicCount() + 1);
+			this.axis.setTicCount(this.axis.getTicCount() + 1, dataSheet);
 			this.chartFrame.repaint();
 		} else if (actionCommand.equals("removeTic")) {
-			this.axis.setTicCount(Math.max(2, this.axis.getTicCount() - 1));
+			this.axis.setTicCount(Math.max(2, this.axis.getTicCount() - 1), dataSheet);
 			this.chartFrame.repaint();
 		} else if (actionCommand.equals("reduceDistanceThisAxis")) {
 			this.axis.setWidth(Math.max(0, axis.getWidth() - 10));
@@ -107,7 +108,7 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 		} else if (actionCommand.equals("resetAllFilters")) {
 			ParallelCoordinatesChart chart = this.axis.getChart();
 			for (int i = 0; i < chart.getAxisCount(); i++) {
-				chart.getAxis(i).resetFilters();
+				chart.getAxis(i).resetFilters(dataSheet);
 			}
 			this.chartFrame.repaint();
 		} else if (actionCommand.equals("reduceDistanceAllAxes")) {
@@ -123,7 +124,7 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 			}
 			this.chartFrame.repaint();
 		} else if (actionCommand.equals("invertAxis")) {
-			this.axis.setAxisInverted(!this.axis.isAxisInverted());
+			this.axis.setAxisInverted(!this.axis.isAxisInverted(), dataSheet);
 			this.chartFrame.repaint();		
 		} else if (actionCommand.equals("applyColorGradient")) {
 			ParallelCoordinatesChart chart = (ParallelCoordinatesChart) this.chartFrame.getChart();

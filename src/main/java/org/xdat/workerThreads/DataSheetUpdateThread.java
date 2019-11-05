@@ -83,8 +83,8 @@ public class DataSheetUpdateThread extends SwingWorker {
 					double[] ufValues = upperFilterValues.get(f);
 					double[] lfValues = lowerFilterValues.get(f);
 					for (int a = 0; a < c.getAxisCount(); a++) {
-						c.getAxis(a).getUpperFilter().setValue(ufValues[a]);
-						c.getAxis(a).getLowerFilter().setValue(lfValues[a]);
+						c.getAxis(a).getUpperFilter().setValue(ufValues[a], dataSheet);
+						c.getAxis(a).getLowerFilter().setValue(lfValues[a], dataSheet);
 					}
 				}
 				f.repaint();

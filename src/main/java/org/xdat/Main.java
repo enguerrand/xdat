@@ -310,7 +310,7 @@ public class Main extends JFrame {
 		for (int i = 0; i < this.chartFrames.size(); i++) {
 			Chart c = this.chartFrames.get(i).getChart();
 			if (c.getClass().equals(ParallelCoordinatesChart.class)) {
-				((ParallelCoordinatesChart) c).getAxis(columnIndex).applyFilters();
+				((ParallelCoordinatesChart) c).getAxis(columnIndex).applyFilters(getDataSheet());
 			}
 		}
 	}
@@ -328,7 +328,7 @@ public class Main extends JFrame {
 		for (int i = 0; i < this.chartFrames.size(); i++) {
 			Chart c = this.chartFrames.get(i).getChart();
 			if (c.getClass().equals(ParallelCoordinatesChart.class)) {
-				((ParallelCoordinatesChart) c).getAxis(axisIndex).resetFilters();
+				((ParallelCoordinatesChart) c).getAxis(axisIndex).resetFilters(getDataSheet());
 			}
 		}
 	}

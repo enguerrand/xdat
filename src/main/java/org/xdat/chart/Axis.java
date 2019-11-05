@@ -104,41 +104,19 @@ public class Axis implements Serializable {
 		dataSheet.evaluateBoundsForAllDesigns(this.chart);
 	}
 
-	/**
-	 * Gets the axis label font color.
-	 * 
-	 * @return the axis label font color
-	 */
 	public Color getAxisLabelFontColor() {
 		return axisLabelFontColor;
 	}
 
-	/**
-	 * Sets the axis label font color.
-	 * 
-	 * @param axisLabelFontColor
-	 *            the new axis label font color
-	 */
 	public void setAxisLabelFontColor(Color axisLabelFontColor) {
 		this.axisLabelFontColor = axisLabelFontColor;
 	}
 
-	/**
-	 * Gets the axis label font size.
-	 * 
-	 * @return the axis label font size
-	 */
 	public int getAxisLabelFontSize() {
 		return axisLabelFontSize;
 	}
 
-	/**
-	 * Sets the axis label font size.
-	 * 
-	 * @param axisLabelFontSize
-	 *            the new axis label font size
-	 */
-	public void setAxisLabelFontSize(int axisLabelFontSize) {
+	public void setAxisLabelFontSize(int axisLabelFontSize, DataSheet dataSheet) {
 		double[] upperFilterValues = new double[this.chart.getAxisCount()];
 		double[] lowerFilterValues = new double[this.chart.getAxisCount()];
 		for (int i = 0; i < this.chart.getAxisCount(); i++) {
@@ -149,8 +127,8 @@ public class Axis implements Serializable {
 		this.axisLabelFontSize = axisLabelFontSize;
 		for (int i = 0; i < this.chart.getAxisCount(); i++) {
 			Axis axis = this.chart.getAxis(i);
-			axis.getLowerFilter().setValue(lowerFilterValues[i]);
-			axis.getUpperFilter().setValue(upperFilterValues[i]);
+			axis.getLowerFilter().setValue(lowerFilterValues[i], dataSheet);
+			axis.getUpperFilter().setValue(upperFilterValues[i], dataSheet);
 		}
 	}
 
@@ -194,10 +172,10 @@ public class Axis implements Serializable {
 			return this.parameter.getDiscreteLevelCount();
 	}
 
-	public void setTicCount(int ticCount) {
+	public void setTicCount(int ticCount, DataSheet dataSheet) {
 		this.ticCount = ticCount;
 		if (ticCount < 2) {
-			this.applyFilters();
+			this.applyFilters(dataSheet);
 		}
 	}
 
@@ -311,12 +289,12 @@ public class Axis implements Serializable {
 		return this.axisInverted;
 	}
 
-	public void setAxisInverted(boolean axisInverted) {
+	public void setAxisInverted(boolean axisInverted, DataSheet dataSheet) {
 		double maxFilterValue = this.getMaximumFilter().getValue();
 		double minFilterValue = this.getMinimumFilter().getValue();
 		this.axisInverted = axisInverted;
-		this.getMaximumFilter().setValue(maxFilterValue);
-		this.getMinimumFilter().setValue(minFilterValue);
+		this.getMaximumFilter().setValue(maxFilterValue, dataSheet);
+		this.getMinimumFilter().setValue(minFilterValue, dataSheet);
 	}
 
 	public boolean isAutoFit() {
@@ -330,11 +308,6 @@ public class Axis implements Serializable {
 		this.autoFit = autoFit;
 	}
 
-	/**
-	 * Takes the current filter values and sets them as new min and max values
-	 *
-	 * @param dataSheet
-	 */
 	public void setFilterAsNewRange(DataSheet dataSheet) {
 		// log("setFilterAsNewRange: current range: "+this.getMin()+" and "+this.getMax()+" for axis "+this.getName());
 		// log("setFilterAsNewRange:filterPositions: "+this.lowerFilter.getValue()+" and "+this.upperFilter.getValue()+" for axis "+this.getName());
@@ -344,27 +317,17 @@ public class Axis implements Serializable {
 		this.setMin(minFilterValue, dataSheet);
 		this.setMax(maxFilterValue, dataSheet);
 		// log("setFilterAsNewRange: new range set to "+this.getMin()+" and "+this.getMax()+" for axis "+this.getName());
-		this.resetFilters();
+		this.resetFilters(dataSheet);
 	}
 
-	/**
-	 * Apply filters to designs
-	 * 
-	 * @see Filter
-	 */
-	public void applyFilters() {
-		this.upperFilter.apply();
-		this.lowerFilter.apply();
+	public void applyFilters(DataSheet dataSheet) {
+		this.upperFilter.apply(dataSheet);
+		this.lowerFilter.apply(dataSheet);
 	}
 
-	/**
-	 * Resets both filters to the Axis min and max values..
-	 * 
-	 * @see Filter
-	 */
-	public void resetFilters() {
-		this.upperFilter.reset();
-		this.lowerFilter.reset();
+	public void resetFilters(DataSheet dataSheet) {
+		this.upperFilter.reset(dataSheet);
+		this.lowerFilter.reset(dataSheet);
 	}
 
 }

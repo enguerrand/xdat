@@ -23,6 +23,7 @@ package org.xdat.actionListeners.parallelCoordinatesDisplaySettings;
 import org.xdat.Main;
 import org.xdat.chart.Axis;
 import org.xdat.chart.ParallelCoordinatesChart;
+import org.xdat.data.DataSheet;
 import org.xdat.gui.dialogs.ParallelCoordinatesDisplaySettingsDialog;
 import org.xdat.gui.frames.ChartFrame;
 import org.xdat.gui.panels.ParallelCoordinatesChartSidebarPanel;
@@ -46,6 +47,7 @@ public class ChartSpecificDisplaySettingsDialogActionListener implements ActionL
 
 	public void actionPerformed(ActionEvent e) {
 		String actionCommand = e.getActionCommand();
+        DataSheet dataSheet = this.mainWindow.getDataSheet();
 		if (actionCommand.equals("Ok")) {
 			Axis axis = this.chart.getAxis(this.dialog.getAxisDisplaySettingsPanel().getAxisChoiceCombo().getSelectedItem().toString());
 
@@ -70,14 +72,14 @@ public class ChartSpecificDisplaySettingsDialogActionListener implements ActionL
 			axis.setAxisColor(this.dialog.getAxisDisplaySettingsPanel().getAxisDisplaySettingsActionListener().getAxisColor());
 			axis.setWidth((Integer) this.dialog.getAxisDisplaySettingsPanel().getAxisWidthSpinner().getValue());
 			axis.setAxisLabelFontColor(this.dialog.getAxisDisplaySettingsPanel().getAxisDisplaySettingsActionListener().getAxisLabelColor());
-			axis.setAxisLabelFontSize((Integer) this.dialog.getAxisDisplaySettingsPanel().getAxisLabelFontSizeSpinner().getValue());
+			axis.setAxisLabelFontSize((Integer) this.dialog.getAxisDisplaySettingsPanel().getAxisLabelFontSizeSpinner().getValue(), dataSheet);
 			axis.setTicLength((Integer) this.dialog.getAxisDisplaySettingsPanel().getTicSizeSpinner().getValue());
-			axis.setTicCount((Integer) this.dialog.getAxisDisplaySettingsPanel().getTicCountSpinner().getValue());
+			axis.setTicCount((Integer) this.dialog.getAxisDisplaySettingsPanel().getTicCountSpinner().getValue(), dataSheet);
 			axis.setTicLabelDigitCount((Integer) this.dialog.getAxisDisplaySettingsPanel().getTicLabelDigitCountSpinner().getValue());
 			axis.setTicLabelFontColor(this.dialog.getAxisDisplaySettingsPanel().getAxisDisplaySettingsActionListener().getTicLabelColor());
 			axis.setTicLabelFontSize((Integer) this.dialog.getAxisDisplaySettingsPanel().getTicLabelFontSizeSpinner().getValue());
 			axis.setFilterInverted(this.dialog.getAxisDisplaySettingsPanel().getAxisDisplaySettingsActionListener().isInvertFilter());
-			axis.setAxisInverted(this.dialog.getAxisDisplaySettingsPanel().getAxisDisplaySettingsActionListener().isInvertAxis());
+			axis.setAxisInverted(this.dialog.getAxisDisplaySettingsPanel().getAxisDisplaySettingsActionListener().isInvertAxis(), dataSheet);
 			axis.setAutoFit(this.dialog.getAxisDisplaySettingsPanel().getAxisDisplaySettingsActionListener().isAutoFitAxis());
 			if (axis.isAutoFit()) {
 				axis.autofit(mainWindow.getDataSheet());
