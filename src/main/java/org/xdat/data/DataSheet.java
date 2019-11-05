@@ -29,7 +29,6 @@ import javax.swing.JOptionPane;
 import javax.swing.ListModel;
 import javax.swing.ProgressMonitor;
 import javax.swing.event.ListDataListener;
-import javax.swing.event.TableModelListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -84,7 +83,6 @@ public class DataSheet implements Serializable, ListModel {
 	private List<Design> data = new ArrayList<>();
 	private Map<Integer, Design> designIdsMap = new HashMap<>();
 	private List<Parameter> parameters = new LinkedList<>();
-	private transient List<TableModelListener> tableModelListeners = new ArrayList<>();
 	private transient List<ListDataListener> listDataListener = new ArrayList<>();
 	private transient List<DatasheetListener> listeners = new ArrayList<>();
 	private String delimiter;
