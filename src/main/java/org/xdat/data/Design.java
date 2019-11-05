@@ -49,7 +49,6 @@ public class Design implements Serializable {
 		Optional<Float> parsed = NumberParser.parseNumber(parameterValue);
 		if (parsed.isPresent()) {
 			this.numericalParameterValues.put(param, parsed.get());
-			param.setAtLeastOneNumeric(true);
 			this.stringParameterValues.remove(param);
 		} else {
 			param.setNumeric(false);

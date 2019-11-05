@@ -50,8 +50,6 @@ public class Parameter implements Serializable {
     private DataSheet dataSheet;
 	private String name;
 	private boolean numeric = true;
-	private boolean atLeastOneNumeric = false;
-	private boolean atLeastOneNonNumeric = false;
 	private TreeSet<String> discreteLevels = new TreeSet<>(new ReverseStringComparator());
     private int ticLabelDigitCount = 3;
 	public Parameter(String name, DataSheet dataSheet) {
@@ -75,53 +73,42 @@ public class Parameter implements Serializable {
 	 * @return true, if the parameter is mixed
 	 */
 	boolean isMixed() {
-		return (this.atLeastOneNonNumeric && this.atLeastOneNumeric);
+		return getType() == ParameterType.MIXED;
+	}
+
+	private ParameterType getType(){
+		boolean foundNumericValue = false;
+		boolean foundStringValue = false;
+        for (Design design : this.dataSheet.getDesigns()) {
+            String string = design.getStringValue(this);
+            if(NumberParser.parseNumber(string).isPresent()){
+                foundNumericValue = true;
+            } else {
+                foundStringValue = true;
+            }
+            if(foundNumericValue && foundStringValue) {
+                return ParameterType.MIXED;
+            }
+        }
+        if (foundStringValue) {
+            return ParameterType.NON_NUMERIC;
+        } else if (foundNumericValue) {
+            return ParameterType.NUMERIC;
+        }
+        // This can only happen if we have no designs. Consider the parameter numeric in this case
+        return ParameterType.NUMERIC;
 	}
 
 	public boolean isNumeric() {
 		return numeric;
 	}
 
-	void checkIfNumeric() {
-		this.numeric = true;
-		for (int i = 0; i < this.dataSheet.getDesignCount(); i++) {
-			String string = this.dataSheet.getDesign(i).getStringValue(this);
-			if(NumberParser.parseNumber(string).isPresent()){
-				this.atLeastOneNumeric = true;
-			} else {
-				this.setNumeric(false);
-			}
-		}
-	}
-
 	void setNumeric(boolean numeric) {
-
-		if (this.numeric && !numeric) {
-			this.atLeastOneNonNumeric = true;
-			for (int i = 0; i < this.dataSheet.getDesignCount(); i++) {
-				String string = this.dataSheet.getDesign(i).getStringValue(this);
-				int index = 0;
-				Iterator<String> it = discreteLevels.iterator();
-				boolean stringFound = false;
-				while (it.hasNext()) {
-					if (string.equalsIgnoreCase(it.next())) {
-						stringFound = true;
-						break;
-					}
-					index++;
-				}
-
-				if (!stringFound) {
-					// String not found, add it to discrete levels
-					this.discreteLevels.add(string);
-				}
-			}
+		if (numeric == this.numeric) {
+			return;
 		}
 		this.numeric = numeric;
-	}
-
-	void setAtLeastOneNumeric(boolean atLeastOneNumeric) {
-		this.atLeastOneNumeric = atLeastOneNumeric;
+		updateDiscreteLevels();
 	}
 
 	/**
@@ -149,11 +136,7 @@ public class Parameter implements Serializable {
 		if (this.numeric) {
 			Optional<Float> parsed = NumberParser.parseNumber(string);
 			if(parsed.isPresent()) {
-				this.atLeastOneNumeric = true;
 				return parsed.get();
-			} else {
-				this.setNumeric(false);
-				this.atLeastOneNonNumeric = true;
 			}
 		}
 
@@ -226,11 +209,16 @@ public class Parameter implements Serializable {
 		}
 	}
 
+	void updateNumeric() {
+		this.setNumeric(getType() == ParameterType.NUMERIC);
+
+	}
+
 	void updateDiscreteLevels(){
+	    this.discreteLevels.clear();
 	    if (isNumeric()) {
 	        return;
         }
-	    this.discreteLevels.clear();
 	    this.discreteLevels.addAll(this.dataSheet.getDesigns()
                 .stream()
                 .map(d -> d.getStringValue(this))
@@ -250,13 +238,6 @@ public class Parameter implements Serializable {
         int digitCount = getTicLabelDigitCount();
         return "%"+(digitCount+1)+"."+digitCount+"f";
     }
-
-	void resetDiscreteLevelsAndState() {
-		this.discreteLevels = new TreeSet<>(new ReverseStringComparator());
-		this.numeric = true;
-		this.atLeastOneNonNumeric = false;
-		this.atLeastOneNumeric = false;
-	}
 
 	public int getLongestTicLabelStringLength(FontMetrics fm, String numberFormat) {
 		if (this.isNumeric()) {

@@ -180,24 +180,17 @@ public class DataSheet implements Serializable, ListModel {
 		Map<Integer, Design> idbuffer = new HashMap<>(this.designIdsMap);
 		this.data.clear();
 		this.designIdsMap.clear();
-		for (int i = 0; i < this.parameters.size(); i++) {
-			this.parameters.get(i).resetDiscreteLevelsAndState();
 
-		}
-
-		if (dataHasHeaders) // if data has headers read the parameter names from
-							// the first line
-		{
-			for (int i = 0; i < this.parameters.size(); i++) {
-				this.parameters.get(i).setName(null);
-
+		// if data has headers read the parameter names from the first line
+		if (dataHasHeaders){
+			for (Parameter parameter : this.parameters) {
+				parameter.setName(null);
 			}
 			for (int i = 0; i < lineElements.length; i++) {
 				this.parameters.get(i).setName(this.getUniqueParameterName(lineElements[i]));
 			}
-		} else // if data does not have headers read the first Design from the
-				// first line and create default Parameter names
-		{
+			// if data does not have headers read the first Design from the first line and create default Parameter names
+		} else {
 			Design newDesign = new Design(idCounter++);
 			for (int i = 0; i < this.parameters.size(); i++) {
 				if (lineElements.length <= i) {
@@ -225,12 +218,9 @@ public class DataSheet implements Serializable, ListModel {
 			this.designIdsMap = idbuffer;
 		}
 
-		// this loop ensures that all discrete levels are known to the parameter
-		// so it returns the right double values
-		for (int i = 0; i < this.parameters.size(); i++) {
-			if (!this.parameters.get(i).isNumeric()) {
-				this.parameters.get(i).updateDiscreteLevels();
-			}
+		for (Parameter parameter : this.parameters) {
+			parameter.updateNumeric();
+			parameter.updateDiscreteLevels();
 		}
 		fireListeners(l -> l.onDataChanged(initialiseBooleanArray(true), initialiseBooleanArray(true), initialiseBooleanArray(true)));
 		fireListeners(DatasheetListener::onDataPanelUpdateRequired);
@@ -270,23 +260,27 @@ public class DataSheet implements Serializable, ListModel {
 		}
 	}
 
-	public void setValueAt(Object arg0, int rowIndex, int columnIndex) {
+	public void setValueAt(Object newValue, int rowIndex, int columnIndex) {
 		Parameter parameter = this.parameters.get(columnIndex - 1);
 		boolean previousNumeric = parameter.isNumeric();
-		String previousValue = this.getDesign(rowIndex).getStringValue(parameter);
 		boolean[] axisAutofitRequired = initialiseBooleanArray(false);
 		boolean[] axisResetFilterRequired = initialiseBooleanArray(false);
 		boolean[] axisApplyFiltersRequired = initialiseBooleanArray(false);
-		this.data.get(rowIndex).setValue(parameters.get(columnIndex - 1), arg0.toString());
+		this.data.get(rowIndex).setValue(parameters.get(columnIndex - 1), newValue.toString());
+
 		if (!previousNumeric) {
 			parameter.updateDiscreteLevels();
 		}
 
-		Optional<Float> parsed = NumberParser.parseNumber(arg0.toString());
-		if(!parsed.isPresent()) {
+		Optional<Float> parsed = NumberParser.parseNumber(newValue.toString());
+		boolean parsable = parsed.isPresent();
+
+		if(previousNumeric && !parsable) {
 			parameter.setNumeric(false);
-		} else if (!previousNumeric) {
-			parameter.checkIfNumeric();
+		} else if (!previousNumeric && parsable) {
+			parameter.updateNumeric();
+		}
+		if (previousNumeric != parameter.isNumeric()) {
 			axisAutofitRequired[columnIndex - 1] = true;
 			axisResetFilterRequired[columnIndex - 1] = true;
 		}
@@ -327,12 +321,12 @@ public class DataSheet implements Serializable, ListModel {
 			Design removedDesign = data.remove(designsToRemove[i]);
 			this.designIdsMap.remove(removedDesign.getId());
 			// check if that makes any non-numeric parameter numeric
-			for (int j = 0; j < this.parameters.size(); j++) {
-				if (!this.parameters.get(j).isNumeric()) {
-					String string = removedDesign.getStringValue(this.parameters.get(j));
+			for (Parameter parameter : this.parameters) {
+				if (!parameter.isNumeric()) {
+					String string = removedDesign.getStringValue(parameter);
 					if (!NumberParser.parseNumber(string).isPresent()) {
-						this.parameters.get(j).updateDiscreteLevels();
-						this.parameters.get(j).checkIfNumeric();
+						parameter.updateNumeric();
+						parameter.updateDiscreteLevels();
 					}
 				}
 			}
