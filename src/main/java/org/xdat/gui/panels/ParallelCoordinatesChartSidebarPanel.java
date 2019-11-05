@@ -55,8 +55,6 @@ import java.util.Map;
 
 public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 
-	static final long serialVersionUID = 0L;
-	static final boolean printLog = false;
 	private static final Color CLUSTER_NAME_TEXT_FIELD_EDITING_COLOR = new Color(255, 205, 51);
 	private static final Color CLUSTER_NAME_TEXT_FIELD_STANDARD_COLOR = new Color(230, 230, 230);
 	private ParallelChartSidebarActionListener cmd;

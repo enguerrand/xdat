@@ -114,14 +114,11 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 		if (!progressMonitor.isCanceled()) {
 			progressMonitor.setNote("Building Filters...");
 			progressMonitor.setProgress(0);
-			// log("constructor: axes created. Creating filters...");
 			for (int i = 0; i < dataSheet.getParameterCount() && !progressMonitor.isCanceled(); i++) {
 				this.axes.get(i).addFilters(dataSheet);
 				progressMonitor.setProgress(i);
 			}
-			// log("constructor: filters created. ");
 		}
-
 	}
 
 	public String getTitle() {

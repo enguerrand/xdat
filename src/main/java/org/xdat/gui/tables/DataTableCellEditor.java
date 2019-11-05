@@ -19,8 +19,6 @@
  */
 package org.xdat.gui.tables;
 
-import org.xdat.data.DataSheet;
-
 import javax.swing.DefaultCellEditor;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -29,20 +27,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.EventObject;
 
-/**
- * The Class DataTableCellEditor. <br>
- * Cell editor for the table displaying the JTable with the {@link DataSheet}.
- * 
- */
 public class DataTableCellEditor extends DefaultCellEditor {
 
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/**
-	 * Instantiates a new Data Table Cell Editor.
-	 * 
-	 */
 	public DataTableCellEditor() {
 		super(new JTextField());
 
@@ -56,10 +42,8 @@ public class DataTableCellEditor extends DefaultCellEditor {
 				srcTable.getSelectionModel().clearSelection();
 			}
 			return false;
-		} else if (anEvent.getClass().equals(MouseEvent.class) && ((MouseEvent) anEvent).getClickCount() < 2) {
-			return false;
 		} else {
-			return true;
+			return !anEvent.getClass().equals(MouseEvent.class) || ((MouseEvent) anEvent).getClickCount() >= 2;
 		}
 	}
 }

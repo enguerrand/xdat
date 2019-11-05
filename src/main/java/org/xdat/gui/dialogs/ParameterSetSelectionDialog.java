@@ -40,7 +40,6 @@ import java.util.List;
 
 public class ParameterSetSelectionDialog extends JDialog {
 
-	static final long serialVersionUID = 2L;
 	private List<JCheckBox> checkBoxes = new LinkedList<>();
 
 	public ParameterSetSelectionDialog(Main mainWindow, ChartFrame chartFrame) {

@@ -23,48 +23,23 @@ package org.xdat.gui.tables;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
 
-/**
- * A column model for the JTable that displays the
- * {@link org.xdat.data.DataSheet}.
- */
 public class GenericTableColumnModel extends DefaultTableColumnModel {
 
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0002;
-
-	/**
-	 * Instantiates a new generic table column model.
-	 */
 	public GenericTableColumnModel() {
 		super();
 		this.setColumnMargin(1);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * javax.swing.table.DefaultTableColumnModel#getColumnSelectionAllowed()
-	 */
+	@Override
 	public boolean getColumnSelectionAllowed() {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.table.DefaultTableColumnModel#moveColumn(int, int)
-	 */
+	@Override
 	public void moveColumn(int arg0, int arg1) {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * javax.swing.table.DefaultTableColumnModel#removeColumn(javax.swing.table
-	 * .TableColumn)
-	 */
+	@Override
 	public void removeColumn(TableColumn arg0) {
 	}
 }

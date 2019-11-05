@@ -41,12 +41,6 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-/**
- * ActionListener for a
- * {@link org.xdat.gui.panels.ParallelCoordinatesChartDisplaySettingsPanel} that
- * allows to modify the Display Settings of a
- * {@link org.xdat.chart.ParallelCoordinatesChart}.
- */
 public class ParallelChartSidebarActionListener implements ActionListener, ChangeListener {
 	private ParallelCoordinatesChartSidebarPanel sidePanel;
 	private Main mainWindow;
@@ -163,11 +157,6 @@ public class ParallelChartSidebarActionListener implements ActionListener, Chang
 		}
 	}
 
-	/**
-	 * Gets the active design color.
-	 * 
-	 * @return the active design color
-	 */
 	public Color getActiveDesignColor() {
 		return activeDesignColor;
 	}

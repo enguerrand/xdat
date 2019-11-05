@@ -91,14 +91,12 @@ public class ParallelChartFrameComboModel extends AbstractListModel implements M
 	public void insertElementAt(Object obj, int index) {
 		this.chartNames.add(index, obj.toString());
 		this.fireIntervalAdded(this, 0, this.chartNames.size());
-
 	}
 
 	@Override
 	public void removeElement(Object obj) {
 		this.chartNames.remove(obj);
 		this.fireIntervalRemoved(this, 0, this.chartNames.size());
-
 	}
 
 	@Override

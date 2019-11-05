@@ -33,11 +33,10 @@ import java.awt.event.KeyEvent;
 
 public class ParallelCoordinatesChartFrameAddDesignToClusterMenu extends JMenu implements MenuListener {
 
-	static final long serialVersionUID = 2L;
-	private Main mainWindow;
-	private ChartFrame chartFrame;
+	private final Main mainWindow;
+	private final ChartFrame chartFrame;
 
-	public ParallelCoordinatesChartFrameAddDesignToClusterMenu(Main mainWindow, ChartFrame chartFrame) {
+	ParallelCoordinatesChartFrameAddDesignToClusterMenu(Main mainWindow, ChartFrame chartFrame) {
 		super("Add filtered designs to cluster");
 		this.mainWindow = mainWindow;
 		this.chartFrame = chartFrame;

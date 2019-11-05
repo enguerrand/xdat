@@ -36,46 +36,18 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-/**
- * ActionListener that is used for a
- * {@link org.xdat.gui.menus.ScatterChart2D.ScatterChart2DFrameOptionsMenu}.
- */
 public class Scatter2DChartFrameOptionsMenuActionListener implements ActionListener {
 
-	/** The main window. */
 	private Main mainWindow;
-
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** The chart. */
 	private ScatterChart2D chart;
-
-	/** The chart frame. */
 	private ChartFrame chartFrame;
 
-	/**
-	 * Instantiates a new chart frame options menu action listener.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param chart
-	 *            the chart
-	 * @param chartFrame
-	 *            the chart frame
-	 */
 	public Scatter2DChartFrameOptionsMenuActionListener(Main mainWindow, ScatterChart2D chart, ChartFrame chartFrame) {
 		this.mainWindow = mainWindow;
 		this.chart = chart;
 		this.chartFrame = chartFrame;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals("Settings")) {
 			new ScatterChart2DSettingsDialog(mainWindow, chartFrame, chart);
@@ -106,10 +78,6 @@ public class Scatter2DChartFrameOptionsMenuActionListener implements ActionListe
 					JOptionPane.showMessageDialog(this.chartFrame, "IOException on saving image: " + exc.getMessage(), "Export to Image", JOptionPane.OK_OPTION);
 				}
 			}
-		}
-
-		else {
-			System.out.println(e.getActionCommand());
 		}
 	}
 }

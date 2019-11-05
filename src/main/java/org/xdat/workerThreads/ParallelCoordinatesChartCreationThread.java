@@ -20,39 +20,20 @@
 
 package org.xdat.workerThreads;
 
-import javax.swing.JOptionPane;
-import javax.swing.ProgressMonitor;
-import javax.swing.SwingWorker;
-
 import org.xdat.Main;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.exceptions.NoParametersDefinedException;
 import org.xdat.gui.frames.ChartFrame;
 
-/**
- * A thread that runs in the background to create a new parallel coordinates
- * chart. This takes away this potentially long-running task from the EDT. <br>
- * At the same time a ProgressMonitor is used to show progress, if required.
- * 
- */
+import javax.swing.JOptionPane;
+import javax.swing.ProgressMonitor;
+import javax.swing.SwingWorker;
+
 public class ParallelCoordinatesChartCreationThread extends SwingWorker {
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
 
-	/** The main window. */
 	private Main mainWindow;
-
-	/** The progress monitor. */
 	private ProgressMonitor progressMonitor;
 
-	/**
-	 * Instantiates a new chart creation thread.
-	 * 
-	 * @param mainWindow
-	 *            The main window
-	 * @param progressMonitor
-	 *            The progress monitor
-	 */
 	public ParallelCoordinatesChartCreationThread(Main mainWindow, ProgressMonitor progressMonitor) {
 		this.mainWindow = mainWindow;
 		this.progressMonitor = progressMonitor;
@@ -60,13 +41,8 @@ public class ParallelCoordinatesChartCreationThread extends SwingWorker {
 
 	@Override
 	public Object doInBackground() {
-		// log("do in background invoked from Thread "+Thread.currentThread().getId());
-		// log("Create: Creation invoked at "+(new Date()).toString());
 		ParallelCoordinatesChart chart = new ParallelCoordinatesChart(mainWindow.getDataSheet(), progressMonitor, mainWindow.getUniqueChartId(ParallelCoordinatesChart.class));
-
-		// log("doInBackground: progressMonitor isCanceled = "+progressMonitor.isCanceled());
 		if (progressMonitor.isCanceled()) {
-			// log("doInBackground: progressMonitor is Canceled ");
 			return null;
 		} else {
 			try {
@@ -77,15 +53,5 @@ public class ParallelCoordinatesChartCreationThread extends SwingWorker {
 			}
 			return null;
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.SwingWorker#done()
-	 */
-	@Override
-	protected void done() {
-		super.done();
 	}
 }

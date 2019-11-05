@@ -20,36 +20,19 @@
 
 package org.xdat.gui.menus.mainWIndow;
 
-import java.awt.Event;
-import java.awt.event.KeyEvent;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
-
 import org.xdat.Main;
 import org.xdat.actionListeners.mainMenu.MainChartMenuActionListener;
 
-/**
- * Chart menu for the {@link org.xdat.Main} window.
- */
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import java.awt.event.KeyEvent;
+
 public class MainChartMenu extends JMenu {
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0001;
 
-	/** The create parallel coordinates chart menu item. */
-	private JMenuItem createPCChartMenuItem = new JMenuItem("Create Parallel Coordinates Chart", 'p');
+	private final JMenuItem createPCChartMenuItem = new JMenuItem("Create Parallel Coordinates Chart", 'p');
+	private final JMenuItem createScatter2DChartMenuItem = new JMenuItem("Create Scatter Chart 2D", 's');
 
-	/** The create 2D scatter chart menu item. */
-	private JMenuItem createScatter2DChartMenuItem = new JMenuItem("Create Scatter Chart 2D", 's');
-
-	/**
-	 * Instantiates a new main chart menu.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 */
-	public MainChartMenu(Main mainWindow) {
+	MainChartMenu(Main mainWindow) {
 		super("Chart");
 		this.setMnemonic(KeyEvent.VK_C);
 		MainChartMenuActionListener cmd = new MainChartMenuActionListener(mainWindow);
@@ -67,29 +50,8 @@ public class MainChartMenu extends JMenu {
 		this.setItemsRequiringDataSheetEnabled(false);
 	}
 
-	/**
-	 * Specifies whether the menu item createMenuItem is enabled. This is
-	 * required because this item is only available when data is loaded.
-	 * 
-	 * @param enabled
-	 *            specifies whether the menu item createMenuItem is enabled.
-	 */
-	public void setItemsRequiringDataSheetEnabled(boolean enabled) {
+	void setItemsRequiringDataSheetEnabled(boolean enabled) {
 		this.createPCChartMenuItem.setEnabled(enabled);
 		this.createScatter2DChartMenuItem.setEnabled(enabled);
 	}
-
-	/**
-	 * Sets the ctrl accelerator.
-	 * 
-	 * @param mi
-	 *            the menu item
-	 * @param acc
-	 *            the accelerator
-	 */
-	private void setCtrlAccelerator(JMenuItem mi, char acc) {
-		KeyStroke ks = KeyStroke.getKeyStroke(acc, Event.CTRL_MASK);
-		mi.setAccelerator(ks);
-	}
-
 }

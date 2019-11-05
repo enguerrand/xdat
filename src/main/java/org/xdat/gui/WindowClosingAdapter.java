@@ -23,37 +23,14 @@ package org.xdat.gui;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-/**
- * Closing adapter for the {@link org.xdat.Main} window..
- */
 public class WindowClosingAdapter extends WindowAdapter {
 
-	/** The exit system. */
 	private boolean exitSystem;
 
-	/**
-	 * Instantiates a new window closing adapter.
-	 * 
-	 * @param exitSystem
-	 *            the exit system
-	 */
 	public WindowClosingAdapter(boolean exitSystem) {
 		this.exitSystem = exitSystem;
 	}
 
-	/**
-	 * Instantiates a new window closing adapter.
-	 */
-	public WindowClosingAdapter() {
-		this(false);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
-	 */
 	public void windowClosing(WindowEvent event) {
 		event.getWindow().setVisible(false);
 		event.getWindow().dispose();

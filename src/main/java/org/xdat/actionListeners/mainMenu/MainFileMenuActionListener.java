@@ -66,7 +66,6 @@ public class MainFileMenuActionListener implements ActionListener {
 			} else {
 				String filepath = session.getSessionDirectory() + System.getProperty("file.separator") + session.getSessionName() + Session.sessionFileExtension;
 				this.mainWindow.saveSessionAs(filepath);
-				// this.mainWindow.updateDataPanel();
 			}
 		} else if (e.getActionCommand().equals("Exit")) {
 			mainWindow.setVisible(false);
@@ -105,7 +104,6 @@ public class MainFileMenuActionListener implements ActionListener {
 			}
 			UserPreferences.getInstance().setLastFile(filepath);
 			this.mainWindow.setTitle("xdat   -   " + filepath + Session.sessionFileExtension);
-			// this.mainWindow.updateDataPanel();
 		}
 	}
 }

@@ -20,30 +20,15 @@
 
 package org.xdat.gui.menus.mainWIndow;
 
-import java.awt.Event;
-import java.awt.event.KeyEvent;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
-
 import org.xdat.Main;
 import org.xdat.actionListeners.mainMenu.MainFileMenuActionListener;
 
-/**
- * File menu for the {@link org.xdat.Main} window.
- */
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import java.awt.event.KeyEvent;
+
 public class MainFileMenu extends JMenu {
 
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0001;
-
-	/**
-	 * Instantiates a new main file menu.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 */
 	public MainFileMenu(Main mainWindow) {
 		super("File");
 		this.setMnemonic(KeyEvent.VK_F);
@@ -68,18 +53,4 @@ public class MainFileMenu extends JMenu {
 		mi.addActionListener(cmd);
 		this.add(mi);
 	}
-
-	/**
-	 * Sets the ctrl accelerator.
-	 * 
-	 * @param mi
-	 *            the menu item
-	 * @param acc
-	 *            the accelerator
-	 */
-	private void setCtrlAccelerator(JMenuItem mi, char acc) {
-		KeyStroke ks = KeyStroke.getKeyStroke(acc, Event.CTRL_MASK);
-		mi.setAccelerator(ks);
-	}
-
 }

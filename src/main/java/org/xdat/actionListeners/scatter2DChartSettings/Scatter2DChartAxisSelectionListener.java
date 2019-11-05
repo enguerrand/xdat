@@ -19,19 +19,15 @@
  */
 package org.xdat.actionListeners.scatter2DChartSettings;
 
-import javax.swing.JList;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
 import org.xdat.chart.ScatterChart2D;
 import org.xdat.data.AxisType;
 import org.xdat.gui.frames.ChartFrame;
 import org.xdat.gui.panels.Scatter2DChartAxisPanel;
 
-/**
- * List selection listener for a parameter selection list for a
- * {@link org.xdat.chart.ScatterChart2D}.
- */
+import javax.swing.JList;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 public class Scatter2DChartAxisSelectionListener implements ListSelectionListener {
 	private ScatterChart2D chart;
 
@@ -51,7 +47,6 @@ public class Scatter2DChartAxisSelectionListener implements ListSelectionListene
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		int selected_row = ((JList) e.getSource()).getSelectedIndex();
-		// System.out.println(selected_row);
 		chart.getScatterPlot2D().setParameterForAxis(axisType, chart.getDataSheet().getParameter(selected_row));
 		this.panel.currentParameterChanged();
 		this.frame.repaint();

@@ -24,7 +24,6 @@ import org.xdat.Main;
 import org.xdat.chart.ScatterChart2D;
 import org.xdat.exceptions.NoParametersDefinedException;
 import org.xdat.gui.frames.ChartFrame;
-import org.xdat.gui.menus.mainWIndow.MainChartMenu;
 import org.xdat.workerThreads.ParallelCoordinatesChartCreationThread;
 
 import javax.swing.JOptionPane;
@@ -33,21 +32,16 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-/**
- * ActionListener for a {@link MainChartMenu}.
- */
 public class MainChartMenuActionListener implements ActionListener {
 
 	private Main mainWindow;
 
 	public MainChartMenuActionListener(Main mainWindow) {
 		this.mainWindow = mainWindow;
-
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals("Create Parallel Coordinates Chart")) {
-			// log("Create: discrete level count of last parameter is: "+mainWindow.getDataSheet().getParameter(mainWindow.getDataSheet().getParameterCount()-1).getDiscreteLevelCount());
 			if (mainWindow.getDataSheet() == null) {
 				JOptionPane.showMessageDialog(mainWindow, "Please create a data sheet first by selecting Data->Import.", "Create Chart", JOptionPane.INFORMATION_MESSAGE);
 			} else {
@@ -69,8 +63,6 @@ public class MainChartMenuActionListener implements ActionListener {
 				}
 
 			}
-		} else {
-			System.out.println(e.getActionCommand());
 		}
 	}
 }

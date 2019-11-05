@@ -30,8 +30,7 @@ import java.awt.event.KeyEvent;
 
 public class MainDataRemoveParameterMenu extends JMenu implements MenuListener {
 
-	static final long serialVersionUID = 1L;
-	private Main mainWindow;
+	private final Main mainWindow;
 
 	public MainDataRemoveParameterMenu(Main mainWindow) {
 		super("Remove Parameter");

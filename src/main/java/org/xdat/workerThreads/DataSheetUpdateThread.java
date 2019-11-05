@@ -34,12 +34,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * A thread that runs in the background to create a new datasheet. This takes
- * away this potentially long-running task from the EDT. <br>
- * At the same time a ProgressMonitor is used to show progress, if required.
- *
- */
 public class DataSheetUpdateThread extends SwingWorker {
 	private String pathToInputFile;
 	private boolean dataHasHeaders;

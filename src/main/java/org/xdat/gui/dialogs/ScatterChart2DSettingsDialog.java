@@ -46,7 +46,6 @@ import java.awt.GridLayout;
 
 public class ScatterChart2DSettingsDialog extends JDialog {
 
-	static final long serialVersionUID = 2L;
 	private ColorChoiceButton fgColorButton;
 	private ColorChoiceButton bgColorButton;
 	private ColorChoiceButton standardDesignColorButton;

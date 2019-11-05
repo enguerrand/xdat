@@ -20,28 +20,17 @@
 
 package org.xdat.gui.tables;
 
+import org.xdat.Main;
+import org.xdat.data.Design;
+
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.xdat.Main;
-import org.xdat.data.Design;
-
-/**
- * The Class DataTableSelectionModel. <br>
- * Used to trigger a repaint of all charts when the selection on the data table
- * changes..
- */
 public class DataTableSelectionModel extends DefaultListSelectionModel implements ListSelectionListener {
-	/** the main Window */
+
 	private Main mainWindow;
 
-	/**
-	 * Instantiates a new Data Table Selection Model
-	 * 
-	 * @param mainWindow
-	 *            the main Window
-	 */
 	public DataTableSelectionModel(Main mainWindow) {
 		this.mainWindow = mainWindow;
 	}

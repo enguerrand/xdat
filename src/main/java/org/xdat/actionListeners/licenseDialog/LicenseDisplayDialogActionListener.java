@@ -33,12 +33,6 @@ public class LicenseDisplayDialogActionListener implements ActionListener {
 		this.dialog = dialog;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals("Accept License Agreement")) {
 			this.preferences.setLicenseAccepted(true);

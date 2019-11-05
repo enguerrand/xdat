@@ -20,49 +20,22 @@
 
 package org.xdat.gui.buttons;
 
+import org.xdat.Main;
+
+import javax.swing.JButton;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
 import java.net.URL;
 
-import javax.swing.JButton;
-
-import org.xdat.Main;
-
-/**
- * Custom Button that can be represented by to images. One for the default state
- * and one for the pressed state.
- */
 public class CustomButton extends JButton {
 
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0003;
-
-	/** Image that represents the button. */
 	private Image imgDefault;
-
-	/** Image that represents the button when pressed. */
 	private Image imgPressed;
 
-	/**
-	 * Instantiates a new custom button.
-	 * 
-	 * @param toolTip
-	 *            the message that is displayed when hovering over the button
-	 *            with the mouse.
-	 * @param pathToDefaultImage
-	 *            the path to image representing the unpressed state of the
-	 *            button.
-	 * @param pathToPressedImage
-	 *            the path to image representing the pressed state of the
-	 *            button.
-	 * @param actionCommand
-	 *            the action command
-	 */
 	public CustomButton(String toolTip, String pathToDefaultImage, String pathToPressedImage, String actionCommand) {
 		super();
 		this.setToolTipText(toolTip);
@@ -89,11 +62,7 @@ public class CustomButton extends JButton {
 		this.setPreferredSize(new Dimension(imgDefault.getWidth(this), imgDefault.getHeight(this)));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
-	 */
+	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		if (this.getModel().isPressed()) {
@@ -101,16 +70,6 @@ public class CustomButton extends JButton {
 		} else {
 			g.drawImage(this.imgDefault, 0, 0, this);
 		}
-
-	}
-
-	/**
-	 * Action performed.
-	 * 
-	 * @param e
-	 *            the action event
-	 */
-	public void actionPerformed(ActionEvent e) {
 
 	}
 }

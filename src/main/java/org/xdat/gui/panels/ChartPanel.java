@@ -27,7 +27,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 
 public abstract class ChartPanel extends JPanel {
-	static final long serialVersionUID = 1L;
+
 	private Chart chart;
 	private int marginTop = 20;
 	private int marginBottom = 80;

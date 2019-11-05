@@ -20,38 +20,20 @@
 
 package org.xdat.gui.menus.ScatterChart2D;
 
-import java.awt.Event;
-import java.awt.event.KeyEvent;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
-
 import org.xdat.Main;
 import org.xdat.actionListeners.scatter2DChartFrame.Scatter2DChartFrameOptionsMenuActionListener;
 import org.xdat.chart.ScatterChart2D;
 import org.xdat.gui.frames.ChartFrame;
 
-/**
- * Options Menu for a {@link org.xdat.gui.frames.ChartFrame}
- */
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import java.awt.event.KeyEvent;
+
 public class ScatterChart2DFrameOptionsMenu extends JMenu {
 
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0002;
-
-	/** The action listener. */
 	private Scatter2DChartFrameOptionsMenuActionListener cmd;
 
-	/**
-	 * Instantiates a new chart frame options menu.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param chartFrame
-	 *            the chart frame
-	 */
-	public ScatterChart2DFrameOptionsMenu(Main mainWindow, ChartFrame chartFrame) {
+	ScatterChart2DFrameOptionsMenu(Main mainWindow, ChartFrame chartFrame) {
 		super("Options");
 		this.setMnemonic(KeyEvent.VK_O);
 		JMenuItem mi;
@@ -72,18 +54,4 @@ public class ScatterChart2DFrameOptionsMenu extends JMenu {
 		mi.addActionListener(cmd);
 		this.add(mi);
 	}
-
-	/**
-	 * Sets the ctrl accelerator.
-	 * 
-	 * @param mi
-	 *            the menu item
-	 * @param acc
-	 *            the accelerator
-	 */
-	private void setCtrlAccelerator(JMenuItem mi, char acc) {
-		KeyStroke ks = KeyStroke.getKeyStroke(acc, Event.CTRL_MASK);
-		mi.setAccelerator(ks);
-	}
-
 }

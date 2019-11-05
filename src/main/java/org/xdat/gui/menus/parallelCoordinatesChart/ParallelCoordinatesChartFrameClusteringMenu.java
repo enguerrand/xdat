@@ -28,11 +28,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import java.awt.event.KeyEvent;
 
-public class ParallelCoordinatesChartFrameClusteringMenu extends JMenu {
+class ParallelCoordinatesChartFrameClusteringMenu extends JMenu {
 
-	static final long serialVersionUID = 1L;
-
-	public ParallelCoordinatesChartFrameClusteringMenu(Main mainWindow, ChartFrame chartFrame) {
+	ParallelCoordinatesChartFrameClusteringMenu(Main mainWindow, ChartFrame chartFrame) {
 		super("Clustering");
 		this.setMnemonic(KeyEvent.VK_C);
 
@@ -46,6 +44,5 @@ public class ParallelCoordinatesChartFrameClusteringMenu extends JMenu {
 		ParallelCoordinatesChartFrameAddDesignToClusterMenu clustersMenu;
 		clustersMenu = new ParallelCoordinatesChartFrameAddDesignToClusterMenu(mainWindow, chartFrame);
 		this.add(clustersMenu);
-
 	}
 }

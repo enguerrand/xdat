@@ -27,35 +27,11 @@ import org.xdat.data.DataSheet;
 import java.awt.Color;
 import java.awt.Dimension;
 
-/**
- * A serializable representation of all relevant settings for a two-dimensional
- * scatter chart which is displayed on a ChartFrame.
- * 
- * @see org.xdat.gui.frames.ChartFrame
- */
 public class ScatterChart2D extends Chart {
 
-	/** The version tracking unique identifier for Serialization. */
 	static final long serialVersionUID = 1;
-
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** The ScatterPlot2D belonging to this chart */
 	private ScatterPlot2D scatterPlot2D;
 
-	/**
-	 * Instantiates a new 2D scatter chart.
-	 * 
-	 * @param dataSheet
-	 *            the data sheet
-	 * @param showDecorations
-	 *            show decorations yes / no
-	 * @param frameSize
-	 *            size of the plot excluding margins
-	 * @param id 
-	 * 				the id
-	 */
 	public ScatterChart2D(DataSheet dataSheet, boolean showDecorations, Dimension frameSize, int id) {
 		super(dataSheet, id);
 		this.scatterPlot2D = new ScatterPlot2D(dataSheet, showDecorations);
@@ -63,9 +39,6 @@ public class ScatterChart2D extends Chart {
 
 	}
 
-	/**
-	 * Set current settings as default
-	 */
 	public void setCurrentSettingsAsDefault() {
 		UserPreferences userPreferences = UserPreferences.getInstance();
 		userPreferences.setScatterChart2DDisplayMode(this.scatterPlot2D.getDisplayedDesignSelectionMode());
@@ -85,65 +58,30 @@ public class ScatterChart2D extends Chart {
 
 	}
 
-	/**
-	 * Determines the width of this Chart.
-	 * 
-	 * @return the width of this chart
-	 */
 	public int getWidth() {
 		return this.getFrameSize().width;
 	}
 
-	/**
-	 * Determines the height of this Chart.
-	 * 
-	 * @return the height of this chart
-	 */
 	public int getHeight() {
 		return this.getFrameSize().height;
 	}
 
-	/**
-	 * Gets the title.
-	 * 
-	 * @return the title
-	 */
 	public String getTitle() {
 		return "2D Scatter Chart " + this.getID();
 	}
 
-	/**
-	 * Gets the back ground color.
-	 * 
-	 * @return the back ground color
-	 */
 	public ScatterPlot2D getScatterPlot2D() {
 		return this.scatterPlot2D;
 	}
 
-	/**
-	 * Gets the back ground color.
-	 * 
-	 * @return the back ground color
-	 */
 	public Color getBackGroundColor() {
 		return this.scatterPlot2D.getBackGroundColor();
 	}
 
-	/**
-	 * Sets the back ground color.
-	 * 
-	 * @param backGroundColor
-	 *            the new back ground color
-	 */
 	public void setBackGroundColor(Color backGroundColor) {
 		this.scatterPlot2D.setBackGroundColor(backGroundColor);
 	}
 
-	/**
-	 * Reset display settings to default.
-     * @param dataSheet
-     */
 	public void resetDisplaySettingsToDefault(DataSheet dataSheet) {
 		this.scatterPlot2D.resetDisplaySettingsToDefault();
 	}

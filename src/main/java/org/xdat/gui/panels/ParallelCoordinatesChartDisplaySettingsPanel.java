@@ -123,9 +123,6 @@ public class ParallelCoordinatesChartDisplaySettingsPanel extends JPanel {
 
 	}
 
-	/**
-	 * Builds the panel.
-	 */
 	private void buildPanel() {
 		// create components
 

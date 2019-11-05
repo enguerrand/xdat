@@ -20,94 +20,26 @@
 
 package org.xdat.gui.panels;
 
-import org.xdat.gui.panels.ParallelCoordinatesChartPanel;
-
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-
 import org.xdat.Main;
-import org.xdat.UserPreferences;
-import org.xdat.actionListeners.parallelCoordinatesChartFrame.ParallelChartSidebarActionListener;
 import org.xdat.chart.Chart;
-import org.xdat.chart.ParallelCoordinatesChart;
-import org.xdat.data.Cluster;
-import org.xdat.data.ClusterSet;
-import org.xdat.gui.buttons.ColorChoiceButton;
 import org.xdat.gui.buttons.CustomButton;
 import org.xdat.gui.frames.ChartFrame;
 
-/**
- * Panel to modify display settings for a
- * {@link org.xdat.chart.Chart}.
- */
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 public abstract class SidebarPanel extends JPanel {
-	/**
-	 * The version tracking unique identifier for Serialization.
-	 */
-	static final long serialVersionUID = 0000;
 
-	/**
-	 * Flag to enable debug message printing for this class.
-	 */
-	static final boolean printLog = false;
-	
-	
-	/**
-	 * The main Window
-	 */
 	private Main mainWindow;
-
-	/**
-	 * The chart frame
-	 */
 	private ChartFrame chartFrame;
-	
-	
-	/**
-	 * The chart panel
-	 */
 	private ChartPanel chartPanel;
-	
-
-	/**
-	 * the panel with chart specific content
-	 */
 	private JPanel contentPanel;
-	
-	/**
-	 * the header panel
-	 */
 	private JPanel headerPanel;
-	
-	/**
-	 * The chart frame to which the settings apply.
-	 */
-	private Chart chart;
-	
-	/**
-	 * Instantiates a new side panel 
-	 * @param mainWindow
-	 * 			     the main window
-	 * @param chartFrame
-	 *       		the chart frame
-	 * @param chartPanel
-	 *       		the chart panel
-	 * @param chart
-	 *            the chart
-	 */
-	public SidebarPanel(Main mainWindow, ChartFrame chartFrame, ChartPanel chartPanel, Chart chart) {
+    private Chart chart;
+
+	SidebarPanel(Main mainWindow, ChartFrame chartFrame, ChartPanel chartPanel, Chart chart) {
 		this.mainWindow = mainWindow;
 		this.chartFrame = chartFrame;
 		this.chartPanel = chartPanel;
@@ -131,9 +63,6 @@ public abstract class SidebarPanel extends JPanel {
 		this.chartFrame.repaint();
 	}
 
-	/**
-	 * Builds the header panel
-	 */
 	private void buildHeaderPanel(final boolean maximized) {
 		this.headerPanel.removeAll();
 		this.headerPanel.setLayout(new BorderLayout());
@@ -153,46 +82,24 @@ public abstract class SidebarPanel extends JPanel {
 		});
 	}
 
-	/**
-	 * Gets the main window
-	 * @return the main window
-	 */
 	public Main getMainWindow() {
 		return mainWindow;
 	}
 
-	/**
-	 * Gets the chart
-	 * @return the chart
-	 */
 	public Chart getChart() {
 		return chart;
 	}
 	
-	/**
-	 * gets the chart panel
-	 * @return the chart panel
-	 */
 	public ChartPanel getChartPanel() {
 		return chartPanel;
 	}
 	
-	/**
-	 * Gets the chart frame
-	 * @return the chart frame
-	 */
 	public ChartFrame getChartFrame() {
 		return chartFrame;
 	}
 	
-	/**
-	 * Builds the panel
-	 */
 	protected abstract void buildPanel(JPanel contentPanel);
 
-	/**
-	 * Initializes members needed before building the panel
-	 */
 	protected abstract void initialize();
 
 }

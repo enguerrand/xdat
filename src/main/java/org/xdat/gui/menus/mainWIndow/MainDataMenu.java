@@ -20,55 +20,25 @@
 
 package org.xdat.gui.menus.mainWIndow;
 
-import java.awt.Event;
-import java.awt.event.KeyEvent;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
-
 import org.xdat.Main;
 import org.xdat.actionListeners.mainMenu.MainDataMenuActionListener;
 
-/**
- * Data menu for the {@link org.xdat.Main} window.
- */
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import java.awt.Event;
+import java.awt.event.KeyEvent;
+
 public class MainDataMenu extends JMenu {
 
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0001;
+	private final JMenuItem importDataWithHeadersMenuItem = new JMenuItem("Import Data with Headers", 'i');
+	private final JMenuItem updateDataWithHeadersMenuItem = new JMenuItem("Update Data from File with Headers", 'u');
+	private final JMenuItem updateDataWithoutHeadersMenuItem = new JMenuItem("Update Data from File without Headers", 'o');
+	private final JMenuItem removeSelectedDesignsMenuItem = new JMenuItem("Remove selected designs", 'd');
+	private final JMenuItem unselectAllMenuItem = new JMenuItem("Unselect all designs", Event.ESCAPE);
+	private final MainDataRemoveParameterMenu removeParametersMenu;
+	private final JMenuItem clusteringMenuItem = new JMenuItem("Clustering", 'c');
 
-	/** The import data with headers menu item. */
-	private JMenuItem importDataWithHeadersMenuItem = new JMenuItem("Import Data with Headers", 'i');
-
-	/** The import data without headers menu item. */
-	private JMenuItem importDataWithoutHeadersMenuItem = new JMenuItem("Import Data without Headers", 'w');
-
-	/** The update data with headers menu item. */
-	private JMenuItem updateDataWithHeadersMenuItem = new JMenuItem("Update Data from File with Headers", 'u');
-
-	/** The update data without headers menu item. */
-	private JMenuItem updateDataWithoutHeadersMenuItem = new JMenuItem("Update Data from File without Headers", 'o');
-
-	/** The remove selected designs menu item. */
-	private JMenuItem removeSelectedDesignsMenuItem = new JMenuItem("Remove selected designs", 'd');
-
-	/** The unselect all menu item. */
-	private JMenuItem unselectAllMenuItem = new JMenuItem("Unselect all designs", Event.ESCAPE);
-
-	/** The remove parameters menu. */
-	private MainDataRemoveParameterMenu removeParametersMenu;
-
-	/** The clustering menu item. */
-	private JMenuItem clusteringMenuItem = new JMenuItem("Clustering", 'c');
-
-	/**
-	 * Instantiates a new main data menu.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 */
-	public MainDataMenu(Main mainWindow) {
+	MainDataMenu(Main mainWindow) {
 		super("Data");
 		this.setMnemonic(KeyEvent.VK_D);
 
@@ -79,6 +49,7 @@ public class MainDataMenu extends JMenu {
 		importDataWithHeadersMenuItem.setMnemonic(KeyEvent.VK_I);
 		importDataWithHeadersMenuItem.addActionListener(cmd);
 		this.add(importDataWithHeadersMenuItem);
+		JMenuItem importDataWithoutHeadersMenuItem = new JMenuItem("Import Data without Headers", 'w');
 		importDataWithoutHeadersMenuItem.setMnemonic(KeyEvent.VK_W);
 		importDataWithoutHeadersMenuItem.addActionListener(cmd);
 		this.add(importDataWithoutHeadersMenuItem);
@@ -114,34 +85,13 @@ public class MainDataMenu extends JMenu {
 
 	}
 
-	/**
-	 * Specifies whether the menu items requiring an active datasheet are
-	 * enabled.
-	 * 
-	 * @param enabled
-	 *            specifies whether the menu items requiring an active datasheet
-	 *            are enabled.
-	 */
-	public void setItemsRequiringDataSheetEnabled(boolean enabled) {
+	void setItemsRequiringDataSheetEnabled(boolean enabled) {
 		this.updateDataWithHeadersMenuItem.setEnabled(enabled);
 		this.updateDataWithoutHeadersMenuItem.setEnabled(enabled);
 		this.removeSelectedDesignsMenuItem.setEnabled(enabled);
 		this.removeParametersMenu.setEnabled(enabled);
 		this.unselectAllMenuItem.setEnabled(enabled);
 		this.clusteringMenuItem.setEnabled(enabled);
-	}
-
-	/**
-	 * Sets the ctrl accelerator.
-	 * 
-	 * @param mi
-	 *            the menu item
-	 * @param acc
-	 *            the accelerator
-	 */
-	private void setCtrlAccelerator(JMenuItem mi, char acc) {
-		KeyStroke ks = KeyStroke.getKeyStroke(acc, Event.CTRL_MASK);
-		mi.setAccelerator(ks);
 	}
 
 }

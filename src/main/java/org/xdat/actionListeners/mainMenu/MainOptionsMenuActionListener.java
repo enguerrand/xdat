@@ -48,8 +48,6 @@ public class MainOptionsMenuActionListener implements ActionListener {
 			if (userDecision == JOptionPane.OK_OPTION) {
 				UserPreferences.getInstance().resetToDefault();
 			}
-		} else {
-			System.out.println(e.getActionCommand());
 		}
 	}
 }

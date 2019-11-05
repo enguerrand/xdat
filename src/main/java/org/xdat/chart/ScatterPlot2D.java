@@ -30,12 +30,6 @@ import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * A serializable representation of all relevant settings for a two-dimensional
- * scatter chart which is displayed on a ChartFrame.
- * 
- * @see org.xdat.gui.frames.ChartFrame
- */
 public class ScatterPlot2D extends Plot {
 	static final long serialVersionUID = 4;
 	public static final int SHOW_ALL_DESIGNS = 0;

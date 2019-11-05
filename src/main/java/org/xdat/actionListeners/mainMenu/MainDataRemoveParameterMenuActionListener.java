@@ -20,39 +20,22 @@
 
 package org.xdat.actionListeners.mainMenu;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import org.xdat.Main;
 import org.xdat.chart.Chart;
 import org.xdat.chart.ParallelCoordinatesChart;
-import org.xdat.gui.menus.mainWIndow.MainDataRemoveParameterMenu;
 
-/**
- * ActionListener for a {@link MainDataRemoveParameterMenu}.
- */
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 public class MainDataRemoveParameterMenuActionListener implements ActionListener {
 
-	/** The main window. */
 	private Main mainWindow;
 
-	/**
-	 * Instantiates a new main data remove parameter menu action listener.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 */
 	public MainDataRemoveParameterMenuActionListener(Main mainWindow) {
 		this.mainWindow = mainWindow;
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
 	public void actionPerformed(ActionEvent e) {
 		String paramName = e.getActionCommand();
 		Chart[] charts = new Chart[this.mainWindow.getCurrentSession().getChartCount()];

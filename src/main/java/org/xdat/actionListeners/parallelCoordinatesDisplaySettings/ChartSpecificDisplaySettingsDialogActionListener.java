@@ -95,8 +95,6 @@ public class ChartSpecificDisplaySettingsDialogActionListener implements ActionL
 			this.dialog.dispose();
 		} else if (actionCommand.equals("Cancel")) {
 			this.dialog.dispose();
-		} else {
-			System.out.println("ChartSpecificDisplaySettingsDialogActionListener: " + e.getActionCommand());
 		}
 	}
 }

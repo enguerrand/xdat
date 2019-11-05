@@ -19,39 +19,20 @@
  */
 package org.xdat.gui.menus.parallelCoordinatesChart;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-
 import org.xdat.Main;
 import org.xdat.actionListeners.parallelCoordinatesChartFrame.ParallelChartContextMenuActionListener;
 import org.xdat.chart.Axis;
 import org.xdat.gui.frames.ChartFrame;
 
-/**
- * A context menu for the parallel coordinates chart that is opened upon
- * right-click.
- * <p>
- * This makes it easier to edit axis-specific settings.
- */
-public class ParallelCoordinatesContextMenu extends JPopupMenu {
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0000;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
 
-	/**
-	 * Instantiates a new parallel coordinates context menu.
-	 * 
-	 * @param mainWindow
-	 *            the main Window
-	 * @param chartFrame
-	 *            the chart frame
-	 * @param axis
-	 *            the axis
-	 */
+public class ParallelCoordinatesContextMenu extends JPopupMenu {
+
 	public ParallelCoordinatesContextMenu(Main mainWindow, ChartFrame chartFrame, Axis axis) {
 		super();
 		this.add(new JLabel(" Axis settings: " + axis.getName()));
@@ -187,5 +168,4 @@ public class ParallelCoordinatesContextMenu extends JPopupMenu {
 		label.setForeground(new Color(140, 140, 180));
 		item.add(label, BorderLayout.EAST);
 	}
-
 }

@@ -20,28 +20,14 @@
 
 package org.xdat.gui.panels;
 
-import java.awt.Font;
-
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import java.awt.Font;
 
-/**
- * A generic class with some display settings. Used in other classes rather than
- * JPanel in order to be able to change their looks all at once.
- */
 public class TitledSubPanel extends JPanel {
 
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0001;
-
-	/**
-	 * Instantiates a new titled sub panel.
-	 * 
-	 * @param title
-	 *            the title
-	 */
 	public TitledSubPanel(String title) {
 		super();
 		TitledBorder titledBorder = BorderFactory.createTitledBorder(title);

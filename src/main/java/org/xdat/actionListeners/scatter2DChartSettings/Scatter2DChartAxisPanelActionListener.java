@@ -24,16 +24,12 @@ import org.xdat.Main;
 import org.xdat.chart.ScatterChart2D;
 import org.xdat.data.AxisType;
 import org.xdat.gui.frames.ChartFrame;
-import org.xdat.gui.panels.Scatter2DChartAxisPanel;
 
 import javax.swing.JTextField;
 import java.awt.event.ActionEvent;
 
-/**
- * ActionListener for a {@link Scatter2DChartAxisPanel} that allows to modify
- * the Display Settings of an axis of a {@link ScatterChart2D}.
- */
 public class Scatter2DChartAxisPanelActionListener {
+
 	private Main mainWindow;
 	private ScatterChart2D chart;
 	private ChartFrame frame;

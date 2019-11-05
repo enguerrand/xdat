@@ -46,13 +46,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.util.Vector;
 
-/**
- * Panel to modify display settings for Objects of type
- * {@link org.xdat.chart.Axis} of the
- * {@link org.xdat.chart.ParallelCoordinatesChart}.
- */
 public class AxisDisplaySettingsPanel extends JPanel {
-	static final long serialVersionUID = 0000;
+
 	private Main mainWindow;
 	private ParallelCoordinatesDisplaySettingsDialog dialog;
 	private UserPreferences userPreferences;
@@ -107,18 +102,6 @@ public class AxisDisplaySettingsPanel extends JPanel {
 		this.axisMaxTextField.setPreferredSize(maxMinTextFieldsPreferredSizes);
 	}
 
-	/**
-	 * Instantiates a new axis display settings panel that is used to modify the
-	 * settings of a particular chart. These changes are not stored in the
-	 * preferences and are lost when the chart is closed.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param dialog
-	 *            the dialog on which the panel is located
-	 * @param chartFrame
-	 *            the chart frame to which the settings apply.
-	 */
 	public AxisDisplaySettingsPanel(Main mainWindow, ParallelCoordinatesDisplaySettingsDialog dialog, ChartFrame chartFrame) {
 		this.mainWindow = mainWindow;
 		this.userPreferences = UserPreferences.getInstance();
@@ -140,12 +123,6 @@ public class AxisDisplaySettingsPanel extends JPanel {
 
 	}
 
-	/**
-	 * Sets the initial states of all controls.
-	 * 
-	 * @param axis
-	 *            the new states
-	 */
 	public void setStates(Axis axis) {
 		this.setInvertFilterSelection(axis.isFilterInverted());
 		this.setInvertAxisSelection(axis.isAxisInverted());
@@ -181,9 +158,6 @@ public class AxisDisplaySettingsPanel extends JPanel {
 		this.dialog.repaint();
 	}
 
-	/**
-	 * Builds the panel.
-	 */
 	private void buildPanel() {
 		// create components
 
@@ -325,7 +299,7 @@ public class AxisDisplaySettingsPanel extends JPanel {
 		return this.cmd;
 	}
 
-	public void setInvertFilterSelection(boolean invertFilterSelection) {
+	private void setInvertFilterSelection(boolean invertFilterSelection) {
 		if (invertFilterSelection)
 			invertFilterButtonGroup.setSelected(invertFilterTrueButton.getModel(), true);
 		else
@@ -334,14 +308,10 @@ public class AxisDisplaySettingsPanel extends JPanel {
 	}
 
 	public boolean getInvertFilterSelection() {
-		if (invertFilterTrueButton.getModel().equals(invertFilterButtonGroup.getSelection())) {
-			return true;
-		} else {
-			return false;
-		}
+		return invertFilterTrueButton.getModel().equals(invertFilterButtonGroup.getSelection());
 	}
 
-	public void setInvertAxisSelection(boolean invertAxisSelection) {
+	private void setInvertAxisSelection(boolean invertAxisSelection) {
 		if (invertAxisSelection)
 			invertAxisButtonGroup.setSelected(invertAxisTrueButton.getModel(), true);
 		else
@@ -350,14 +320,10 @@ public class AxisDisplaySettingsPanel extends JPanel {
 	}
 
 	public boolean getInvertAxisSelection() {
-		if (invertAxisTrueButton.getModel().equals(invertAxisButtonGroup.getSelection())) {
-			return true;
-		} else {
-			return false;
-		}
+		return invertAxisTrueButton.getModel().equals(invertAxisButtonGroup.getSelection());
 	}
 
-	public void setAutoFitAxisSelection(boolean autoFitAxisSelection) {
+	private void setAutoFitAxisSelection(boolean autoFitAxisSelection) {
 		if (autoFitAxisSelection) {
 			autoFitAxisButtonGroup.setSelected(autoFitAxisTrueButton.getModel(), true);
 			axisMaxTextField.setEnabled(false);
@@ -454,13 +420,6 @@ public class AxisDisplaySettingsPanel extends JPanel {
 		}
 	}
 
-	/**
-	 * When autofitting is switched off, this method is used to enable the
-	 * fields where the ranges can be entered.
-	 * 
-	 * @param fieldsEnabled
-	 *            specifies whether the axis range fields are enabled
-	 */
 	public void setAxisRangeFieldsEnabled(boolean fieldsEnabled) {
 		this.axisMinTextField.setEnabled(fieldsEnabled);
 		this.axisMaxTextField.setEnabled(fieldsEnabled);

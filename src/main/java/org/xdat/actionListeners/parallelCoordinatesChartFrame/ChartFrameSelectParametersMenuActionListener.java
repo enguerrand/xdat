@@ -48,7 +48,6 @@ public class ChartFrameSelectParametersMenuActionListener implements ActionListe
 			Component[] menuComps = this.chartFrame.getJMenuBar().getMenu(0).getMenuComponents();
 			for (int i = 0; i < menuComps.length; i++) {
 				if (menuComps[i].getClass().equals(JCheckBoxMenuItem.class)) {
-					// ((JCheckBoxMenuItem)menuComps[i]).setState(true);
 					this.chart.getAxis(((JCheckBoxMenuItem) menuComps[i]).getText()).setActive(true);
 				}
 			}
@@ -56,7 +55,6 @@ public class ChartFrameSelectParametersMenuActionListener implements ActionListe
 			Component[] menuComps = this.chartFrame.getJMenuBar().getMenu(0).getMenuComponents();
 			for (int i = 0; i < menuComps.length; i++) {
 				if (menuComps[i].getClass().equals(JCheckBoxMenuItem.class)) {
-					// ((JCheckBoxMenuItem)menuComps[i]).setState(false);
 					this.chart.getAxis(((JCheckBoxMenuItem) menuComps[i]).getText()).setActive(false);
 				}
 			}
@@ -64,14 +62,12 @@ public class ChartFrameSelectParametersMenuActionListener implements ActionListe
 			Component[] menuComps = this.chartFrame.getJMenuBar().getMenu(0).getMenuComponents();
 			for (int i = 0; i < menuComps.length; i++) {
 				if (menuComps[i].getClass().equals(JCheckBoxMenuItem.class)) {
-					// ((JCheckBoxMenuItem)menuComps[i]).setState(!((JCheckBoxMenuItem)menuComps[i]).getState());
 					this.chart.getAxis(((JCheckBoxMenuItem) menuComps[i]).getText()).setActive(!this.chart.getAxis(((JCheckBoxMenuItem) menuComps[i]).getText()).isActive());
 				}
 			}
 		} else if (actionCommand.equals("Custom Selection")) {
 			new ParameterSetSelectionDialog(this.mainWindow, this.chartFrame);
 		} else {
-			// log("(actionCommand.equals(\"Reverse Selection\"))="+(actionCommand.equals("Reverse Selection")));
 			this.chart.getAxis(actionCommand).setActive(!this.chart.getAxis(actionCommand).isActive());
 		}
 		this.chartFrame.getChartPanel().setSize(this.chartFrame.getChartPanel().getPreferredSize());

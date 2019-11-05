@@ -59,18 +59,7 @@ public class Design implements Serializable {
 		}
 	}
 
-	/**
-	 * Gets the numeric (double) representation of a value for a given
-	 * parameter.
-	 * 
-	 * @param param
-	 *            the parameter for which the value should be returned.
-	 * @return the parameter value
-	 * @throws IllegalArgumentException
-	 *             if the parameter is unknown to the design.
-	 */
 	public double getDoubleValue(Parameter param) {
-
 		if (stringParameterValues.containsKey(param)) {
 			return param.getDoubleValueOf(stringParameterValues.get(param));
 		} else if (numericalParameterValues.containsKey(param) && param.isNumeric()) {
@@ -78,10 +67,6 @@ public class Design implements Serializable {
 		} else if (numericalParameterValues.containsKey(param)) {
 			return param.getDoubleValueOf(Float.toString(numericalParameterValues.get(param)));
 		} else {
-			// Enumeration<Parameter> e = parameterValues.keys();
-			// log("getDoubleValue: parameterValues.containsKey(param) = "+parameterValues.containsKey(param));
-			// while(e.hasMoreElements())
-			// log("getDoubleValue: parameterValues has key "+e.nextElement().getName());
 			throw new IllegalArgumentException("Unknown parameter " + param.getName());
 		}
 	}
@@ -91,16 +76,6 @@ public class Design implements Serializable {
 			return (stringParameterValues.get(param));
 		} else if (numericalParameterValues.containsKey(param)) {
 			return Float.toString(numericalParameterValues.get(param));
-		} else {
-			throw new IllegalArgumentException("Unknown parameter " + param.getName());
-		}
-	}
-
-	public void removeParameter(Parameter param) {
-		if (stringParameterValues.containsKey(param)) {
-			stringParameterValues.remove(param);
-		} else if (numericalParameterValues.containsKey(param)) {
-			numericalParameterValues.remove(param);
 		} else {
 			throw new IllegalArgumentException("Unknown parameter " + param.getName());
 		}

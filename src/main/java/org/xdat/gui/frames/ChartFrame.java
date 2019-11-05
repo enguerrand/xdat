@@ -48,7 +48,6 @@ import java.util.List;
 
 public class ChartFrame extends JFrame implements ComponentListener {
 
-	static final long serialVersionUID = 1L;
 	private Main mainWindow;
 	private Chart chart;
 	private ChartPanel chartPanel;
@@ -117,8 +116,8 @@ public class ChartFrame extends JFrame implements ComponentListener {
 	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
-		for (int i = 0; i < this.registeredDialog.size(); i++) {
-			registeredDialog.get(i).repaint();
+		for (JDialog jDialog : this.registeredDialog) {
+			jDialog.repaint();
 		}
 	}
 

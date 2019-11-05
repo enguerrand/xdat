@@ -20,17 +20,16 @@
 
 package org.xdat.actionListeners.parallelCoordinatesDisplaySettings;
 
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JColorChooser;
-import javax.swing.JDialog;
-
 import org.xdat.Main;
 import org.xdat.UserPreferences;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.gui.panels.ParallelCoordinatesChartDisplaySettingsPanel;
+
+import javax.swing.JColorChooser;
+import javax.swing.JDialog;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 public class ParallelChartDisplaySettingsActionListener implements ActionListener {
 	private JDialog dialog;
 	private UserPreferences userPreferences;
@@ -55,19 +54,6 @@ public class ParallelChartDisplaySettingsActionListener implements ActionListene
 		this.showDesignIDs = userPreferences.isParallelCoordinatesShowDesignIDs();
 	}
 
-	/**
-	 * Instantiates a new chart display settings action listener to edit
-	 * settings for a specific chart.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param panel
-	 *            the panel
-	 * @param chart
-	 *            the chart
-	 * @param dialog
-	 * 			the dialog
-	 */
 	public ParallelChartDisplaySettingsActionListener(Main mainWindow, ParallelCoordinatesChartDisplaySettingsPanel panel, ParallelCoordinatesChart chart, JDialog dialog) {
 		this.dialog = dialog;
 		this.userPreferences = UserPreferences.getInstance();

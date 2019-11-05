@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ClusterTableModel extends AbstractTableModel {
+
     private final List<Cluster> clustersBuffer = new LinkedList<>();
     private final ClusterFactory factory;
 

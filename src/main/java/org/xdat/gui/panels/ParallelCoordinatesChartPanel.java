@@ -27,7 +27,6 @@ import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.data.DataSheet;
 import org.xdat.data.Design;
 import org.xdat.data.Parameter;
-import org.xdat.exceptions.NoAxisFoundException;
 import org.xdat.gui.frames.ChartFrame;
 import org.xdat.gui.menus.parallelCoordinatesChart.ParallelCoordinatesContextMenu;
 import org.xdat.gui.tables.DataSheetTableColumnModel;
@@ -52,6 +51,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMotionListener, MouseListener, MouseWheelListener {
 	static final long serialVersionUID = 5L;
@@ -427,29 +427,20 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		}
 	}
 
-	private Axis getAxisAtLocation(int x) throws NoAxisFoundException {
+	private Optional<Axis> getAxisAtLocation(int x)  {
 		for (int i = 0; i < this.chart.getAxisCount(); i++) {
 			Filter uf = this.chart.getAxis(i).getUpperFilter();
-			if // check if this axis was meant by the click
-			(this.chart.getAxis(i).isActive() && x >= uf.getXPos() - 0.5 * this.chart.getAxis(i).getWidth() && x < uf.getXPos() + 0.5 * this.chart.getAxis(i).getWidth()) {
-				return this.chart.getAxis(i);
+			if (this.chart.getAxis(i).isActive() && x >= uf.getXPos() - 0.5 * this.chart.getAxis(i).getWidth() && x < uf.getXPos() + 0.5 * this.chart.getAxis(i).getWidth()) {
+				return Optional.of(this.chart.getAxis(i));
 			}
 		}
-		throw new NoAxisFoundException(x);
+		return Optional.empty();
 	}
 
-	/**
-	 * Finds the new index when dragging an axis to a given x location.
-	 * 
-	 * @param x
-	 *            the location
-	 * @return the found index
-	 */
-	private int getNewAxisIndexAtLocation(int x) throws NoAxisFoundException {
+	private int getNewAxisIndexAtLocation(int x) {
 		for (int i = 0; i < this.chart.getAxisCount(); i++) {
 			Filter uf = this.chart.getAxis(i).getUpperFilter();
-			if // check if this axis was meant by the click
-			(this.chart.getAxis(i).isActive() && x < uf.getXPos()) {
+			if (this.chart.getAxis(i).isActive() && x < uf.getXPos()) {
 				return i;
 			}
 		}
@@ -471,17 +462,13 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 			}
 			
 			this.mainWindow.getDataSheetTablePanel().setSelectedRows(newSelection);
-		}
-		else if (e.getButton() == 3) {
+		} else if (e.getButton() == 3) {
 			int x = e.getX();
 			int y = e.getY();
 
-			try {
-				Axis axis = this.getAxisAtLocation(x);
+			this.getAxisAtLocation(x).ifPresent(axis -> {
 				(new ParallelCoordinatesContextMenu(this.mainWindow, this.chartFrame, axis)).show(this, x, y);
-			} catch (NoAxisFoundException e1) {
-				e1.printStackTrace();
-			}
+			});
 		}
 
 	}
@@ -518,12 +505,10 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		if (this.draggedFilter == null){
 			this.storeBufferedImage();
 			if ( e.getButton() == 1 && withinAxisDragZone(e.getX()) > -1) {
-				try {
-					this.draggedAxis = this.getAxisAtLocation(dragStartX);
+				this.getAxisAtLocation(dragStartX).ifPresent(axis -> {
+					this.draggedAxis = axis;
 					setCursor(new Cursor(Cursor.MOVE_CURSOR));
-				} catch (NoAxisFoundException e1) {
-					e1.printStackTrace();
-				}
+				});
 			} else if (e.getButton() == 1) {
 				this.hoverList.clear();
 				this.dragSelecting = true;
@@ -542,17 +527,13 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		}
 		if (this.draggedAxis != null) {
 			repaintRequired = true;
-			try {
-				int newIndex = this.getNewAxisIndexAtLocation(e.getX() - 1); // column index starts at  one, param index at 0
-				DataSheetTableColumnModel cm = (DataSheetTableColumnModel) this.mainWindow.getDataSheetTablePanel().getDataTable().getColumnModel();
-                int currentIndex = dataSheet.getParameterIndex(this.draggedAxis.getName()) + 1;
-				if (newIndex > currentIndex) {
-					cm.moveColumn(currentIndex, newIndex);
-				} else if (newIndex < currentIndex) {
-					cm.moveColumn(currentIndex, newIndex + 1);
-				}
-			} catch (NoAxisFoundException e1) {
-				e1.printStackTrace();
+			int newIndex = this.getNewAxisIndexAtLocation(e.getX() - 1); // column index starts at  one, param index at 0
+			DataSheetTableColumnModel cm = (DataSheetTableColumnModel) this.mainWindow.getDataSheetTablePanel().getDataTable().getColumnModel();
+			int currentIndex = dataSheet.getParameterIndex(this.draggedAxis.getName()) + 1;
+			if (newIndex > currentIndex) {
+				cm.moveColumn(currentIndex, newIndex);
+			} else if (newIndex < currentIndex) {
+				cm.moveColumn(currentIndex, newIndex + 1);
 			}
 			this.draggedAxis = null;
 		}
@@ -690,23 +671,16 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 			this.chart.incrementAxisWidth(-e.getUnitsToScroll());
 		} else if (modifier == 2) {
 			int x = e.getX();
-			try {
-				Axis axis = this.getAxisAtLocation(x);
+			this.getAxisAtLocation(x).ifPresent(axis -> {
 				axis.setWidth(Math.max(0, axis.getWidth() - e.getUnitsToScroll()));
-			} catch (NoAxisFoundException e1) {
-			}
-		}
-
-		else if (modifier == 8) {
+			});
+		} else if (modifier == 8) {
 			int x = e.getX();
-			try {
-				Axis axis = this.getAxisAtLocation(x);
+			this.getAxisAtLocation(x).ifPresent(axis -> {
 				axis.setTicCount(Math.max(2, axis.getTicCount() - e.getWheelRotation()), mainWindow.getDataSheet());
-			} catch (NoAxisFoundException e1) {
-			}
+			});
 		}
 		this.repaint();
-
 	}
 
 	private void storeBufferedImage() {

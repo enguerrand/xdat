@@ -20,64 +20,34 @@
 
 package org.xdat.gui.menus.parallelCoordinatesChart;
 
-import java.awt.Event;
-import java.awt.event.KeyEvent;
-
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-
 import org.xdat.Main;
 import org.xdat.actionListeners.parallelCoordinatesChartFrame.ChartFrameSelectParametersMenuActionListener;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.gui.frames.ChartFrame;
 
-/**
- * Menu of the {@link org.xdat.gui.frames.ChartFrame} that allows to select the
- * {@link org.xdat.data.Parameter}s to be displayed.
- */
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import java.awt.event.KeyEvent;
+
 public class ParallelCoordinatesChartFrameSelectParametersMenu extends JMenu implements MenuListener {
 
-	/** The Main Window. */
 	private Main mainWindow;
-
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 1L;
-
-	/** The actionlistener. */
 	private ChartFrameSelectParametersMenuActionListener cmd;
-
-	/** The Chart. */
 	private ParallelCoordinatesChart chart;
 
-	/**
-	 * Instantiates a new chart frame select parameters menu.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param chartFrame
-	 *            the chart frame
-	 * @param chart
-	 *            the chart
-	 */
-	public ParallelCoordinatesChartFrameSelectParametersMenu(Main mainWindow, ChartFrame chartFrame, ParallelCoordinatesChart chart) {
+	ParallelCoordinatesChartFrameSelectParametersMenu(Main mainWindow, ChartFrame chartFrame, ParallelCoordinatesChart chart) {
 		super("Parameters");
 		this.addMenuListener(this);
 		this.mainWindow = mainWindow;
 		this.chart = chart;
 		this.setMnemonic(KeyEvent.VK_P);
-
 		this.cmd = new ChartFrameSelectParametersMenuActionListener(mainWindow, chartFrame, chart);
 
 	}
 
-	/**
-	 * Builds all the menu items
-	 * 
-	 */
 	private void buildMenu() {
 		this.removeAll();
 
@@ -120,38 +90,16 @@ public class ParallelCoordinatesChartFrameSelectParametersMenu extends JMenu imp
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * javax.swing.event.MenuListener#menuCanceled(javax.swing.event.MenuEvent)
-	 */
 	@Override
 	public void menuCanceled(MenuEvent arg0) {
-
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * javax.swing.event.MenuListener#menuDeselected(javax.swing.event.MenuEvent
-	 * )
-	 */
 	@Override
 	public void menuDeselected(MenuEvent arg0) {
-
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * javax.swing.event.MenuListener#menuSelected(javax.swing.event.MenuEvent)
-	 */
 	@Override
 	public void menuSelected(MenuEvent arg0) {
 		buildMenu();
 	}
-
 }

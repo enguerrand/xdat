@@ -139,13 +139,11 @@ public class MainDataMenuActionListener implements ActionListener {
 			}
 
 		} else if (e.getActionCommand().equals("Clustering")) {
-			if (mainWindow.getDataSheet() == null)
+			if (mainWindow.getDataSheet() == null) {
 				JOptionPane.showMessageDialog(mainWindow, "Please create a data sheet first by selecting Data->Import.", "Clustering", JOptionPane.INFORMATION_MESSAGE);
-			else
+			} else {
 				new ClusterDialog(mainWindow, mainWindow);
-
-		} else {
-			System.out.println(e.getActionCommand());
+			}
 		}
 	}
 }

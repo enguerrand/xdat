@@ -20,43 +20,23 @@
 
 package org.xdat.gui;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
 import org.xdat.Main;
 import org.xdat.gui.frames.ChartFrame;
 
-/**
- * Closing adapter for the {@link org.xdat.gui.frames.ChartFrame}.
- */
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 public class ChartFrameClosingAdapter extends WindowAdapter {
 
-	/** The main window. */
 	private Main mainWindow;
-
-	/** The chart frame. */
 	private ChartFrame chartFrame;
 
-	/**
-	 * Instantiates a new chart frame closing adapter.
-	 * 
-	 * @param chartFrame
-	 *            the chart frame
-	 * @param mainWindow
-	 *            the main window
-	 */
 	public ChartFrameClosingAdapter(ChartFrame chartFrame, Main mainWindow) {
 		super();
 		this.mainWindow = mainWindow;
 		this.chartFrame = chartFrame;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
-	 */
 	public void windowClosing(WindowEvent event) {
 		mainWindow.removeChartFrame(chartFrame);
 		chartFrame.setVisible(false);

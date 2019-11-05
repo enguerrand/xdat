@@ -39,7 +39,6 @@ import java.awt.GridLayout;
 import java.util.List;
 
 public class DataSheetTablePanel extends JPanel {
-	static final long serialVersionUID = 1L;
 
 	private Main mainWindow;
 	private JTable dataTable;

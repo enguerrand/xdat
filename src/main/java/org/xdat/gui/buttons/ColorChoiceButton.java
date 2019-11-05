@@ -20,56 +20,22 @@
 
 package org.xdat.gui.buttons;
 
+import javax.swing.JButton;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
 
-import javax.swing.JButton;
-
-/**
- * Button to display the current color of a {@link org.xdat.data.Cluster} and
- * bring up a dialog to edit this color.
- */
 public class ColorChoiceButton extends JButton {
 
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0001;
-
-	/** The current color. */
 	private Color currentColor;
-
-	/** The edge width. */
-	private int width = 16;
+	private final int width;
+	private final int height;
 	
-	/** The edge height. */
-	private int height = 16;
-	
-	/**
-	 * Instantiates a new color choice button with an edge length of 16 pixels
-	 * 
-	 * @param currentColor
-	 *            the current color
-	 * @param actionCommand
-	 *            the action command
-	 */
 	public ColorChoiceButton(Color currentColor, String actionCommand) {
 		this(currentColor, actionCommand, 16, 16);
 	}
 
-	/**
-	 * Instantiates a new color choice button.
-	 * 
-	 * @param currentColor
-	 *            the current color
-	 * @param actionCommand
-	 *            the action command
-	 * @param width
-	 *            the width
-	 * @param height
-	 *            the height
-	 */
 	public ColorChoiceButton(Color currentColor, String actionCommand, int width, int height) {
 		super();
 		this.currentColor = currentColor;
@@ -80,11 +46,7 @@ public class ColorChoiceButton extends JButton {
 		this.setPreferredSize(new Dimension(this.width, this.height));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
-	 */
+	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		g.setColor(this.currentColor);
@@ -92,31 +54,10 @@ public class ColorChoiceButton extends JButton {
 
 	}
 
-	/**
-	 * Action performed.
-	 * 
-	 * @param e
-	 *            the e
-	 */
-	public void actionPerformed(ActionEvent e) {
-
-	}
-
-	/**
-	 * Sets the current color.
-	 * 
-	 * @param currentColor
-	 *            the new current color
-	 */
 	public void setCurrentColor(Color currentColor) {
 		this.currentColor = currentColor;
 	}
 	
-	/**
-	 * Sets the alpha of the current color
-	 * @param alpha
-	 * 		the alpha value
-	 */
 	public void setAlpha(int alpha){
 		this.currentColor = new Color(this.currentColor.getRed(), this.currentColor.getGreen(), this.currentColor.getBlue(), alpha);
 		this.repaint();

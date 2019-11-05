@@ -63,11 +63,7 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 			boolean jumpedAxisWasInactive = true;
 			while (currentIndex > 0 && jumpedAxisWasInactive) {
 				jumpedAxisWasInactive = !((ParallelCoordinatesChart) this.chartFrame.getChart()).getAxis(currentIndex - 1).isActive();
-				// log("jumpedAxisWasInactive "+jumpedAxisWasInactive+" name: "+((ParallelCoordinatesChart)this.chartFrame.getChart()).getAxis(currentIndex-1).getName());
-				cm.moveColumn(currentIndex + 1, currentIndex); // column index
-																// starts at
-																// one, param
-																// index at 0
+				cm.moveColumn(currentIndex + 1, currentIndex); // column index starts at one, param index at 0
 				currentIndex--;
 			}
 		}
@@ -78,14 +74,7 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 			boolean jumpedAxisWasInactive = true;
 			while (currentIndex + 2 < cm.getColumnCount() && jumpedAxisWasInactive) {
 				jumpedAxisWasInactive = !((ParallelCoordinatesChart) this.chartFrame.getChart()).getAxis(currentIndex + 1).isActive();
-				// log("jumpedAxisWasInactive "+jumpedAxisWasInactive+" name: "+((ParallelCoordinatesChart)this.chartFrame.getChart()).getAxis(currentIndex-1).getName());
-				cm.moveColumn(currentIndex + 1, currentIndex + 2); // column
-																	// index
-																	// starts at
-																	// one,
-																	// param
-																	// index at
-																	// 0
+				cm.moveColumn(currentIndex + 1, currentIndex + 2); // column index starts at one, param index at 0
 				currentIndex++;
 			}
 		}
@@ -229,8 +218,6 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 				datasheet.getDesign(designID).removeAxisGradientColor();
 			}
 			this.mainWindow.repaintAllChartFrames();
-		} else {
-			System.out.println(e.getActionCommand());
 		}
 	}
 }

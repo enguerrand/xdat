@@ -39,12 +39,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 
-/**
- * A dialog to edit {@link org.xdat.data.Cluster}s.
- */
 public class ClusterDialog extends JDialog {
 
-	static final long serialVersionUID = 1L;
 	private JTable clusterTable;
 
 	public ClusterDialog(JFrame parent, Main mainWindow) {
@@ -72,7 +68,7 @@ public class ClusterDialog extends JDialog {
 		nameCol.setResizable(true);
 		cm.addColumn(nameCol);
 
-		ColorRenderer colorRenderer = new ColorRenderer(false);
+		ColorRenderer colorRenderer = new ColorRenderer();
 		TableColumn colorCol = new TableColumn(1, 50, colorRenderer, new ColorEditor(this));
 		colorCol.setHeaderValue("Color");
 		colorCol.setResizable(true);

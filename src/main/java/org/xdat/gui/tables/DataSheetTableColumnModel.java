@@ -29,7 +29,6 @@ import javax.swing.table.TableColumn;
 
 public class DataSheetTableColumnModel extends DefaultTableColumnModel {
 
-	static final long serialVersionUID = 2L;
 	private Main mainWindow;
 
 	public DataSheetTableColumnModel(Main mainWindow) {

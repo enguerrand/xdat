@@ -20,54 +20,24 @@
 
 package org.xdat.actionListeners.mainMenu;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.util.Properties;
-
-import javax.swing.JOptionPane;
-
 import org.xdat.BuildProperties;
 import org.xdat.Main;
-import org.xdat.gui.menus.mainWIndow.MainHelpMenu;
 
-/**
- * ActionListener for the {@link MainHelpMenu}.<br>
- * If a textfile with the name build-date.txt is found in the root directory of
- * the package the text will be read from the file and printed as the build date
- * in the about dialog.
- */
+import javax.swing.JOptionPane;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 public class MainHelpMenuActionListener implements ActionListener {
 
-	/**
-	 * The main window.
-	 */
-	private Main mainWindow;
-
-	/**
-	 * Flag to enable debug message printing for this class.
-	 */
-	static final boolean printLog = false;
+	private final Main mainWindow;
 	private final BuildProperties properties;
 
-	/**
-	 * Instantiates a new main help menu action listener.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 */
 	public MainHelpMenuActionListener(Main mainWindow) {
 		this.mainWindow = mainWindow;
 		properties = new BuildProperties();
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals("About")) {
 			final String version = properties.getVersion();
@@ -80,8 +50,6 @@ public class MainHelpMenuActionListener implements ActionListener {
                             "Visit www.xdat.org to get help."
                     ,
 					"About xdat", JOptionPane.INFORMATION_MESSAGE);
-		} else {
-			System.out.println(e.getActionCommand());
 		}
 	}
 }

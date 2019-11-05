@@ -49,12 +49,6 @@ public class Scatter2DChartDisplaySettingsActionListener implements ActionListen
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
 	public void actionPerformed(ActionEvent e) {
 		String actionCommand = e.getActionCommand();
 		if (actionCommand.equals("Display all designs")) {
@@ -93,8 +87,6 @@ public class Scatter2DChartDisplaySettingsActionListener implements ActionListen
 			this.chart.resetDisplaySettingsToDefault(mainWindow.getDataSheet());
 			this.frame.repaint();
 			this.dialog.buildPanel(frame.getMainWindow(), this.frame, this.chart);
-		} else {
-			System.out.println("Scatter2DChartDisplaySettingsActionListener: " + e.getActionCommand());
 		}
 		this.frame.repaint();
 	}
@@ -106,9 +98,6 @@ public class Scatter2DChartDisplaySettingsActionListener implements ActionListen
 		ScatterPlot2D plot = this.chart.getScatterPlot2D();
 		if (source.equals("dataPointSizeSpinner")) {
 			plot.setDotRadius(value);
-		} else {
-			System.out.println("Scatter2DChartDisplaySettingsChangeListener: value: " + value);
-			System.out.println("Scatter2DChartDisplaySettingsChangeListener: source: " + source);
 		}
 		frame.repaint();
 	}
