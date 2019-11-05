@@ -88,7 +88,7 @@ public class ClusterDialog extends JDialog {
 		activeCol.setResizable(true);
 		cm.addColumn(activeCol);
 
-		ClusterTableModel tableModel = mainWindow.getDataSheet().getClusterSet().createTableModel(mainWindow.getClusterFactory());
+		ClusterTableModel tableModel = mainWindow.getCurrentClusterSet().createTableModel(mainWindow.getClusterFactory());
 		this.clusterTable = new JTable(tableModel, cm);
 		JScrollPane scrollPane = new JScrollPane(this.clusterTable);
 

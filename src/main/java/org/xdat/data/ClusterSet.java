@@ -24,6 +24,7 @@ import org.xdat.gui.tables.ClusterTableModel;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,7 +44,9 @@ public class ClusterSet implements Serializable {
 	}
 
 	public void newCluster(ClusterFactory factory){
-        this.clusters.add(factory.newCluster(this.clusters));
+        Cluster newCluster = factory.newCluster(this.clusters);
+        this.clusters.add(newCluster);
+        this.dataSheet.onClustersUpdated(Collections.emptyList(), Collections.singletonList(newCluster), Collections.emptyList());
     }
 
 	public Cluster getCluster(int i) {
@@ -51,10 +54,11 @@ public class ClusterSet implements Serializable {
 	}
 
 	public Cluster getCluster(String clusterName) {
-		for (int i = 0; i < this.clusters.size(); i++) {
-			if (this.clusters.get(i).getName().equals(clusterName))
-				return this.clusters.get(i);
-		}
+        for (Cluster cluster : this.clusters) {
+            if (cluster.getName().equals(clusterName)) {
+                return cluster;
+            }
+        }
 		throw new IllegalArgumentException("Could not find cluster " + clusterName);
 	}
 
@@ -69,7 +73,8 @@ public class ClusterSet implements Serializable {
     public void removeCluster(String clusterName) {
         for (int i = 0; i < this.clusters.size(); i++) {
             if (this.clusters.get(i).getName().equals(clusterName)) {
-                this.clusters.remove(i);
+                Cluster removed = this.clusters.remove(i);
+                this.dataSheet.onClustersUpdated(Collections.emptyList(), Collections.emptyList(), Collections.singletonList(removed));
                 return;
             }
         }
@@ -80,7 +85,7 @@ public class ClusterSet implements Serializable {
         return clusters;
     }
 
-    void applyClustersBuffer(List<Cluster> clustersBuffer) {
+    public void applyClustersBuffer(List<Cluster> clustersBuffer) {
         List<Cluster> removedClusters = new ArrayList<>();
         List<Cluster> changedClusters = new ArrayList<>();
         List<Cluster> addedClusters = new ArrayList<>();
@@ -110,5 +115,11 @@ public class ClusterSet implements Serializable {
             }
         }
         this.dataSheet.onClustersUpdated(changedClusters, addedClusters, removedClusters);
+    }
+
+    public void initTransientData() {
+        for (Cluster cluster : this.clusters) {
+            cluster.initTransientData();
+        }
     }
 }

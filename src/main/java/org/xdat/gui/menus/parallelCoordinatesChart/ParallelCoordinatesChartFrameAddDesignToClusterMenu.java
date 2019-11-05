@@ -50,7 +50,7 @@ public class ParallelCoordinatesChartFrameAddDesignToClusterMenu extends JMenu i
 		ChartFrameAddDesignToClusterMenuActionListener cmd = new ChartFrameAddDesignToClusterMenuActionListener(mainWindow, chartFrame);
 
 		JMenuItem mi;
-		ClusterSet clusterSet = mainWindow.getDataSheet().getClusterSet();
+		ClusterSet clusterSet = mainWindow.getCurrentClusterSet();
 		if (clusterSet.getClusterCount() == 0) {
 			mi = new JMenuItem("No clusters defined");
 			this.add(mi);

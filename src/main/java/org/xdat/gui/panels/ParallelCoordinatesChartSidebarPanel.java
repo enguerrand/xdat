@@ -126,7 +126,7 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 		}
 
 		linkColorButtonToSlider(this.activeDesignColorButton, this.activeDesignAlphaSlider);
-		this.updateClusterList(getMainWindow().getDataSheet().getClusterSet());
+		this.updateClusterList(getMainWindow().getCurrentClusterSet());
 		this.validate();
 	}
 

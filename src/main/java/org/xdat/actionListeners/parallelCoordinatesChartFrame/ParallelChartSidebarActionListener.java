@@ -65,6 +65,7 @@ public class ParallelChartSidebarActionListener implements ActionListener, Chang
 	public void actionPerformed(ActionEvent e) {
 		String actionCommand = e.getActionCommand();
 		ParallelCoordinatesChart chart = (ParallelCoordinatesChart) chartPanel.getChart();
+		ClusterSet clusterSet = mainWindow.getCurrentClusterSet();
 
 		if (actionCommand.equals("Active Design Color")) {
 			Color newColor = JColorChooser.showDialog(sidePanel.getChartFrame(), "Background Color", this.activeDesignColor);
@@ -81,12 +82,10 @@ public class ParallelChartSidebarActionListener implements ActionListener, Chang
 				chartPanel.repaint();
 			}
 		} else if (actionCommand.equals("Add Cluster")) {
-			DataSheet data = mainWindow.getDataSheet();
-			data.getClusterSet().newCluster(clusterFactory);
-			this.sidePanel.updateClusterList(data.getClusterSet());
+			clusterSet.newCluster(clusterFactory);
+			this.sidePanel.updateClusterList(clusterSet);
 		} else if (actionCommand.equals("Remove")) {
 			JButton button = (JButton) e.getSource();
-			ClusterSet clusterSet = mainWindow.getDataSheet().getClusterSet();
 			clusterSet.removeCluster(button.getName());
 
 			this.sidePanel.updateClusterList(clusterSet);
@@ -96,7 +95,7 @@ public class ParallelChartSidebarActionListener implements ActionListener, Chang
 		} else if (actionCommand.equals("Apply")) {
 			JButton button = (JButton) e.getSource();
 			DataSheet dataSheet = chart.getDataSheet();
-			Cluster cluster = dataSheet.getClusterSet().getCluster(button.getName());
+			Cluster cluster = clusterSet.getCluster(button.getName());
 			for (int i = 0; i < dataSheet.getDesignCount(); i++) {
 				if (dataSheet.getDesign(i).isActive(chart)) {
 					dataSheet.getDesign(i).setCluster(cluster);
@@ -110,7 +109,6 @@ public class ParallelChartSidebarActionListener implements ActionListener, Chang
 			}
 		} else if (actionCommand.equals("Active")) {
 			JCheckBox checkBox = (JCheckBox) e.getSource();
-			ClusterSet clusterSet = mainWindow.getDataSheet().getClusterSet();
 			clusterSet.getCluster(checkBox.getName()).setActive(checkBox.isSelected());
 
 			for (int i = 0; i < this.mainWindow.getChartFrameCount(); i++) {
@@ -119,7 +117,7 @@ public class ParallelChartSidebarActionListener implements ActionListener, Chang
 			}
 		} else if (actionCommand.equals("clusterColor")) {
 			ColorChoiceButton button = (ColorChoiceButton) e.getSource();
-			Cluster cluster = mainWindow.getDataSheet().getClusterSet().getCluster(button.getName());
+			Cluster cluster = clusterSet.getCluster(button.getName());
 
 			Color newColor = JColorChooser.showDialog(sidePanel.getChartFrame(), "Cluster Color", cluster.getActiveDesignColor(true));
 			if (newColor != null) {
@@ -155,7 +153,7 @@ public class ParallelChartSidebarActionListener implements ActionListener, Chang
 				Color oldDefaultColor = UserPreferences.getInstance().getParallelCoordinatesActiveDesignDefaultColor();
 				UserPreferences.getInstance().setParallelCoordinatesActiveDesignDefaultColor(new Color(oldDefaultColor.getRed(), oldDefaultColor.getGreen(), oldDefaultColor.getBlue(), value));
 			} else {
-				Cluster cluster = mainWindow.getDataSheet().getClusterSet().getCluster(slider.getName());
+				Cluster cluster = mainWindow.getCurrentClusterSet().getCluster(slider.getName());
 				if(cluster != null){
 					Color newColor = new Color(cluster.getActiveDesignColor(true).getRed(), cluster.getActiveDesignColor(true).getGreen(), cluster.getActiveDesignColor(true).getBlue(), value);
 					cluster.setActiveDesignColor(newColor);

@@ -61,8 +61,10 @@ public class ClusterDialogActionListener implements ActionListener {
 
 			List<Cluster> clustersBuffer = this.tableModel.getClustersBuffer();
             DataSheet dataSheet = this.mainWindow.getDataSheet();
-            dataSheet.applyClustersBuffer(clustersBuffer);
-			this.tableModel.applyBuffer(dataSheet.getClusterSet().getClusters(), dataSheet);
+
+			mainWindow.getCurrentClusterSet().applyClustersBuffer(clustersBuffer);
+
+			this.tableModel.applyBuffer(this.mainWindow.getCurrentClusterSet().getClusters(), dataSheet);
 			for (int i = 0; i < this.mainWindow.getChartFrameCount(); i++) {
 				this.mainWindow.getChartFrame(i).validate();
 				this.mainWindow.getChartFrame(i).repaint();

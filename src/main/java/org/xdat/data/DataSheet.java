@@ -79,16 +79,21 @@ import java.util.function.Consumer;
 public class DataSheet implements Serializable, ListModel {
 
 	static final long serialVersionUID = 8;
-	private ClusterSet clusterSet;
 	private List<Design> data = new ArrayList<>();
 	private Map<Integer, Design> designIdsMap = new HashMap<>();
 	private List<Parameter> parameters = new LinkedList<>();
-	private transient List<ListDataListener> listDataListener = new ArrayList<>();
-	private transient List<DatasheetListener> listeners = new ArrayList<>();
+	private transient List<ListDataListener> listDataListener;
+	private transient List<DatasheetListener> listeners;
 	private String delimiter;
+
+	public void initTransientData() {
+		this.listDataListener = new ArrayList<>();
+		this.listeners = new ArrayList<>();
+	}
+
 	public DataSheet(String pathToInputFile, boolean dataHasHeaders, Main mainWindow, ProgressMonitor progressMonitor) throws IOException {
+		initTransientData();
 		UserPreferences userPreferences = UserPreferences.getInstance();
-		this.clusterSet = new ClusterSet(this);
 		this.delimiter = userPreferences.getDelimiter();
 		if (userPreferences.isTreatConsecutiveAsOne())
 			this.delimiter = this.delimiter + "+";
@@ -118,14 +123,13 @@ public class DataSheet implements Serializable, ListModel {
 		line = (f.readLine()).trim();
 
 		String[] lineElements = line.split(this.delimiter);
-		if (dataHasHeaders) // if data has headers read the parameter names from
-							// the first line
-		{
+		if (dataHasHeaders) {
+			// if data has headers read the parameter names from the first line
 			for (int i = 0; i < lineElements.length; i++) {
 				this.parameters.add(new Parameter(this.getUniqueParameterName(lineElements[i]), this));
 			}
-		} else // if data does not have headers read the first Design from the first line and create default Parameter names
-		{
+		} else {
+			// if data does not have headers read the first Design from the first line and create default Parameter names
 			Design newDesign = new Design(idCounter++);
 			for (int i = 0; i < lineElements.length; i++) {
 				this.parameters.add(new Parameter("Parameter " + (i + 1), this));
@@ -425,10 +429,6 @@ public class DataSheet implements Serializable, ListModel {
 		return unique;
 	}
 
-	public ClusterSet getClusterSet() {
-		return clusterSet;
-	}
-
 	public void evaluateBoundsForAllDesigns(ParallelCoordinatesChart chart) {
 		for (int i = 0; i < this.getDesignCount(); i++) {
 			this.data.get(i).evaluateBounds(chart, this);
@@ -450,10 +450,7 @@ public class DataSheet implements Serializable, ListModel {
 
 	@Override
 	public void addListDataListener(ListDataListener l) {
-		if (listDataListener == null)
-			listDataListener = new LinkedList<>();
 		listDataListener.add(l);
-
 	}
 
 	@Override
@@ -483,10 +480,6 @@ public class DataSheet implements Serializable, ListModel {
 		for (DatasheetListener listener : this.listeners) {
 			action.accept(listener);
 		}
-	}
-
-	public void applyClustersBuffer(List<Cluster> clusters) {
-		this.clusterSet.applyClustersBuffer(clusters);
 	}
 
 	void onClustersUpdated(List<Cluster> changed, List<Cluster> added, List<Cluster> removed) {

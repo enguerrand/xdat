@@ -55,7 +55,7 @@ public class Cluster implements Serializable {
 		this.uniqueId = uniqueId;
 		this.activeDesignColor = UserPreferences.getInstance().getParallelCoordinatesActiveDesignDefaultColor();
 		this.activeDesignColorNoAlpha = new Color(this.activeDesignColor.getRed(), this.activeDesignColor.getGreen(), this.activeDesignColor.getBlue());
-		this.clusterListeners = new ArrayList<>();
+		initTransientData();
 	}
 
 	public Color getActiveDesignColor(boolean useAlpha) {
@@ -121,19 +121,11 @@ public class Cluster implements Serializable {
 	}
 	
 	public void addClusterListener(ClusterListener l){
-		if(this.clusterListeners==null){
-			this.clusterListeners = new ArrayList<>();
-		}
 		this.clusterListeners.add(l);
 	}
 	
 	public void removeClusterListener(ClusterListener l){
-		if(this.clusterListeners==null){
-			return;
-		}
-		if(this.clusterListeners.contains(l)){
-			this.clusterListeners.remove(l);
-		}
+		this.clusterListeners.remove(l);
 	}
 	
 	private void fireNameChanged(){
@@ -160,4 +152,8 @@ public class Cluster implements Serializable {
     public int hashCode() {
         return Objects.hash(uniqueId);
     }
+
+	void initTransientData() {
+		this.clusterListeners = new ArrayList<>();
+	}
 }

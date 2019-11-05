@@ -24,6 +24,7 @@ import org.xdat.actionListeners.scatter2DChartSettings.ParallelChartFrameComboMo
 import org.xdat.chart.Chart;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.data.ClusterFactory;
+import org.xdat.data.ClusterSet;
 import org.xdat.data.DataSheet;
 import org.xdat.data.DatasheetListener;
 import org.xdat.exceptions.NoParametersDefinedException;
@@ -41,7 +42,6 @@ import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.event.ListDataListener;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
@@ -55,14 +55,13 @@ import java.util.List;
 public class Main extends JFrame {
 	public static final long serialVersionUID = 10L;
 	private MainMenuBar mainMenuBar;
-	private transient DataSheetTablePanel dataSheetTablePanel;
 	private Session currentSession;
 	private List<ChartFrame> chartFrames = new LinkedList<>();
-	private transient List<ListDataListener> listDataListener = new LinkedList<>();
-	private transient List<ParallelChartFrameComboModel> comboModels = new LinkedList<>();
 	private final BuildProperties buildProperties;
 	private final ClusterFactory clusterFactory = new ClusterFactory();
 	private final DatasheetListener datasheetListener;
+	private transient DataSheetTablePanel dataSheetTablePanel;
+	private transient List<ParallelChartFrameComboModel> comboModels = new LinkedList<>();
 
 	private static final List<String> LOOK_AND_FEEL_ORDER_OF_PREF = Arrays.asList(
 			"com.sun.java.swing.plaf.gtk.GTKLookAndFeel",
@@ -217,6 +216,14 @@ public class Main extends JFrame {
 		this.rebuildAllChartFrames();
 	}
 
+	public ClusterSet getCurrentClusterSet() {
+        return this.currentSession.getCurrentClusterSet();
+    }
+
+    public void setCurrentClusterSet(ClusterSet clusterSet) {
+        this.currentSession.setCurrentClusterSet(clusterSet);
+    }
+
 	public Session getCurrentSession() {
 		return currentSession;
 	}
@@ -336,7 +343,7 @@ public class Main extends JFrame {
 	public void loadSession(String pathToFile) {
 		try {
 			this.disposeAllChartFrames();
-			this.currentSession = Session.readFromFile(this, pathToFile);
+			this.currentSession = Session.readFromFile(pathToFile);
 
 			this.setTitle("xdat   -   " + pathToFile);
 

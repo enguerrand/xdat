@@ -21,6 +21,7 @@
 package org.xdat.workerThreads;
 
 import org.xdat.Main;
+import org.xdat.data.ClusterSet;
 import org.xdat.data.DataSheet;
 
 import javax.swing.JOptionPane;
@@ -28,38 +29,13 @@ import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 import java.io.IOException;
 
-/**
- * A thread that runs in the background to create a new datasheet. This takes
- * away this potentially long-running task from the EDT. <br>
- * At the same time a ProgressMonitor is used to show progress, if required.
- * 
- */
 public class DataSheetCreationThread extends SwingWorker {
 
-	/** The path to the input file to be imported. */
 	private String pathToInputFile;
-
-	/** Specifies, whether the data to be imported has headers. */
 	private boolean dataHasHeaders;
-
-	/** The main window. */
 	private Main mainWindow;
-
-	/** The progress monitor. */
 	private ProgressMonitor progressMonitor;
 
-	/**
-	 * Instantiates a new data sheet creation thread.
-	 * 
-	 * @param pathToInputFile
-	 *            The path to the input file to be imported
-	 * @param dataHasHeaders
-	 *            Specifies, whether the data to be imported has headers
-	 * @param mainWindow
-	 *            The main window
-	 * @param progressMonitor
-	 *            The progress monitor
-	 */
 	public DataSheetCreationThread(String pathToInputFile, boolean dataHasHeaders, Main mainWindow, ProgressMonitor progressMonitor) {
 		this.pathToInputFile = pathToInputFile;
 		this.dataHasHeaders = dataHasHeaders;
@@ -71,11 +47,13 @@ public class DataSheetCreationThread extends SwingWorker {
 	public Object doInBackground() {
 		try {
 			DataSheet dataSheet = new DataSheet(this.pathToInputFile, this.dataHasHeaders, this.mainWindow, this.progressMonitor);
+			ClusterSet clusterSet = new ClusterSet(dataSheet);
 
 			if (this.progressMonitor.isCanceled()) {
 				this.mainWindow.repaint();
 			} else {
 				this.mainWindow.setDataSheet(dataSheet);
+				this.mainWindow.setCurrentClusterSet(clusterSet);
 				this.mainWindow.getMainMenuBar().setItemsRequiringDataSheetEnabled(true);
 			}
 		} catch (IOException e) {

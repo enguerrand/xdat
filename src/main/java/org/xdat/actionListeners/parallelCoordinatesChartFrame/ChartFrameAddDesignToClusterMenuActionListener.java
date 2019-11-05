@@ -40,7 +40,7 @@ public class ChartFrameAddDesignToClusterMenuActionListener implements ActionLis
 	public void actionPerformed(ActionEvent e) {
 		String actionCommand = e.getActionCommand();
 		DataSheet dataSheet = chartFrame.getChart().getDataSheet();
-		Cluster cluster = dataSheet.getClusterSet().getCluster(actionCommand);
+		Cluster cluster = mainWindow.getCurrentClusterSet().getCluster(actionCommand);
 		ParallelCoordinatesChart chart = (ParallelCoordinatesChart) chartFrame.getChart();
 		for (int i = 0; i < dataSheet.getDesignCount(); i++) {
 			if (dataSheet.getDesign(i).isActive(chart)) {

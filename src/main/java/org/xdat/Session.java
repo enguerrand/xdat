@@ -21,6 +21,7 @@
 package org.xdat;
 
 import org.xdat.chart.Chart;
+import org.xdat.data.ClusterSet;
 import org.xdat.data.DataSheet;
 
 import java.io.FileInputStream;
@@ -47,21 +48,15 @@ import java.util.List;
 public class Session implements Serializable {
 
 	static final long serialVersionUID = 5L;
-
 	public static final String sessionFileExtension = ".ses";
-
 	private String sessionName = "Untitled";
-
 	private String sessionDirectory;
-
 	private DataSheet currentDataSheet;
-
+	private ClusterSet currentClusterSet;
 	private List<Chart> charts = new LinkedList<Chart>();
 
-	/**
-	 * Instantiates a new session.
-	 */
 	public Session() {
+		this.currentClusterSet = new ClusterSet();
 	}
 
 	public void saveToFile(String pathToFile) throws IOException {
@@ -71,13 +66,19 @@ public class Session implements Serializable {
 		os.close();
 	}
 
-	public static Session readFromFile(Main mainWindow, String pathToFile) throws java.io.InvalidClassException, java.io.IOException, ClassNotFoundException {
+	public static Session readFromFile(String pathToFile) throws IOException, ClassNotFoundException {
 		FileInputStream fs = new FileInputStream(pathToFile);
 		ObjectInputStream is = new ObjectInputStream(fs);
 		Session readSession = (Session) is.readObject();
+		readSession.initTransientData();
 		is.close();
 		return readSession;
 
+	}
+
+	private void initTransientData() {
+		this.currentDataSheet.initTransientData();
+		this.currentClusterSet.initTransientData();
 	}
 
 	public Chart getChart(int index) {
@@ -106,6 +107,14 @@ public class Session implements Serializable {
 
 	public void setCurrentDataSheet(DataSheet currentDataSheet) {
 		this.currentDataSheet = currentDataSheet;
+	}
+
+	public ClusterSet getCurrentClusterSet() {
+		return currentClusterSet;
+	}
+
+	public void setCurrentClusterSet(ClusterSet currentClusterSet) {
+		this.currentClusterSet = currentClusterSet;
 	}
 
 	public String getSessionName() {
