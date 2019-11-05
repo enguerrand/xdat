@@ -22,6 +22,7 @@ package org.xdat.workerThreads;
 
 import org.xdat.Main;
 import org.xdat.chart.ParallelCoordinatesChart;
+import org.xdat.data.ClusterSet;
 import org.xdat.data.DataSheet;
 import org.xdat.exceptions.InconsistentDataException;
 import org.xdat.gui.frames.ChartFrame;
@@ -73,7 +74,8 @@ public class DataSheetUpdateThread extends SwingWorker {
 			}
 
 			DataSheet dataSheet = mainWindow.getDataSheet();
-			dataSheet.updateData(pathToInputFile, dataHasHeaders, progressMonitor);
+			ClusterSet clusterSet = mainWindow.getCurrentClusterSet();
+			dataSheet.updateData(pathToInputFile, dataHasHeaders, progressMonitor, clusterSet);
 
 			for (int i = 0; i < mainWindow.getChartFrameCount(); i++) {
 				ChartFrame f = mainWindow.getChartFrame(i);

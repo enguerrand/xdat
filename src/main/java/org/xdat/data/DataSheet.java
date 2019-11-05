@@ -37,45 +37,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
-/**
- * A representation of the data imported from a text file.
- * <p>
- * Everytime the user imports data from a text file the data is stored in a
- * DataSheet. The data sheet is a kind of wrapper class for the collection of
- * all rows in the text file. Each row represents one
- * {@link org.xdat.data.Design}.
- * <p>
- * In addition to storing the Designs and providing the possibility to display
- * them in a JTable by implementing TableModel, the DataSheet class also keeps
- * track of the Parameters in the data set. Each column represents one
- * {@link org.xdat.data.Parameter}.
- * <p>
- * The third main function of this class is to actually read the data from a
- * text file. While doing this, the DataSheet also collects some additional
- * information, such as
- * <ul>
- * <li>the parameter types (numeric/discrete, see the Parameter class for
- * further info)
- * <li>the Parameter names. These are obtained from a header line in the data or
- * are given default names such as Parameter 1, Parameter 2 and so on.
- * </ul>
- * <p>
- * A ListModel is implemented for other functions of the program to be able to
- * display parameters in a JList.
- * <p>
- * Finally, the DataSheet also keeps track of all {@link org.xdat.data.Cluster}
- * s. However, it does not store the information to which Cluster each Design
- * belongs. This information is stored in the Designs themselves. It is
- * important to understand this because it means that whenever
- * {@link DataSheet#updateData(String, boolean, ProgressMonitor) } is called this
- * information is lost.
- */
 public class DataSheet implements Serializable, ListModel {
 
 	static final long serialVersionUID = 8;
@@ -157,7 +126,7 @@ public class DataSheet implements Serializable, ListModel {
 		}
 	}
 
-	public void updateData(String pathToInputFile, boolean dataHasHeaders, ProgressMonitor progressMonitor) throws IOException, InconsistentDataException {
+	public void updateData(String pathToInputFile, boolean dataHasHeaders, ProgressMonitor progressMonitor, ClusterSet clusterSet) throws IOException, InconsistentDataException {
 		int lineCount = getLineCount(pathToInputFile);
 		progressMonitor.setMaximum(lineCount);
 
@@ -176,6 +145,8 @@ public class DataSheet implements Serializable, ListModel {
 
 		List<Design> buffer = new ArrayList<>(this.data);
 		Map<Integer, Design> idbuffer = new HashMap<>(this.designIdsMap);
+		// clusterId -> designHashes
+		Map<Integer, Set<Integer>> clustersToDesignHashes = computeClusterDesignHashes(this.data);
 		this.data.clear();
 		this.designIdsMap.clear();
 
@@ -220,9 +191,39 @@ public class DataSheet implements Serializable, ListModel {
 			parameter.updateNumeric(this);
 			parameter.updateDiscreteLevels(this);
 		}
+
+		restoreClustersFromHashes(clustersToDesignHashes, this.data, clusterSet);
+
 		fireListeners(l -> l.onDataChanged(initialiseBooleanArray(true), initialiseBooleanArray(true), initialiseBooleanArray(true)));
 		fireListeners(DatasheetListener::onDataPanelUpdateRequired);
 
+	}
+
+	private void restoreClustersFromHashes(Map<Integer, Set<Integer>> clustersToDesignHashes, List<Design> designs, ClusterSet clusterSet) {
+		for (Map.Entry<Integer, Set<Integer>> entry : clustersToDesignHashes.entrySet()) {
+			Integer clusterId = entry.getKey();
+			Set<Integer> designHashes = entry.getValue();
+			clusterSet.findClusterById(clusterId).ifPresent(cluster -> {
+				for (Design design : designs) {
+					if (designHashes.contains(design.computeValuesHash(parameters))) {
+						design.setCluster(cluster);
+					}
+				}
+			});
+		}
+	}
+
+	private Map<Integer, Set<Integer>> computeClusterDesignHashes(List<Design> designs) {
+		Map<Integer, Set<Integer>> clustersToDesignHashes = new HashMap<>();
+		for (Design design : designs) {
+			Cluster cluster = design.getCluster();
+			if(cluster != null) {
+				clustersToDesignHashes
+						.computeIfAbsent(cluster.getUniqueId(), k -> new HashSet<>())
+						.add(design.computeValuesHash(parameters));
+			}
+		}
+		return clustersToDesignHashes;
 	}
 
 	private void readDesignsFromFile(ProgressMonitor progressMonitor, BufferedReader f, int idCounter) throws IOException {
@@ -412,16 +413,16 @@ public class DataSheet implements Serializable, ListModel {
 	private String getUniqueParameterName(String nameSuggestion) {
 		String name = nameSuggestion;
 		int id = 2;
-		while (!isNameUnique(name))
+		while (!isNameUnique(name)) {
 			name = nameSuggestion + " (" + (id++) + ")";
-		// log("getUniqueParameterName: returning name "+name);
+		}
 		return name;
 	}
 
 	private boolean isNameUnique(String name) {
 		boolean unique = true;
-		for (int i = 0; i < this.parameters.size(); i++) {
-			if (name.equals(this.parameters.get(i).getName())) {
+		for (Parameter parameter : this.parameters) {
+			if (name.equals(parameter.getName())) {
 				unique = false;
 				break;
 			}

@@ -27,14 +27,16 @@ import org.xdat.chart.ParallelCoordinatesChart;
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 public class Design implements Serializable {
 
 	static final long serialVersionUID = 4L;
-	private Map<Parameter, String> stringParameterValues = new HashMap<Parameter, String>(0, 1);
-	private Map<Parameter, Float> numericalParameterValues = new HashMap<Parameter, Float>(0, 1);
+	private Map<Parameter, String> stringParameterValues = new HashMap<>(0, 1);
+	private Map<Parameter, Float> numericalParameterValues = new HashMap<>(0, 1);
 	private int id;
 	private Cluster cluster;
 	private Map<Filter, Boolean> activationMap = new HashMap<>();
@@ -190,5 +192,35 @@ public class Design implements Serializable {
 
 	public boolean hasGradientColor() {
 		return (this.gradientColor != null);
+	}
+
+	public int computeValuesHash(List<Parameter> parameters) {
+		return Objects.hash(parameters.stream()
+				.map(p -> new ParameterValue(p, getStringValue(p)))
+				.toArray());
+	}
+
+	private static class ParameterValue {
+		private final Parameter parameter;
+		private final String value;
+
+		private ParameterValue(Parameter parameter, String value) {
+			this.parameter = parameter;
+			this.value = value;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			ParameterValue that = (ParameterValue) o;
+			return Objects.equals(parameter, that.parameter) &&
+					Objects.equals(value, that.value);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(parameter, value);
+		}
 	}
 }

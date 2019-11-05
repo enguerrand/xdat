@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class ClusterSet implements Serializable {
 
@@ -61,6 +62,12 @@ public class ClusterSet implements Serializable {
         }
 		throw new IllegalArgumentException("Could not find cluster " + clusterName);
 	}
+
+	public Optional<Cluster> findClusterById(int id) {
+        return this.clusters.stream()
+                .filter(c -> c.getUniqueId() == id)
+                .findAny();
+    }
 
 	public int getClusterCount() {
 		return this.clusters.size();
