@@ -116,7 +116,7 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 			progressMonitor.setProgress(0);
 			// log("constructor: axes created. Creating filters...");
 			for (int i = 0; i < dataSheet.getParameterCount() && !progressMonitor.isCanceled(); i++) {
-				this.axes.get(i).addFilters();
+				this.axes.get(i).addFilters(dataSheet);
 				progressMonitor.setProgress(i);
 			}
 			// log("constructor: filters created. ");
@@ -377,7 +377,7 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 		return topMargin;
 	}
 
-	public void resetDisplaySettingsToDefault() {
+	public void resetDisplaySettingsToDefault(DataSheet dataSheet) {
 		UserPreferences userPreferences = UserPreferences.getInstance();
 		this.backGroundColor = userPreferences.getParallelCoordinatesDefaultBackgroundColor();
 		this.showDesignIDs = userPreferences.isParallelCoordinatesShowDesignIDs();
@@ -394,7 +394,7 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 		this.filterHeight = userPreferences.getParallelCoordinatesFilterHeight();
 		this.filterWidth = userPreferences.getParallelCoordinatesFilterWidth();
 		for (int i = 0; i < axes.size(); i++) {
-			axes.get(i).resetSettingsToDefault();
+			axes.get(i).resetSettingsToDefault(dataSheet);
 		}
 	}
 
@@ -420,17 +420,5 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 
 	public void setFilterWidth(int filterWidth) {
 		this.filterWidth = filterWidth;
-	}
-
-	public void applyAllFilters() {
-		for (int i = 0; i < this.getDataSheet().getParameterCount(); i++) {
-			this.axes.get(i).applyFilters();
-		}
-	}
-
-	public void autofitAllAxes() {
-		for (int i = 0; i < this.axes.size(); i++) {
-			this.axes.get(i).autofit();
-		}
 	}
 }

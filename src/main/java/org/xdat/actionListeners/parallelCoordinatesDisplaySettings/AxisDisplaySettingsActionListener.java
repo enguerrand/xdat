@@ -44,12 +44,14 @@ public class AxisDisplaySettingsActionListener implements ActionListener, Change
 	private boolean invertFilter;
 	private boolean invertAxis;
 	private boolean autoFitAxis;
+	private Main mainWindow;
 	private AxisDisplaySettingsPanel panel;
 	private ParallelCoordinatesChart parallelCoordinatesChart;
 	private Axis currentAxis;
 	private boolean spinnerValueChanged = false;
 
 	public AxisDisplaySettingsActionListener(Main mainWindow, JDialog dialog, AxisDisplaySettingsPanel panel) {
+		this.mainWindow = mainWindow;
 		this.panel = panel;
 		this.dialog = dialog;
 		axisColor = UserPreferences.getInstance().getParallelCoordinatesAxisColor();
@@ -171,12 +173,12 @@ public class AxisDisplaySettingsActionListener implements ActionListener, Change
 		axis.setAxisInverted(this.invertAxis);
 		axis.setAutoFit(this.autoFitAxis);
 		if (this.autoFitAxis) {
-			axis.autofit();
+			axis.autofit(mainWindow.getDataSheet());
 		} else {
 			if (panel.getAxisMin() < panel.getAxisMax())
-				axis.setMin(panel.getAxisMin());
-			if (panel.getAxisMax() > axis.getMin())
-				axis.setMax(panel.getAxisMax());
+				axis.setMin(panel.getAxisMin(), mainWindow.getDataSheet());
+			if (panel.getAxisMax() > axis.getMin(mainWindow.getDataSheet()))
+				axis.setMax(panel.getAxisMax(), mainWindow.getDataSheet());
 		}
 		if (axis.isAxisInverted()) {
 			axis.getUpperFilter().setValue(Math.min(upperFilterValue, lowerFilterValue));
@@ -190,7 +192,17 @@ public class AxisDisplaySettingsActionListener implements ActionListener, Change
 	}
 
 	private boolean isSettingsChanged() {
-		boolean settingsUnChanged = (axisColor == this.currentAxis.getAxisColor() && axisLabelColor == this.currentAxis.getAxisLabelFontColor() && ticLabelColor == this.currentAxis.getAxisLabelFontColor() && invertFilter == this.currentAxis.isFilterInverted() && invertAxis == this.currentAxis.isAxisInverted() && autoFitAxis == this.currentAxis.isAutoFit() && (panel.getAxisMin() == this.currentAxis.getMin() || !this.currentAxis.getParameter().isNumeric()) && (panel.getAxisMax() == this.currentAxis.getMax() || !this.currentAxis.getParameter().isNumeric()));
+		boolean settingsUnChanged = (
+				axisColor == this.currentAxis.getAxisColor() &&
+				axisLabelColor == this.currentAxis.getAxisLabelFontColor() &&
+				ticLabelColor == this.currentAxis.getAxisLabelFontColor() &&
+				invertFilter == this.currentAxis.isFilterInverted() &&
+				invertAxis == this.currentAxis.isAxisInverted() &&
+				autoFitAxis == this.currentAxis.isAutoFit() && (
+						panel.getAxisMin() == this.currentAxis.getMin(mainWindow.getDataSheet()) || !this.currentAxis.getParameter().isNumeric()
+				) && (
+						panel.getAxisMax() == this.currentAxis.getMax(mainWindow.getDataSheet()) || !this.currentAxis.getParameter().isNumeric()
+				));
 
 		return ((!settingsUnChanged) || this.spinnerValueChanged);
 	}

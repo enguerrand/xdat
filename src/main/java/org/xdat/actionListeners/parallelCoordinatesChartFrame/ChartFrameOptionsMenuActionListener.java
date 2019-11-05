@@ -51,7 +51,7 @@ public class ChartFrameOptionsMenuActionListener implements ActionListener {
 		if (e.getActionCommand().equals("Display Settings")) {
 			new ParallelCoordinatesDisplaySettingsDialog(this.mainWindow, this.chart, this.chartFrame);
 		} else if (e.getActionCommand().equals("Reset to Default")) {
-			this.chart.resetDisplaySettingsToDefault();
+			this.chart.resetDisplaySettingsToDefault(this.mainWindow.getDataSheet());
 			this.chartFrame.repaint();
 		} else if (e.getActionCommand().equals("Export to png")) {
 			String filepath;

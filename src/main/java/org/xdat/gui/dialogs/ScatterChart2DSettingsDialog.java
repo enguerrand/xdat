@@ -69,7 +69,7 @@ public class ScatterChart2DSettingsDialog extends JDialog {
 	}
 
 	public void buildPanel(Main mainWindow, ChartFrame chartFrame, ScatterChart2D scatterChart2D) {
-		Scatter2DChartDisplaySettingsActionListener cmd = new Scatter2DChartDisplaySettingsActionListener(chartFrame, scatterChart2D, this);
+		Scatter2DChartDisplaySettingsActionListener cmd = new Scatter2DChartDisplaySettingsActionListener(mainWindow, chartFrame, scatterChart2D, this);
 
 		// create components
 		this.getContentPane().removeAll();

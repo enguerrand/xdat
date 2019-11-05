@@ -81,7 +81,7 @@ public abstract class Chart implements Serializable {
 		this.location = location;
 	}
 
-	public abstract void resetDisplaySettingsToDefault();
+	public abstract void resetDisplaySettingsToDefault(DataSheet dataSheet);
 	
 	public boolean isAntiAliasing() {
 		return antiAliasing;

@@ -80,7 +80,7 @@ public class Scatter2DChartFrameOptionsMenuActionListener implements ActionListe
 		if (e.getActionCommand().equals("Settings")) {
 			new ScatterChart2DSettingsDialog(mainWindow, chartFrame, chart);
 		} else if (e.getActionCommand().equals("Reset to Default")) {
-			this.chart.resetDisplaySettingsToDefault();
+			this.chart.resetDisplaySettingsToDefault(this.mainWindow.getDataSheet());
 			this.chartFrame.repaint();
 		} else if (e.getActionCommand().equals("Export to png")) {
 			String filepath;

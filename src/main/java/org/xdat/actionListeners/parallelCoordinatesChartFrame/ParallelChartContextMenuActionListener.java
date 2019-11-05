@@ -34,9 +34,9 @@ import java.awt.event.ActionListener;
 
 public class ParallelChartContextMenuActionListener implements ActionListener {
 
-	private Main mainWindow;
-	private ChartFrame chartFrame;
-	private Axis axis;
+	private final Main mainWindow;
+	private final ChartFrame chartFrame;
+	private final Axis axis;
 
 	public ParallelChartContextMenuActionListener(Main mainWindow, ChartFrame chartFrame, Axis axis) {
 		this.mainWindow = mainWindow;
@@ -48,13 +48,13 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		String actionCommand = e.getActionCommand();
 		if (actionCommand.equals("setCurrentFilterAsNewRange")) {
-			this.axis.setFilterAsNewRange();
+			this.axis.setFilterAsNewRange(mainWindow.getDataSheet());
 			this.chartFrame.repaint();
 		} else if (actionCommand.equals("resetFilter")) {
 			this.axis.resetFilters();
 			this.chartFrame.repaint();
 		} else if (actionCommand.equals("autofit")) {
-			this.axis.autofit();
+			this.axis.autofit(mainWindow.getDataSheet());
 			this.chartFrame.repaint();
 		} else if (actionCommand.equals("moveAxisLeft")) {
 			DataSheetTableColumnModel cm = (DataSheetTableColumnModel) this.mainWindow.getDataSheetTablePanel().getDataTable().getColumnModel();
@@ -129,7 +129,7 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 			ParallelCoordinatesChart chart = (ParallelCoordinatesChart) this.chartFrame.getChart();
 			DataSheet datasheet = chart.getDataSheet();
 
-			double axisRange = this.axis.getMax() - this.axis.getMin();
+			double axisRange = this.axis.getMax(mainWindow.getDataSheet()) - this.axis.getMin(mainWindow.getDataSheet());
 
 			for (int designID = 0; designID < datasheet.getDesignCount(); designID++) {
 				Design currentDesign = datasheet.getDesign(designID);
@@ -141,9 +141,9 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 					double ratio;
 					int alpha = 255;
 					if (axis.isAxisInverted()) {
-						ratio = (axis.getMax() - value) / axisRange;
+						ratio = (axis.getMax(mainWindow.getDataSheet()) - value) / axisRange;
 					} else {
-						ratio = (value - axis.getMin()) / axisRange;
+						ratio = (value - axis.getMin(mainWindow.getDataSheet())) / axisRange;
 					}
 
 					if (ratio > 1 || ratio < 0) {

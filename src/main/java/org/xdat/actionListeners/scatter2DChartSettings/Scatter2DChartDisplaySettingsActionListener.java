@@ -20,51 +20,29 @@
 
 package org.xdat.actionListeners.scatter2DChartSettings;
 
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JColorChooser;
-import javax.swing.JSpinner;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.xdat.Main;
 import org.xdat.chart.ScatterChart2D;
 import org.xdat.chart.ScatterPlot2D;
 import org.xdat.gui.dialogs.ScatterChart2DSettingsDialog;
 import org.xdat.gui.frames.ChartFrame;
 
-/**
- * ActionListener for a {@link ScatterChart2DSettingsDialog} that allows to
- * modify the Display Settings of a {@link ScatterChart2D}.
- */
+import javax.swing.JColorChooser;
+import javax.swing.JSpinner;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 public class Scatter2DChartDisplaySettingsActionListener implements ActionListener, ChangeListener {
 
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
+	private final Main mainWindow;
+	private final ScatterChart2D chart;
+	private final ChartFrame frame;
+	private final ScatterChart2DSettingsDialog dialog;
 
-	/** the scatter 2d chart */
-	private ScatterChart2D chart;
-
-	/** the scatter 2d chart frame */
-	private ChartFrame frame;
-
-	/** the dialog */
-	private ScatterChart2DSettingsDialog dialog;
-
-	/**
-	 * Instantiates a new chart display settings action listener to edit
-	 * settings for a specific chart.
-	 * 
-	 * @param chartFrame
-	 *            the chartFrame
-	 * @param chart
-	 *            the chart
-	 * @param dialog
-	 * 			the dialog
-	 */
-	public Scatter2DChartDisplaySettingsActionListener(ChartFrame chartFrame, ScatterChart2D chart, ScatterChart2DSettingsDialog dialog) {
+	public Scatter2DChartDisplaySettingsActionListener(Main mainWindow, ChartFrame chartFrame, ScatterChart2D chart, ScatterChart2DSettingsDialog dialog) {
+		this.mainWindow = mainWindow;
 		this.frame = chartFrame;
 		this.chart = chart;
 		this.dialog = dialog;
@@ -112,7 +90,7 @@ public class Scatter2DChartDisplaySettingsActionListener implements ActionListen
 			this.chart.setCurrentSettingsAsDefault();
 
 		} else if (actionCommand.equals("Load default settings")) {
-			this.chart.resetDisplaySettingsToDefault();
+			this.chart.resetDisplaySettingsToDefault(mainWindow.getDataSheet());
 			this.frame.repaint();
 			this.dialog.buildPanel(frame.getMainWindow(), this.frame, this.chart);
 		} else {

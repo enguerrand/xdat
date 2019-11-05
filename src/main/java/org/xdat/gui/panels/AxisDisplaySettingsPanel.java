@@ -169,13 +169,13 @@ public class AxisDisplaySettingsPanel extends JPanel {
 		if (axis.getParameter().isNumeric()) {
 			this.autoFitAxisFalseButton.setEnabled(true);
 			this.autoFitAxisTrueButton.setEnabled(true);
-			this.axisMinTextField.setText(Double.toString(axis.getMin()));
-			this.axisMaxTextField.setText(Double.toString(axis.getMax()));
+			this.axisMinTextField.setText(Double.toString(axis.getMin(this.mainWindow.getDataSheet())));
+			this.axisMaxTextField.setText(Double.toString(axis.getMax(this.mainWindow.getDataSheet())));
 		} else {
 			this.autoFitAxisFalseButton.setEnabled(false);
 			this.autoFitAxisTrueButton.setEnabled(false);
-			this.axisMinTextField.setText(axis.getParameter().getStringValueOf(axis.getMin()));
-			this.axisMaxTextField.setText(axis.getParameter().getStringValueOf(axis.getMax()));
+			this.axisMinTextField.setText(axis.getParameter().getStringValueOf(axis.getMin(this.mainWindow.getDataSheet())));
+			this.axisMaxTextField.setText(axis.getParameter().getStringValueOf(axis.getMax(this.mainWindow.getDataSheet())));
 
 		}
 		this.dialog.repaint();
@@ -317,8 +317,8 @@ public class AxisDisplaySettingsPanel extends JPanel {
 	}
 
 	public void setOkCancelButtonTargetChart(ParallelCoordinatesChart chart) {
-		cancelButton.addActionListener(new ChartSpecificDisplaySettingsDialogActionListener(dialog, chart, chartFrame));
-		okButton.addActionListener(new ChartSpecificDisplaySettingsDialogActionListener(dialog, chart, chartFrame));
+		cancelButton.addActionListener(new ChartSpecificDisplaySettingsDialogActionListener(mainWindow, dialog, chart, chartFrame));
+		okButton.addActionListener(new ChartSpecificDisplaySettingsDialogActionListener(mainWindow, dialog, chart, chartFrame));
 	}
 
 	public AxisDisplaySettingsActionListener getAxisDisplaySettingsActionListener() {
@@ -424,10 +424,11 @@ public class AxisDisplaySettingsPanel extends JPanel {
 
 	public double getAxisMax() {
 		double max;
-		if (this.chartFrame == null) {
+		Object selectedItem = this.axisChoiceCombo.getSelectedItem();
+		if (this.chartFrame == null || selectedItem == null) {
 			max = UserPreferences.getInstance().getParallelCoordinatesAxisDefaultMax();
 		} else {
-			max = ((ParallelCoordinatesChart) this.chartFrame.getChart()).getAxis(this.axisChoiceCombo.getSelectedItem().toString()).getMax();
+			max = ((ParallelCoordinatesChart) this.chartFrame.getChart()).getAxis(selectedItem.toString()).getMax(mainWindow.getDataSheet());
 		}
 		try {
 			return Double.parseDouble(axisMaxTextField.getText());
@@ -439,10 +440,11 @@ public class AxisDisplaySettingsPanel extends JPanel {
 
 	public double getAxisMin() {
 		double min;
-		if (this.chartFrame == null) {
+		Object selectedItem = this.axisChoiceCombo.getSelectedItem();
+		if (this.chartFrame == null || selectedItem == null) {
 			min = UserPreferences.getInstance().getParallelCoordinatesAxisDefaultMin();
 		} else {
-			min = ((ParallelCoordinatesChart) this.chartFrame.getChart()).getAxis(this.axisChoiceCombo.getSelectedItem().toString()).getMin();
+			min = ((ParallelCoordinatesChart) this.chartFrame.getChart()).getAxis(selectedItem.toString()).getMin(mainWindow.getDataSheet());
 		}
 		try {
 			return Double.parseDouble(axisMinTextField.getText());

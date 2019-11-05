@@ -20,6 +20,7 @@
 
 package org.xdat.actionListeners.parallelCoordinatesDisplaySettings;
 
+import org.xdat.Main;
 import org.xdat.chart.Axis;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.gui.dialogs.ParallelCoordinatesDisplaySettingsDialog;
@@ -31,11 +32,13 @@ import java.awt.event.ActionListener;
 
 public class ChartSpecificDisplaySettingsDialogActionListener implements ActionListener {
 
+	private final Main mainWindow;
 	private ParallelCoordinatesDisplaySettingsDialog dialog;
 	private ParallelCoordinatesChart chart;
 	private ChartFrame chartFrame;
 
-	public ChartSpecificDisplaySettingsDialogActionListener(ParallelCoordinatesDisplaySettingsDialog dialog, ParallelCoordinatesChart chart, ChartFrame chartFrame) {
+	public ChartSpecificDisplaySettingsDialogActionListener(Main mainWindow, ParallelCoordinatesDisplaySettingsDialog dialog, ParallelCoordinatesChart chart, ChartFrame chartFrame) {
+		this.mainWindow = mainWindow;
 		this.chart = chart;
 		this.dialog = dialog;
 		this.chartFrame = chartFrame;
@@ -77,12 +80,12 @@ public class ChartSpecificDisplaySettingsDialogActionListener implements ActionL
 			axis.setAxisInverted(this.dialog.getAxisDisplaySettingsPanel().getAxisDisplaySettingsActionListener().isInvertAxis());
 			axis.setAutoFit(this.dialog.getAxisDisplaySettingsPanel().getAxisDisplaySettingsActionListener().isAutoFitAxis());
 			if (axis.isAutoFit()) {
-				axis.autofit();
+				axis.autofit(mainWindow.getDataSheet());
 			} else {
 				if (this.dialog.getAxisDisplaySettingsPanel().getAxisMin() < this.dialog.getAxisDisplaySettingsPanel().getAxisMax())
-					axis.setMin(this.dialog.getAxisDisplaySettingsPanel().getAxisMin());
-				if (this.dialog.getAxisDisplaySettingsPanel().getAxisMax() > axis.getMin())
-					axis.setMax(this.dialog.getAxisDisplaySettingsPanel().getAxisMax());
+					axis.setMin(this.dialog.getAxisDisplaySettingsPanel().getAxisMin(), mainWindow.getDataSheet());
+				if (this.dialog.getAxisDisplaySettingsPanel().getAxisMax() > axis.getMin(mainWindow.getDataSheet()))
+					axis.setMax(this.dialog.getAxisDisplaySettingsPanel().getAxisMax(), mainWindow.getDataSheet());
 			}
 
 			this.chartFrame.getChartPanel().setSize(this.chartFrame.getChartPanel().getPreferredSize());

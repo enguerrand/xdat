@@ -20,13 +20,12 @@
 
 package org.xdat.chart;
 
-import java.awt.Color;
-import java.awt.Dimension;
-
-import org.xdat.Main;
 import org.xdat.UserPreferences;
 import org.xdat.data.AxisType;
 import org.xdat.data.DataSheet;
+
+import java.awt.Color;
+import java.awt.Dimension;
 
 /**
  * A serializable representation of all relevant settings for a two-dimensional
@@ -143,8 +142,9 @@ public class ScatterChart2D extends Chart {
 
 	/**
 	 * Reset display settings to default.
-	 */
-	public void resetDisplaySettingsToDefault() {
+     * @param dataSheet
+     */
+	public void resetDisplaySettingsToDefault(DataSheet dataSheet) {
 		this.scatterPlot2D.resetDisplaySettingsToDefault();
 	}
 

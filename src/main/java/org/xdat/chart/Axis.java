@@ -20,13 +20,12 @@
 
 package org.xdat.chart;
 
-import java.awt.Color;
-import java.io.Serializable;
-
-import org.xdat.Main;
 import org.xdat.UserPreferences;
 import org.xdat.data.DataSheet;
 import org.xdat.data.Parameter;
+
+import java.awt.Color;
+import java.io.Serializable;
 
 /**
  * A serializable representation of all relevant settings for an Axis on a
@@ -48,7 +47,6 @@ public class Axis implements Serializable {
 	private boolean autoFit;
 	private double max;
 	private double min;
-	private DataSheet dataSheet;
 	private Parameter parameter;
 	private int width;
 	private int ticCount;
@@ -64,16 +62,15 @@ public class Axis implements Serializable {
 	private boolean filterInverted;
 	private boolean axisInverted;
 	public Axis(DataSheet dataSheet, ParallelCoordinatesChart chart, Parameter parameter) {
-		this.dataSheet = dataSheet;
 		this.chart = chart;
 		this.parameter = parameter;
-		initialiseSettings();
+		initialiseSettings(dataSheet);
 		if (this.autoFit) {
-			autofit();
+			autofit(dataSheet);
 		}
 	}
 
-	private void initialiseSettings() {
+	private void initialiseSettings(DataSheet dataSheet) {
 		UserPreferences userPreferences = UserPreferences.getInstance();
 		this.width = userPreferences.getParallelCoordinatesAxisWidth();
 		this.ticCount = userPreferences.getParallelCoordinatesAxisTicCount();
@@ -88,23 +85,23 @@ public class Axis implements Serializable {
 		this.autoFit = userPreferences.isParallelCoordinatesAutoFitAxis();
 		this.min = userPreferences.getParallelCoordinatesAxisDefaultMin();
 		this.max = userPreferences.getParallelCoordinatesAxisDefaultMax();
-		this.dataSheet.evaluateBoundsForAllDesigns(this.chart);
+		dataSheet.evaluateBoundsForAllDesigns(this.chart);
 	}
 
-	void resetSettingsToDefault() {
-		initialiseSettings();
-		autofit();
+	void resetSettingsToDefault(DataSheet dataSheet) {
+		initialiseSettings(dataSheet);
+		autofit(dataSheet);
 	}
 
-	void addFilters() {
-		this.upperFilter = new Filter(this.dataSheet, this, Filter.UPPER_FILTER);
-		this.lowerFilter = new Filter(this.dataSheet, this, Filter.LOWER_FILTER);
+	void addFilters(DataSheet dataSheet) {
+		this.upperFilter = new Filter(dataSheet, this, Filter.UPPER_FILTER);
+		this.lowerFilter = new Filter(dataSheet, this, Filter.LOWER_FILTER);
 	}
 
-	public void autofit() {
-		this.max = this.dataSheet.getMaxValueOf(this.parameter);
-		this.min = this.dataSheet.getMinValueOf(this.parameter);
-		this.dataSheet.evaluateBoundsForAllDesigns(this.chart);
+	public void autofit(DataSheet dataSheet) {
+		this.max = dataSheet.getMaxValueOf(this.parameter);
+		this.min = dataSheet.getMinValueOf(this.parameter);
+		dataSheet.evaluateBoundsForAllDesigns(this.chart);
 	}
 
 	/**
@@ -157,57 +154,30 @@ public class Axis implements Serializable {
 		}
 	}
 
-	/**
-	 * Gets the maximum value of this Axis.
-	 * 
-	 * @return the maximum value of this Axis
-	 */
-	public double getMax() {
+	public double getMax(DataSheet dataSheet) {
 		if (!this.parameter.isNumeric())
-			return this.dataSheet.getMaxValueOf(this.parameter);
+			return dataSheet.getMaxValueOf(this.parameter);
 		else
 			return max;
 	}
 
-	/**
-	 * Sets the maximum value of this Axis.
-	 * 
-	 * @param max
-	 *            the new maximum value of this Axis
-	 */
-	public void setMax(double max) {
+	public void setMax(double max, DataSheet dataSheet) {
 		this.max = max;
-		this.dataSheet.evaluateBoundsForAllDesigns(this.chart);
+		dataSheet.evaluateBoundsForAllDesigns(this.chart);
 	}
 
-	/**
-	 * Gets the minimum value of this Axis.
-	 * 
-	 * @return the minimum value of this Axis
-	 */
-	public double getMin() {
+	public double getMin(DataSheet dataSheet) {
 		if (!this.parameter.isNumeric())
-			return this.dataSheet.getMinValueOf(this.parameter);
+			return dataSheet.getMinValueOf(this.parameter);
 		else
 			return min;
 	}
 
-	/**
-	 * Sets the minimum value of this Axis.
-	 * 
-	 * @param min
-	 *            the new minimum value of this Axis
-	 */
-	public void setMin(double min) {
+	public void setMin(double min, DataSheet dataSheet) {
 		this.min = min;
-		this.dataSheet.evaluateBoundsForAllDesigns(this.chart);
+		dataSheet.evaluateBoundsForAllDesigns(this.chart);
 	}
 
-	/**
-	 * Gets the range of this Axis.
-	 * 
-	 * @return the range of this Axis
-	 */
 	public double getRange() {
 		if (this.parameter.isNumeric())
 			return max - min;
@@ -215,11 +185,6 @@ public class Axis implements Serializable {
 			return this.parameter.getDiscreteLevelCount() - 1;
 	}
 
-	/**
-	 * Gets the tic count.
-	 * 
-	 * @return the tic count
-	 */
 	public int getTicCount() {
 		if (this.parameter.isNumeric() && this.getRange() > 0)
 			return ticCount;
@@ -278,14 +243,6 @@ public class Axis implements Serializable {
 
 	public void setActive(boolean active) {
 		this.active = active;
-	}
-
-	public DataSheet getDataSheet() {
-		return dataSheet;
-	}
-
-	public void setDataSheet(DataSheet dataSheet) {
-		this.dataSheet = dataSheet;
 	}
 
 	public Parameter getParameter() {
@@ -375,16 +332,17 @@ public class Axis implements Serializable {
 
 	/**
 	 * Takes the current filter values and sets them as new min and max values
-	 * 
+	 *
+	 * @param dataSheet
 	 */
-	public void setFilterAsNewRange() {
+	public void setFilterAsNewRange(DataSheet dataSheet) {
 		// log("setFilterAsNewRange: current range: "+this.getMin()+" and "+this.getMax()+" for axis "+this.getName());
 		// log("setFilterAsNewRange:filterPositions: "+this.lowerFilter.getValue()+" and "+this.upperFilter.getValue()+" for axis "+this.getName());
 		this.setAutoFit(false);
 		double minFilterValue = this.getMinimumFilter().getValue();
 		double maxFilterValue = this.getMaximumFilter().getValue();
-		this.setMin(minFilterValue);
-		this.setMax(maxFilterValue);
+		this.setMin(minFilterValue, dataSheet);
+		this.setMax(maxFilterValue, dataSheet);
 		// log("setFilterAsNewRange: new range set to "+this.getMin()+" and "+this.getMax()+" for axis "+this.getName());
 		this.resetFilters();
 	}

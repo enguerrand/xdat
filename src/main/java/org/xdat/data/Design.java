@@ -131,20 +131,20 @@ public class Design implements Serializable {
 		this.activationMap.put(filter, active);
 	}
 
-	public void evaluateBounds(ParallelCoordinatesChart chart) {
+	public void evaluateBounds(ParallelCoordinatesChart chart, DataSheet dataSheet) {
 		this.insideBounds = true;
 		for (int i = 0; i < chart.getAxisCount(); i++) {
-			if (!isInsideBounds(chart.getAxis(i))) {
+			if (!isInsideBounds(chart.getAxis(i), dataSheet)) {
 				this.insideBounds = false;
 				return;
 			}
 		}
 	}
 
-	private boolean isInsideBounds(Axis axis) {
+	private boolean isInsideBounds(Axis axis, DataSheet dataSheet) {
 		double value = this.getDoubleValue(axis.getParameter());
-		double max = axis.getMax();
-		double min = axis.getMin();
+		double max = axis.getMax(dataSheet);
+		double min = axis.getMin(dataSheet);
 		if (min <= value && value <= max) {
 			return true;
 		} else {

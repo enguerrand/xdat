@@ -55,9 +55,9 @@ import java.util.Map;
 
 public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMotionListener, MouseListener, MouseWheelListener {
 	static final long serialVersionUID = 5L;
-	private Main mainWindow;
-	private ChartFrame chartFrame;
-	private ParallelCoordinatesChart chart;
+	private final Main mainWindow;
+	private final ChartFrame chartFrame;
+	private final ParallelCoordinatesChart chart;
 	private BufferedImage bufferedImage;
 	private Filter draggedFilter;
 	private Axis draggedAxis;
@@ -66,8 +66,8 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 	private int dragCurrentX;
 	private int dragOffsetY;
 	private boolean dragSelecting = false;
-	private HashSet<Integer> hoverList;
-	private Map<int[], HashSet<Integer>> lineMap;
+	private final HashSet<Integer> hoverList;
+	private final Map<int[], HashSet<Integer>> lineMap;
 
 	public ParallelCoordinatesChartPanel(Main mainWindow, ChartFrame chartFrame, ParallelCoordinatesChart chart) {
 		super(chart);
@@ -188,11 +188,11 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		boolean[] axisInversionFlags = new boolean[axisCount];
 		for (int i = 0; i < axisCount; i++) // read all the display settings and put them into arrays to improve rendering speed of the chart
 		{
-			axisRanges[i] = chart.getAxis(i).getMax() - chart.getAxis(i).getMin();
+			axisRanges[i] = chart.getAxis(i).getMax(mainWindow.getDataSheet()) - chart.getAxis(i).getMin(mainWindow.getDataSheet());
 			axisHeights[i] = chart.getAxisHeight();
 			axisWidths[i] = chart.getAxis(i).getWidth();
-			axisMaxValues[i] = chart.getAxis(i).getMax();
-			axisMinValues[i] = chart.getAxis(i).getMin();
+			axisMaxValues[i] = chart.getAxis(i).getMax(mainWindow.getDataSheet());
+			axisMinValues[i] = chart.getAxis(i).getMin(mainWindow.getDataSheet());
 			axisActiveFlags[i] = chart.getAxis(i).isActive();
 			axisInversionFlags[i] = chart.getAxis(i).isAxisInverted();
 		}
@@ -401,21 +401,21 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 					if (currentAxis.getParameter().isNumeric()) {
 						Double ticValue;
 						if (ticCount > 1) {
-							ticValue = currentAxis.getMax() - ticValueDifference * ticID;
+							ticValue = currentAxis.getMax(mainWindow.getDataSheet()) - ticValueDifference * ticID;
 							ticLabel = String.format(currentAxis.getTicLabelFormat(), ticValue);
 							g.drawString(ticLabel, xPosition + ticSize + 7, currentTicYPos + (int) (0.5 * currentAxis.getTicLabelFontSize()));
 						} else {
-							ticValue = currentAxis.getMax();
+							ticValue = currentAxis.getMax(mainWindow.getDataSheet());
 							ticLabel = String.format(currentAxis.getTicLabelFormat(), ticValue);
 							g.drawString(ticLabel, xPosition + 2 * ticSize, yPosition + ((int) (chart.getAxisHeight() / 2)) + (int) (0.5 * currentAxis.getTicLabelFontSize()));
 						}
 
 					} else {
 						if (ticCount > 1) {
-							ticLabel = currentAxis.getParameter().getStringValueOf(currentAxis.getMax() - ticValueDifference * ticID);
+							ticLabel = currentAxis.getParameter().getStringValueOf(currentAxis.getMax(mainWindow.getDataSheet()) - ticValueDifference * ticID);
 							g.drawString(ticLabel, xPosition + 2 * ticSize, currentTicYPos + (int) (0.5 * currentAxis.getTicLabelFontSize()));
 						} else {
-							ticLabel = currentAxis.getParameter().getStringValueOf(currentAxis.getMax());
+							ticLabel = currentAxis.getParameter().getStringValueOf(currentAxis.getMax(mainWindow.getDataSheet()));
 							g.drawString(ticLabel, xPosition + 2 * ticSize, yPosition + ((int) (chart.getAxisHeight() / 2)) + (int) (0.5 * currentAxis.getTicLabelFontSize()));
 						}
 					}

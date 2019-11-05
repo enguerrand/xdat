@@ -433,7 +433,7 @@ public class DataSheet implements Serializable, ListModel {
 
 	public void evaluateBoundsForAllDesigns(ParallelCoordinatesChart chart) {
 		for (int i = 0; i < this.getDesignCount(); i++) {
-			this.data.get(i).evaluateBounds(chart);
+			this.data.get(i).evaluateBounds(chart, this);
 		}
 	}
 

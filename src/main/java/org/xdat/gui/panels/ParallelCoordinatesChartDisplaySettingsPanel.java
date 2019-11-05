@@ -264,8 +264,8 @@ public class ParallelCoordinatesChartDisplaySettingsPanel extends JPanel {
 	}
 
 	public void setOkCancelButtonTargetChart(ParallelCoordinatesChart chart) {
-		cancelButton.addActionListener(new ChartSpecificDisplaySettingsDialogActionListener(dialog, chart, chartFrame));
-		okButton.addActionListener(new ChartSpecificDisplaySettingsDialogActionListener(dialog, chart, chartFrame));
+		cancelButton.addActionListener(new ChartSpecificDisplaySettingsDialogActionListener(mainWindow, dialog, chart, chartFrame));
+		okButton.addActionListener(new ChartSpecificDisplaySettingsDialogActionListener(mainWindow, dialog, chart, chartFrame));
 	}
 
 	public ParallelChartDisplaySettingsActionListener getChartDisplaySettingsActionListener() {
