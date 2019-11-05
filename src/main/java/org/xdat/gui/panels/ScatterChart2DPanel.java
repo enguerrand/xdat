@@ -53,7 +53,9 @@ public class ScatterChart2DPanel extends ChartPanel {
 			// first, check what offset is needed to account for the tic labels
 			// on the left
 			g.setFont(new Font("SansSerif", Font.PLAIN, plot.getTicLabelFontSize(AxisType.Y)));
-			this.yAxisOffset = plot.getParameterForAxis(AxisType.Y).getLongestTicLabelStringLength(g.getFontMetrics(), plot.TIC_LABEL_FORMAT);
+			this.yAxisOffset = plot.getParameterForAxis(
+					AxisType.Y).getLongestTicLabelStringLength(g.getFontMetrics(), plot.TIC_LABEL_FORMAT, mainWindow.getDataSheet()
+			);
 		}
 
 		if (this.mainWindow.getDataSheet().getParameterCount() > 0) {

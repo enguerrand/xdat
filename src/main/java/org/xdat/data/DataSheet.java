@@ -97,7 +97,7 @@ public class DataSheet implements Serializable, ListModel {
 		importData(pathToInputFile, dataHasHeaders, progressMonitor);
 		boolean continueChecking = true;
 		for (Parameter parameter : this.parameters) {
-			if (parameter.isMixed() && continueChecking) {
+			if (parameter.isMixed(this) && continueChecking) {
 				int userAction = JOptionPane.showConfirmDialog(mainWindow, "Parameter " + parameter.getName() + " has numeric values in some designs\n" + "and non-numerical values in others. \nThis will result in the parameter being treated as a \n" + "non-numeric parameter. \n" + "If this is incorrect it is recommended to find the design(s)\n" + "with non-numeric values and correct or remove them.\n\n" + "Press Ok to continue checking parameters or Cancel to\n" + "suppress further warnings.", "Mixed Parameter Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 				continueChecking = (userAction == JOptionPane.OK_OPTION);
 			}
@@ -131,7 +131,7 @@ public class DataSheet implements Serializable, ListModel {
 			Design newDesign = new Design(idCounter++);
 			for (int i = 0; i < lineElements.length; i++) {
 				this.parameters.add(new Parameter("Parameter " + (i + 1), this));
-				newDesign.setValue(this.parameters.get(i), lineElements[i]);
+				newDesign.setValue(this.parameters.get(i), lineElements[i], this);
 
 			}
 			this.data.add(newDesign);
@@ -150,12 +150,8 @@ public class DataSheet implements Serializable, ListModel {
 			this.data = buffer;
 		}
 
-		// this loop ensures that all discrete levels are known to the parameter
-		// so it returns the right double values
-		for (int i = 0; i < this.parameters.size(); i++) {
-			if (!this.parameters.get(i).isNumeric()) {
-				this.parameters.get(i).updateDiscreteLevels();
-			}
+		for (Parameter parameter : this.parameters) {
+			parameter.updateDiscreteLevels(this);
 		}
 	}
 
@@ -194,10 +190,10 @@ public class DataSheet implements Serializable, ListModel {
 			Design newDesign = new Design(idCounter++);
 			for (int i = 0; i < this.parameters.size(); i++) {
 				if (lineElements.length <= i) {
-					newDesign.setValue(this.parameters.get(i), "-");
+					newDesign.setValue(this.parameters.get(i), "-", this);
 				} else {
 					this.parameters.get(i).setName("Parameter " + (i + 1));
-					newDesign.setValue(this.parameters.get(i), lineElements[i]);
+					newDesign.setValue(this.parameters.get(i), lineElements[i], this);
 				}
 
 			}
@@ -219,8 +215,8 @@ public class DataSheet implements Serializable, ListModel {
 		}
 
 		for (Parameter parameter : this.parameters) {
-			parameter.updateNumeric();
-			parameter.updateDiscreteLevels();
+			parameter.updateNumeric(this);
+			parameter.updateDiscreteLevels(this);
 		}
 		fireListeners(l -> l.onDataChanged(initialiseBooleanArray(true), initialiseBooleanArray(true), initialiseBooleanArray(true)));
 		fireListeners(DatasheetListener::onDataPanelUpdateRequired);
@@ -248,9 +244,9 @@ public class DataSheet implements Serializable, ListModel {
 				if (newDesignContainsValues) {
 					for (int i = 0; i < this.parameters.size(); i++) {
 						if (lineElements.length <= i || lineElements[i].length() <= 0 || lineElements[i].equals(new String("\\s"))) {
-							newDesign.setValue(this.parameters.get(i), "-");
+							newDesign.setValue(this.parameters.get(i), "-", this);
 						} else {
-							newDesign.setValue(this.parameters.get(i), lineElements[i]);
+							newDesign.setValue(this.parameters.get(i), lineElements[i], this);
 						}
 					}
 					this.data.add(newDesign);
@@ -266,19 +262,19 @@ public class DataSheet implements Serializable, ListModel {
 		boolean[] axisAutofitRequired = initialiseBooleanArray(false);
 		boolean[] axisResetFilterRequired = initialiseBooleanArray(false);
 		boolean[] axisApplyFiltersRequired = initialiseBooleanArray(false);
-		this.data.get(rowIndex).setValue(parameters.get(columnIndex - 1), newValue.toString());
+		this.data.get(rowIndex).setValue(parameters.get(columnIndex - 1), newValue.toString(), this);
 
 		if (!previousNumeric) {
-			parameter.updateDiscreteLevels();
+			parameter.updateDiscreteLevels(this);
 		}
 
 		Optional<Float> parsed = NumberParser.parseNumber(newValue.toString());
 		boolean parsable = parsed.isPresent();
 
 		if(previousNumeric && !parsable) {
-			parameter.setNumeric(false);
+			parameter.setNumeric(false, this);
 		} else if (!previousNumeric && parsable) {
-			parameter.updateNumeric();
+			parameter.updateNumeric(this);
 		}
 		if (previousNumeric != parameter.isNumeric()) {
 			axisAutofitRequired[columnIndex - 1] = true;
@@ -325,8 +321,8 @@ public class DataSheet implements Serializable, ListModel {
 				if (!parameter.isNumeric()) {
 					String string = removedDesign.getStringValue(parameter);
 					if (!NumberParser.parseNumber(string).isPresent()) {
-						parameter.updateNumeric();
-						parameter.updateDiscreteLevels();
+						parameter.updateNumeric(this);
+						parameter.updateDiscreteLevels(this);
 					}
 				}
 			}
@@ -358,9 +354,9 @@ public class DataSheet implements Serializable, ListModel {
 	}
 
 	public Parameter getParameter(String parameterName) {
-		for (int i = 0; i < this.parameters.size(); i++) {
-			if (parameterName.equals(this.parameters.get(i).getName())) {
-				return this.parameters.get(i);
+		for (Parameter parameter : this.parameters) {
+			if (parameterName.equals(parameter.getName())) {
+				return parameter;
 			}
 		}
 		throw new IllegalArgumentException("Parameter " + parameterName + " not found");

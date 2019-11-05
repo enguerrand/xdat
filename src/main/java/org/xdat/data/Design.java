@@ -45,13 +45,13 @@ public class Design implements Serializable {
 		this.id = id;
 	}
 
-	public void setValue(Parameter param, String parameterValue) {
+	public void setValue(Parameter param, String parameterValue, DataSheet dataSheet) {
 		Optional<Float> parsed = NumberParser.parseNumber(parameterValue);
 		if (parsed.isPresent()) {
 			this.numericalParameterValues.put(param, parsed.get());
 			this.stringParameterValues.remove(param);
 		} else {
-			param.setNumeric(false);
+			param.setNumeric(false, dataSheet);
 			this.stringParameterValues.put(param, parameterValue);
 			this.numericalParameterValues.remove(param);
 		}

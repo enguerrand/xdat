@@ -47,14 +47,12 @@ import java.util.stream.Collectors;
  */
 public class Parameter implements Serializable {
 	static final long serialVersionUID = 4L;
-    private DataSheet dataSheet;
 	private String name;
 	private boolean numeric = true;
 	private TreeSet<String> discreteLevels = new TreeSet<>(new ReverseStringComparator());
     private int ticLabelDigitCount = 3;
 	public Parameter(String name, DataSheet dataSheet) {
 		this.name = name;
-		this.dataSheet = dataSheet;
 	}
 
 	public String getName() {
@@ -71,15 +69,16 @@ public class Parameter implements Serializable {
 	 * value.
 	 * 
 	 * @return true, if the parameter is mixed
+	 * @param dataSheet
 	 */
-	boolean isMixed() {
-		return getType() == ParameterType.MIXED;
+	boolean isMixed(DataSheet dataSheet) {
+		return getType(dataSheet) == ParameterType.MIXED;
 	}
 
-	private ParameterType getType(){
+	private ParameterType getType(DataSheet dataSheet){
 		boolean foundNumericValue = false;
 		boolean foundStringValue = false;
-        for (Design design : this.dataSheet.getDesigns()) {
+        for (Design design : dataSheet.getDesigns()) {
             String string = design.getStringValue(this);
             if(NumberParser.parseNumber(string).isPresent()){
                 foundNumericValue = true;
@@ -103,12 +102,12 @@ public class Parameter implements Serializable {
 		return numeric;
 	}
 
-	void setNumeric(boolean numeric) {
+	void setNumeric(boolean numeric, DataSheet dataSheet) {
 		if (numeric == this.numeric) {
 			return;
 		}
 		this.numeric = numeric;
-		updateDiscreteLevels();
+		updateDiscreteLevels(dataSheet);
 	}
 
 	/**
@@ -209,17 +208,17 @@ public class Parameter implements Serializable {
 		}
 	}
 
-	void updateNumeric() {
-		this.setNumeric(getType() == ParameterType.NUMERIC);
+	void updateNumeric(DataSheet dataSheet) {
+		this.setNumeric(getType(dataSheet) == ParameterType.NUMERIC, dataSheet);
 
 	}
 
-	void updateDiscreteLevels(){
+	void updateDiscreteLevels(DataSheet dataSheet){
 	    this.discreteLevels.clear();
 	    if (isNumeric()) {
 	        return;
         }
-	    this.discreteLevels.addAll(this.dataSheet.getDesigns()
+	    this.discreteLevels.addAll(dataSheet.getDesigns()
                 .stream()
                 .map(d -> d.getStringValue(this))
                 .collect(Collectors.toSet()));
@@ -239,7 +238,7 @@ public class Parameter implements Serializable {
         return "%"+(digitCount+1)+"."+digitCount+"f";
     }
 
-	public int getLongestTicLabelStringLength(FontMetrics fm, String numberFormat) {
+	public int getLongestTicLabelStringLength(FontMetrics fm, String numberFormat, DataSheet dataSheet) {
 		if (this.isNumeric()) {
 			double minValue = Double.POSITIVE_INFINITY;
 			double maxValue = Double.NEGATIVE_INFINITY;
