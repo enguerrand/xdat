@@ -26,9 +26,9 @@ import org.xdat.chart.ParallelCoordinatesChart;
 
 import java.awt.Color;
 import java.io.Serializable;
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class Design implements Serializable {
 
@@ -46,21 +46,16 @@ public class Design implements Serializable {
 	}
 
 	public void setValue(Parameter param, String parameterValue) {
-		try {
-			this.numericalParameterValues.put(param, NumberParser.parseNumber(parameterValue));
+		Optional<Float> parsed = NumberParser.parseNumber(parameterValue);
+		if (parsed.isPresent()) {
+			this.numericalParameterValues.put(param, parsed.get());
 			param.setAtLeastOneNumeric(true);
-			if (this.stringParameterValues.containsKey(param)) {
-				this.stringParameterValues.remove(param);
-			}
-
-		} catch (ParseException e1) {
+			this.stringParameterValues.remove(param);
+		} else {
 			param.setNumeric(false);
 			this.stringParameterValues.put(param, parameterValue);
-			if (this.numericalParameterValues.containsKey(param)) {
-				this.numericalParameterValues.remove(param);
-			}
+			this.numericalParameterValues.remove(param);
 		}
-
 	}
 
 	/**

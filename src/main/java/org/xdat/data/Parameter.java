@@ -24,9 +24,9 @@ import org.xdat.exceptions.CorruptDataException;
 
 import java.awt.FontMetrics;
 import java.io.Serializable;
-import java.text.ParseException;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -82,19 +82,16 @@ public class Parameter implements Serializable {
 		return numeric;
 	}
 
-	boolean checkIfNumeric() {
+	void checkIfNumeric() {
 		this.numeric = true;
 		for (int i = 0; i < this.dataSheet.getDesignCount(); i++) {
-			try {
-				String string = this.dataSheet.getDesign(i).getStringValue(this);
-				NumberParser.parseNumber(string.toString());
+			String string = this.dataSheet.getDesign(i).getStringValue(this);
+			if(NumberParser.parseNumber(string).isPresent()){
 				this.atLeastOneNumeric = true;
-			} catch (ParseException e) {
+			} else {
 				this.setNumeric(false);
-				return false;
 			}
 		}
-		return true;
 	}
 
 	void setNumeric(boolean numeric) {
@@ -131,8 +128,8 @@ public class Parameter implements Serializable {
 	 * Gets a numeric representation of a string value for this parameter.
 	 * <p>
 	 * If the parameter is numeric, an attempt is made to parse the string as a
-	 * Double. If this attempt leads to a ParseException, the parameter is not
-	 * considered numeric anymore, but is transformed into a discrete parameter.
+	 * Double. If this attempt fails, the parameter is not  considered numeric anymore,
+	 * but is transformed into a discrete parameter.
 	 * <p>
 	 * If the parameter is not numeric, the string is looked up in the TreeSet
 	 * discreteLevels that should contain all discrete values (that is Strings)
@@ -150,11 +147,11 @@ public class Parameter implements Serializable {
 	 */
 	double getDoubleValueOf(String string) {
 		if (this.numeric) {
-			try {
-				double value = NumberParser.parseNumber(string);
+			Optional<Float> parsed = NumberParser.parseNumber(string);
+			if(parsed.isPresent()) {
 				this.atLeastOneNumeric = true;
-				return value;
-			} catch (ParseException e1) {
+				return parsed.get();
+			} else {
 				this.setNumeric(false);
 				this.atLeastOneNonNumeric = true;
 			}

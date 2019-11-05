@@ -22,25 +22,27 @@ package org.xdat.data;
 import org.xdat.UserPreferences;
 
 import java.text.NumberFormat;
-import java.text.ParseException;
 import java.text.ParsePosition;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 
 public class NumberParser {
 
-	public static float parseNumber(String string) throws ParseException {
+	public static Optional<Float> parseNumber(String string) {
 		NumberFormat nf = NumberFormat.getInstance(UserPreferences.getInstance().getLocale());
 		ParsePosition parsePosition = new ParsePosition(0);
 		Number number = nf.parse(string, parsePosition);
 		if (number == null) {
-			throw new ParseException("Failed to parse: " + string, 0);
+			return Optional.empty();
 		} else if (parsePosition.getIndex() < string.length()) {
-			throw new ParseException("Could not parse whole string", parsePosition.getErrorIndex());
+			// could not parse the whole string
+			return Optional.empty();
 		} else if ((Pattern.matches(".*\\..{0,2}?\\..*", string) || Pattern.matches(".*,.{0,2}?,.*", string))) {
-			throw new ParseException(" Recognized wrong distance of digit grouping symbols ", parsePosition.getErrorIndex());
+			// Recognized wrong distance of digit grouping symbols
+			return Optional.empty();
 		} else {
-			return number.floatValue();
+			return Optional.of(number.floatValue());
 		}
 	}
 }

@@ -34,7 +34,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -42,6 +41,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -277,23 +277,20 @@ public class DataSheet implements Serializable, ListModel {
 		boolean[] axisAutofitRequired = initialiseBooleanArray(false);
 		boolean[] axisResetFilterRequired = initialiseBooleanArray(false);
 		boolean[] axisApplyFiltersRequired = initialiseBooleanArray(false);
-		try {
-			this.data.get(rowIndex).setValue(parameters.get(columnIndex - 1), arg0.toString());
-			if (!previousNumeric) {
-				parameter.updateDiscreteLevels();
-			}
-
-			NumberParser.parseNumber(arg0.toString());
-
-			if (!previousNumeric) {
-				parameter.checkIfNumeric();
-				axisAutofitRequired[columnIndex - 1] = true;
-				axisResetFilterRequired[columnIndex - 1] = true;
-			}
-
-		} catch (ParseException e1) {
-			parameter.setNumeric(false);
+		this.data.get(rowIndex).setValue(parameters.get(columnIndex - 1), arg0.toString());
+		if (!previousNumeric) {
+			parameter.updateDiscreteLevels();
 		}
+
+		Optional<Float> parsed = NumberParser.parseNumber(arg0.toString());
+		if(!parsed.isPresent()) {
+			parameter.setNumeric(false);
+		} else if (!previousNumeric) {
+			parameter.checkIfNumeric();
+			axisAutofitRequired[columnIndex - 1] = true;
+			axisResetFilterRequired[columnIndex - 1] = true;
+		}
+
 		axisApplyFiltersRequired[columnIndex - 1] = true;
 		fireListeners(l -> l.onDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired));
 	}
@@ -329,13 +326,11 @@ public class DataSheet implements Serializable, ListModel {
 		for (int i = designsToRemove.length - 1; i >= 0; i--) {
 			Design removedDesign = data.remove(designsToRemove[i]);
 			this.designIdsMap.remove(removedDesign.getId());
-			for (int j = 0; j < this.parameters.size(); j++) // check if that makes any non-numeric parameter numeric
-			{
+			// check if that makes any non-numeric parameter numeric
+			for (int j = 0; j < this.parameters.size(); j++) {
 				if (!this.parameters.get(j).isNumeric()) {
-					try {
-						String string = removedDesign.getStringValue(this.parameters.get(j));
-						NumberParser.parseNumber(string);
-					} catch (ParseException e1) {
+					String string = removedDesign.getStringValue(this.parameters.get(j));
+					if (!NumberParser.parseNumber(string).isPresent()) {
 						this.parameters.get(j).updateDiscreteLevels();
 						this.parameters.get(j).checkIfNumeric();
 					}
