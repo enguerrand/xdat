@@ -21,6 +21,7 @@
 package org.xdat.chart;
 
 import org.xdat.data.DataSheet;
+import org.xdat.data.Design;
 import org.xdat.data.Parameter;
 
 import java.io.Serializable;
@@ -180,65 +181,47 @@ public class Filter implements Serializable {
 		}
 		double value = this.getValue();
 
-		if (this.filterType == UPPER_FILTER && axis.isFilterInverted() && axis.isAxisInverted()) {
-			for (int i = 0; i < dataSheet.getDesignCount(); i++) {
-				if (dataSheet.getDesign(i).getDoubleValue(param) - tolerance > value)
-					dataSheet.getDesign(i).setActive(this, false);
+		for (Design design : dataSheet.getDesigns()) {
+			if (this.filterType == UPPER_FILTER && axis.isFilterInverted() && axis.isAxisInverted()) {
+				if (design.getDoubleValue(param) - tolerance > value)
+					design.setActive(this, false);
 				else
-					dataSheet.getDesign(i).setActive(this, true);
-			}
-		} else if (this.filterType == LOWER_FILTER && axis.isFilterInverted() && axis.isAxisInverted()) {
-			for (int i = 0; i < dataSheet.getDesignCount(); i++) {
-				if (dataSheet.getDesign(i).getDoubleValue(param) + tolerance < value)
-					dataSheet.getDesign(i).setActive(this, false);
+					design.setActive(this, true);
+			} else if (this.filterType == LOWER_FILTER && axis.isFilterInverted() && axis.isAxisInverted()) {
+				if (design.getDoubleValue(param) + tolerance < value)
+					design.setActive(this, false);
 				else
-					dataSheet.getDesign(i).setActive(this, true);
-			}
-		}
-
-		else if (this.filterType == UPPER_FILTER && axis.isAxisInverted()) {
-			for (int i = 0; i < dataSheet.getDesignCount(); i++) {
-				if (dataSheet.getDesign(i).getDoubleValue(param) + tolerance < value)
-					dataSheet.getDesign(i).setActive(this, false);
+					design.setActive(this, true);
+			} else if (this.filterType == UPPER_FILTER && axis.isAxisInverted()) {
+				if (design.getDoubleValue(param) + tolerance < value)
+					design.setActive(this, false);
 				else
-					dataSheet.getDesign(i).setActive(this, true);
-			}
-		} else if (this.filterType == LOWER_FILTER && axis.isAxisInverted()) {
-			for (int i = 0; i < dataSheet.getDesignCount(); i++) {
-				if (dataSheet.getDesign(i).getDoubleValue(param) - tolerance > value)
-					dataSheet.getDesign(i).setActive(this, false);
+					design.setActive(this, true);
+			} else if (this.filterType == LOWER_FILTER && axis.isAxisInverted()) {
+				if (design.getDoubleValue(param) - tolerance > value)
+					design.setActive(this, false);
 				else
-					dataSheet.getDesign(i).setActive(this, true);
-			}
-		}
-
-		else if (this.filterType == UPPER_FILTER && axis.isFilterInverted()) {
-			for (int i = 0; i < dataSheet.getDesignCount(); i++) {
-				if (dataSheet.getDesign(i).getDoubleValue(param) + tolerance < value)
-					dataSheet.getDesign(i).setActive(this, false);
+					design.setActive(this, true);
+			} else if (this.filterType == UPPER_FILTER && axis.isFilterInverted()) {
+				if (design.getDoubleValue(param) + tolerance < value)
+					design.setActive(this, false);
 				else
-					dataSheet.getDesign(i).setActive(this, true);
-			}
-		} else if (this.filterType == LOWER_FILTER && axis.isFilterInverted()) {
-			for (int i = 0; i < dataSheet.getDesignCount(); i++) {
-				if (dataSheet.getDesign(i).getDoubleValue(param) - tolerance > value)
-					dataSheet.getDesign(i).setActive(this, false);
+					design.setActive(this, true);
+			} else if (this.filterType == LOWER_FILTER && axis.isFilterInverted()) {
+				if (design.getDoubleValue(param) - tolerance > value)
+					design.setActive(this, false);
 				else
-					dataSheet.getDesign(i).setActive(this, true);
-			}
-		} else if (this.filterType == UPPER_FILTER) {
-			for (int i = 0; i < dataSheet.getDesignCount(); i++) {
-				if (dataSheet.getDesign(i).getDoubleValue(param) - tolerance > value)
-					dataSheet.getDesign(i).setActive(this, false);
+					design.setActive(this, true);
+			} else if (this.filterType == UPPER_FILTER) {
+				if (design.getDoubleValue(param) - tolerance > value)
+					design.setActive(this, false);
 				else
-					dataSheet.getDesign(i).setActive(this, true);
-			}
-		} else if (this.filterType == LOWER_FILTER) {
-			for (int i = 0; i < dataSheet.getDesignCount(); i++) {
-				if (dataSheet.getDesign(i).getDoubleValue(param) + tolerance < value)
-					dataSheet.getDesign(i).setActive(this, false);
+					design.setActive(this, true);
+			} else if (this.filterType == LOWER_FILTER) {
+				if (design.getDoubleValue(param) + tolerance < value)
+					design.setActive(this, false);
 				else
-					dataSheet.getDesign(i).setActive(this, true);
+					design.setActive(this, true);
 			}
 		}
 	}
