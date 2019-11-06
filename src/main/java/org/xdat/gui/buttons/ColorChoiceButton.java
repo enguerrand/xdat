@@ -20,6 +20,8 @@
 
 package org.xdat.gui.buttons;
 
+import org.jetbrains.annotations.Nullable;
+
 import javax.swing.JButton;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -32,16 +34,22 @@ public class ColorChoiceButton extends JButton {
 	private final int width;
 	private final int height;
 	
-	public ColorChoiceButton(Color currentColor, String actionCommand) {
+	public ColorChoiceButton(Color currentColor) {
+		this(currentColor, null, 16, 16);
+	}
+
+	public ColorChoiceButton(Color currentColor, @Nullable String actionCommand) {
 		this(currentColor, actionCommand, 16, 16);
 	}
 
-	public ColorChoiceButton(Color currentColor, String actionCommand, int width, int height) {
+	public ColorChoiceButton(Color currentColor, @Nullable String actionCommand, int width, int height) {
 		super();
 		this.currentColor = currentColor;
 		this.width = width;
 		this.height = height;
-		this.setActionCommand(actionCommand);
+		if (actionCommand != null) {
+			this.setActionCommand(actionCommand);
+		}
 		this.setLayout(new GridLayout(1, 1));
 		this.setPreferredSize(new Dimension(this.width, this.height));
 	}
@@ -57,7 +65,11 @@ public class ColorChoiceButton extends JButton {
 	public void setCurrentColor(Color currentColor) {
 		this.currentColor = currentColor;
 	}
-	
+
+	public Color getCurrentColor() {
+		return currentColor;
+	}
+
 	public void setAlpha(int alpha){
 		this.currentColor = new Color(this.currentColor.getRed(), this.currentColor.getGreen(), this.currentColor.getBlue(), alpha);
 		this.repaint();
