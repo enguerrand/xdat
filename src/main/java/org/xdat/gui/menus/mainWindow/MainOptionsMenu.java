@@ -18,25 +18,37 @@
  * 
  */
 
-package org.xdat.gui.menus.mainWIndow;
+package org.xdat.gui.menus.mainWindow;
 
 import org.xdat.Main;
-import org.xdat.actionListeners.mainMenu.MainHelpMenuActionListener;
+import org.xdat.actionListeners.mainMenu.MainOptionsMenuActionListener;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import java.awt.event.KeyEvent;
 
-class MainHelpMenu extends JMenu {
+class MainOptionsMenu extends JMenu {
 
-	MainHelpMenu(Main mainWindow) {
-		super("Help");
-		this.setMnemonic(KeyEvent.VK_H);
+	MainOptionsMenu(Main mainWindow) {
+		super("Options");
+		this.setMnemonic(KeyEvent.VK_O);
 		JMenuItem mi;
-		MainHelpMenuActionListener cmd = new MainHelpMenuActionListener(mainWindow);
+		MainOptionsMenuActionListener cmd = new MainOptionsMenuActionListener(mainWindow);
 		//
-		mi = new JMenuItem("About", 'a');
-		mi.setMnemonic(KeyEvent.VK_A);
+		mi = new JMenuItem("Import Settings", 'i');
+		mi.setMnemonic(KeyEvent.VK_I);
+		mi.addActionListener(cmd);
+		this.add(mi);
+		//
+		mi = new JMenuItem("Parallel Coordinate Settings", 'd');
+		mi.setMnemonic(KeyEvent.VK_D);
+		mi.addActionListener(cmd);
+		this.add(mi);
+		//
+		this.addSeparator();
+		//
+		mi = new JMenuItem("Reset to Default", 'r');
+		mi.setMnemonic(KeyEvent.VK_R);
 		mi.addActionListener(cmd);
 		this.add(mi);
 	}

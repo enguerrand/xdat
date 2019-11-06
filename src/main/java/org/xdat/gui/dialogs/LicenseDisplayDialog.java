@@ -19,9 +19,6 @@
  */
 package org.xdat.gui.dialogs;
 
-import org.xdat.UserPreferences;
-import org.xdat.actionListeners.licenseDialog.LicenseDisplayDialogActionListener;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -30,6 +27,7 @@ import javax.swing.JTextArea;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -39,8 +37,8 @@ import java.util.stream.Collectors;
 public class LicenseDisplayDialog extends JDialog {
 	static final long serialVersionUID = 1L;
 
-	public LicenseDisplayDialog(UserPreferences preferences) {
-		super();
+	public LicenseDisplayDialog(Window parent) {
+		super(parent);
 		this.setTitle("GNU GENERAL PUBLIC LICENSE");
 		JTextArea licenseTextArea = new JTextArea(this.getLicenseText());
 		licenseTextArea.setLineWrap(true);
@@ -57,10 +55,12 @@ public class LicenseDisplayDialog extends JDialog {
 
 		JPanel buttonsPanel = new JPanel();
 		buttonsPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-		LicenseDisplayDialogActionListener cmd = new LicenseDisplayDialogActionListener(this, preferences);
-		JButton acceptButton = new JButton("Accept License Agreement");
-		acceptButton.addActionListener(cmd);
-		buttonsPanel.add(acceptButton);
+		JButton okButton = new JButton("Ok");
+		okButton.addActionListener(actionEvent -> {
+			setVisible(false);
+			dispose();
+		});
+		buttonsPanel.add(okButton);
 
 		licenseDisplayPanel.add(buttonsPanel, BorderLayout.SOUTH);
 		this.add(licenseDisplayPanel);
@@ -69,8 +69,6 @@ public class LicenseDisplayDialog extends JDialog {
 		int top = (int) (getToolkit().getScreenSize().height * 0.5 - this.getHeight() * 0.5);
 		setLocation(left, top);
 		this.validate();
-		this.setVisible(true);
-
 	}
 
 	private String getLicenseText() {

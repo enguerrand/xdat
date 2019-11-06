@@ -29,9 +29,8 @@ import org.xdat.data.DataSheet;
 import org.xdat.data.DatasheetListener;
 import org.xdat.exceptions.NoParametersDefinedException;
 import org.xdat.gui.WindowClosingAdapter;
-import org.xdat.gui.dialogs.LicenseDisplayDialog;
 import org.xdat.gui.frames.ChartFrame;
-import org.xdat.gui.menus.mainWIndow.MainMenuBar;
+import org.xdat.gui.menus.mainWindow.MainMenuBar;
 import org.xdat.gui.panels.DataSheetTablePanel;
 
 import javax.swing.ImageIcon;
@@ -111,10 +110,6 @@ public class Main extends JFrame {
 				repaintAllChartFrames();
 			}
 		};
-		if (!this.checkLicense()) {
-			this.dispose();
-			return;
-		}
 		this.currentSession = new Session();
 		this.addWindowListener(new WindowClosingAdapter(true));
 		this.mainMenuBar = new MainMenuBar(this);
@@ -377,14 +372,6 @@ public class Main extends JFrame {
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(this, "IOException on saving session: " + e.getMessage(), "Save Session", JOptionPane.OK_OPTION);
 		}
-	}
-
-	private boolean checkLicense() {
-		if (!UserPreferences.getInstance().isLicenseAccepted()) {
-			new LicenseDisplayDialog(UserPreferences.getInstance());
-		}
-
-		return UserPreferences.getInstance().isLicenseAccepted();
 	}
 
 	public MainMenuBar getMainMenuBar() {

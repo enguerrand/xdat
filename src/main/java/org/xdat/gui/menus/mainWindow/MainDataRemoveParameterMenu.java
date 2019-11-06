@@ -17,7 +17,7 @@
  * along with xdat.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.xdat.gui.menus.mainWIndow;
+package org.xdat.gui.menus.mainWindow;
 
 import org.xdat.Main;
 import org.xdat.actionListeners.mainMenu.MainDataRemoveParameterMenuActionListener;

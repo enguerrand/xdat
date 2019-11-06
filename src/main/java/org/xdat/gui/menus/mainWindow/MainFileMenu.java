@@ -18,37 +18,38 @@
  * 
  */
 
-package org.xdat.gui.menus.mainWIndow;
+package org.xdat.gui.menus.mainWindow;
 
 import org.xdat.Main;
-import org.xdat.actionListeners.mainMenu.MainOptionsMenuActionListener;
+import org.xdat.actionListeners.mainMenu.MainFileMenuActionListener;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import java.awt.event.KeyEvent;
 
-class MainOptionsMenu extends JMenu {
+public class MainFileMenu extends JMenu {
 
-	MainOptionsMenu(Main mainWindow) {
-		super("Options");
-		this.setMnemonic(KeyEvent.VK_O);
+	public MainFileMenu(Main mainWindow) {
+		super("File");
+		this.setMnemonic(KeyEvent.VK_F);
 		JMenuItem mi;
-		MainOptionsMenuActionListener cmd = new MainOptionsMenuActionListener(mainWindow);
-		//
-		mi = new JMenuItem("Import Settings", 'i');
-		mi.setMnemonic(KeyEvent.VK_I);
+		MainFileMenuActionListener cmd = new MainFileMenuActionListener(mainWindow);
+		// Save and Load Sessions
+		mi = new JMenuItem("Load Session", 'l');
+		mi.setMnemonic(KeyEvent.VK_L);
 		mi.addActionListener(cmd);
 		this.add(mi);
-		//
-		mi = new JMenuItem("Parallel Coordinate Settings", 'd');
-		mi.setMnemonic(KeyEvent.VK_D);
+		mi = new JMenuItem("Save Session", 's');
+		mi.setMnemonic(KeyEvent.VK_S);
 		mi.addActionListener(cmd);
 		this.add(mi);
-		//
-		this.addSeparator();
-		//
-		mi = new JMenuItem("Reset to Default", 'r');
-		mi.setMnemonic(KeyEvent.VK_R);
+		mi = new JMenuItem("Save Session As...", 'a');
+		mi.setMnemonic(KeyEvent.VK_A);
+		mi.addActionListener(cmd);
+		this.add(mi);
+		// Exit
+		mi = new JMenuItem("Exit", 'x');
+		mi.setMnemonic(KeyEvent.VK_X);
 		mi.addActionListener(cmd);
 		this.add(mi);
 	}

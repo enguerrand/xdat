@@ -18,7 +18,7 @@
  * 
  */
 
-package org.xdat.gui.menus.mainWIndow;
+package org.xdat.gui.menus.mainWindow;
 
 import org.xdat.Main;
 import org.xdat.actionListeners.mainMenu.MainDataMenuActionListener;
