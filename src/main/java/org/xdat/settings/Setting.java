@@ -2,6 +2,8 @@ package org.xdat.settings;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public abstract class Setting<T> {
@@ -11,6 +13,7 @@ public abstract class Setting<T> {
     private T currentValue;
     private final String title;
     private final SettingsType type;
+    private final List<SettingsListener<T>> listeners = new ArrayList<>();
 
     Setting(String title, T hardCodedDefault, SettingsType type, @Nullable String defaultValuePreferenceKey) {
         this.title = title;
@@ -18,6 +21,10 @@ public abstract class Setting<T> {
         this.defaultValuePreferenceKey = defaultValuePreferenceKey;
         this.hardCodedDefault = hardCodedDefault;
         this.currentValue = getDefault();
+    }
+
+    public void addListener(SettingsListener<T> l) {
+        this.listeners.add(l);
     }
 
     public void setCurrentToDefault(){
@@ -51,6 +58,7 @@ public abstract class Setting<T> {
             return false;
         }
         this.currentValue = value;
+        this.listeners.forEach(l -> l.onValueChanged(this));
         return true;
     }
 

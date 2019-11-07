@@ -44,16 +44,17 @@ public class SettingsGroupPanel extends JPanel {
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jFrame.setLayout(new BorderLayout());
         GeneralSettingsGroup generalSettingsGroup = new GeneralSettingsGroup();
+        generalSettingsGroup.getSettings().forEach(s ->
+                s.addListener(source -> {
+                    System.out.println("Value changed on "+s.getTitle()+" to "+source.get());
+                })
+        );
         SettingsGroupPanel settingsGroupPanel = new SettingsGroupPanel(generalSettingsGroup);
         jFrame.add(settingsGroupPanel, BorderLayout.CENTER);
         JButton btn = new JButton("apply");
         btn.addActionListener(action -> {
             boolean changed = settingsGroupPanel.applyAll();
-            if (changed) {
-                for (Setting setting : generalSettingsGroup.getSettings()) {
-                    System.out.println(setting.getTitle() + " => " + setting.get());
-                }
-            }
+            System.out.println("Changed = "+changed);
         });
         jFrame.add(btn, BorderLayout.SOUTH);
         jFrame.setPreferredSize(new Dimension(600, 600));
