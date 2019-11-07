@@ -1,12 +1,11 @@
 package org.xdat.settings;
 
-import org.jetbrains.annotations.Nullable;
 import org.xdat.UserPreferences;
 
 public class IntegerSetting extends Setting<Integer> {
     private final int min;
     private final int max;
-    public IntegerSetting(String title, int hardCodedDefault, @Nullable Key defaultValuePreferenceKey, int min, int max) {
+    public IntegerSetting(String title, int hardCodedDefault, Key defaultValuePreferenceKey, int min, int max) {
         super(title, hardCodedDefault, SettingsType.INTEGER, defaultValuePreferenceKey);
         this.min = min;
         this.max = max;

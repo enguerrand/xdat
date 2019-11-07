@@ -1,24 +1,21 @@
 package org.xdat.settings;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public abstract class Setting<T> {
-    @Nullable
-    private final Key defaultValuePreferenceKey;
+    private final Key key;
     private final T hardCodedDefault;
     private T currentValue;
     private final String title;
     private final SettingsType type;
     private final List<SettingsListener<T>> listeners = new ArrayList<>();
 
-    Setting(String title, T hardCodedDefault, SettingsType type, @Nullable Key defaultValuePreferenceKey) {
+    Setting(String title, T hardCodedDefault, SettingsType type, Key key) {
         this.title = title;
         this.type = type;
-        this.defaultValuePreferenceKey = defaultValuePreferenceKey;
+        this.key = key;
         this.hardCodedDefault = hardCodedDefault;
         this.currentValue = getDefault();
     }
@@ -36,17 +33,17 @@ public abstract class Setting<T> {
     abstract void setDefaultImpl(Key key, T defaultValue);
 
     public void setDefault(T defaultValue){
-        if (this.defaultValuePreferenceKey == null) {
+        if (this.key == null) {
             return;
         }
-        setDefaultImpl(this.defaultValuePreferenceKey, defaultValue);
+        setDefaultImpl(this.key, defaultValue);
     }
 
     public T getDefault() {
-        if (this.defaultValuePreferenceKey == null) {
+        if (this.key == null) {
             return hardCodedDefault;
         }
-        return getDefaultImpl(this.defaultValuePreferenceKey, hardCodedDefault);
+        return getDefaultImpl(this.key, hardCodedDefault);
     }
 
     public T get(){
@@ -68,5 +65,9 @@ public abstract class Setting<T> {
 
     public SettingsType getType() {
         return type;
+    }
+
+    public Key getKey(){
+        return key;
     }
 }

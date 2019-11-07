@@ -1,10 +1,9 @@
 package org.xdat.settings;
 
-import org.jetbrains.annotations.Nullable;
 import org.xdat.UserPreferences;
 
 public class StringSetting extends Setting<String> {
-    public StringSetting(String title, String hardCodedDefault, @Nullable Key defaultValuePreferenceKey) {
+    public StringSetting(String title, String hardCodedDefault, Key defaultValuePreferenceKey) {
         super(title, hardCodedDefault, SettingsType.STRING, defaultValuePreferenceKey);
     }
 

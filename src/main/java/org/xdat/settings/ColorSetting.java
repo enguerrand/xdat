@@ -1,12 +1,11 @@
 package org.xdat.settings;
 
-import org.jetbrains.annotations.Nullable;
 import org.xdat.UserPreferences;
 
 import java.awt.Color;
 
 public class ColorSetting extends Setting<Color> {
-    public ColorSetting(String title, Color hardCodedDefault, @Nullable Key defaultValuePreferenceKey) {
+    public ColorSetting(String title, Color hardCodedDefault, Key defaultValuePreferenceKey) {
         super(title, hardCodedDefault, SettingsType.COLOR, defaultValuePreferenceKey);
     }
 

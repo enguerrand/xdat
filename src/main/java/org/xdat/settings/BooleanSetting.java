@@ -1,10 +1,9 @@
 package org.xdat.settings;
 
-import org.jetbrains.annotations.Nullable;
 import org.xdat.UserPreferences;
 
 public class BooleanSetting extends Setting<Boolean> {
-    public BooleanSetting(String title, boolean hardCodedDefault, @Nullable Key defaultValuePreferenceKey) {
+    public BooleanSetting(String title, boolean hardCodedDefault, Key defaultValuePreferenceKey) {
         super(title, hardCodedDefault, SettingsType.BOOLEAN, defaultValuePreferenceKey);
     }
 

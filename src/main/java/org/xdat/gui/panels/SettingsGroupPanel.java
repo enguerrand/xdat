@@ -23,7 +23,7 @@ public class SettingsGroupPanel extends JPanel {
         JPanel controlsPanel = new JPanel(new GridLayout(0, 1));
         add(labelPanel, BorderLayout.CENTER);
         add(controlsPanel, BorderLayout.EAST);
-        for (Setting setting : settingsGroup.getSettings()) {
+        for (Setting setting : settingsGroup.getSettings().values()) {
             SettingComponents settingComponents = SettingsPanelFactory.from(setting);
             labelPanel.add(settingComponents.getLabel());
             controlsPanel.add(settingComponents.getControl());
@@ -44,7 +44,7 @@ public class SettingsGroupPanel extends JPanel {
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jFrame.setLayout(new BorderLayout());
         GeneralSettingsGroup generalSettingsGroup = new GeneralSettingsGroup();
-        generalSettingsGroup.getSettings().forEach(s ->
+        generalSettingsGroup.getSettings().values().forEach(s ->
                 s.addListener(source -> {
                     System.out.println("Value changed on "+s.getTitle()+" to "+source.get());
                 })
