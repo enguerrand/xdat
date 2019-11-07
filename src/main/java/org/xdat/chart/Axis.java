@@ -20,9 +20,13 @@
 
 package org.xdat.chart;
 
-import org.xdat.UserPreferences;
 import org.xdat.data.DataSheet;
 import org.xdat.data.Parameter;
+import org.xdat.settings.IntegerSetting;
+import org.xdat.settings.Key;
+import org.xdat.settings.Setting;
+import org.xdat.settings.SettingsGroup;
+import org.xdat.settings.SettingsGroupFactory;
 
 import java.awt.Color;
 import java.io.Serializable;
@@ -42,49 +46,27 @@ import java.io.Serializable;
  * @see org.xdat.data.Design
  */
 public class Axis implements Serializable {
-	static final long serialVersionUID = 6L;
+	static final long serialVersionUID = 7L;
 	private ParallelCoordinatesChart chart;
-	private boolean autoFit;
-	private double max;
-	private double min;
 	private Parameter parameter;
-	private int width;
-	private int ticCount;
-	private Color axisColor;
-	private Color axisLabelFontColor;
-	private Color ticLabelFontColor;
-	private int axisLabelFontSize;
-	private int ticLabelFontSize;
-	private int ticLength;
-	private boolean active = true;
 	private Filter upperFilter;
 	private Filter lowerFilter;
-	private boolean filterInverted;
-	private boolean axisInverted;
+	private SettingsGroup settings;
+
 	public Axis(DataSheet dataSheet, ParallelCoordinatesChart chart, Parameter parameter) {
+		this.settings = SettingsGroupFactory.buildParallelCoordinatesChartAxisSettingsGroup();
 		this.chart = chart;
 		this.parameter = parameter;
 		initialiseSettings(dataSheet);
-		if (this.autoFit) {
+		if (this.settings.getBoolean(Key.PARALLEL_COORDINATES_AUTO_FIT_AXIS)) {
 			autofit(dataSheet);
 		}
+		IntegerSetting ticLabelDigitCountSetting = this.settings.getIntegerSetting(Key.PARALLEL_COORDINATES_AXIS_TIC_LABEL_DIGIT_COUNT);
+		ticLabelDigitCountSetting.set(parameter.getTicLabelDigitCount());
+		ticLabelDigitCountSetting.addListener(source -> parameter.setTicLabelDigitCount(source.get()));
 	}
 
 	private void initialiseSettings(DataSheet dataSheet) {
-		UserPreferences userPreferences = UserPreferences.getInstance();
-		this.width = userPreferences.getParallelCoordinatesAxisWidth();
-		this.ticCount = userPreferences.getParallelCoordinatesAxisTicCount();
-		this.axisColor = userPreferences.getParallelCoordinatesAxisColor();
-		this.axisLabelFontColor = userPreferences.getParallelCoordinatesAxisLabelFontColor();
-		this.ticLabelFontColor = userPreferences.getParallelCoordinatesAxisTicLabelFontColor();
-		this.axisLabelFontSize = userPreferences.getParallelCoordinatesAxisLabelFontSize();
-		this.ticLabelFontSize = userPreferences.getParallelCoordinatesAxisTicLabelFontSize();
-		this.ticLength = userPreferences.getParallelCoordinatesAxisTicLength();
-		this.filterInverted = userPreferences.isFilterInverted();
-		this.axisInverted = userPreferences.isParallelCoordinatesAxisInverted();
-		this.autoFit = userPreferences.isParallelCoordinatesAutoFitAxis();
-		this.min = userPreferences.getParallelCoordinatesAxisDefaultMin();
-		this.max = userPreferences.getParallelCoordinatesAxisDefaultMax();
 		dataSheet.evaluateBoundsForAllDesigns(this.chart);
 	}
 
@@ -99,21 +81,17 @@ public class Axis implements Serializable {
 	}
 
 	public void autofit(DataSheet dataSheet) {
-		this.max = dataSheet.getMaxValueOf(this.parameter);
-		this.min = dataSheet.getMinValueOf(this.parameter);
+		this.setMax(dataSheet.getMaxValueOf(this.parameter), dataSheet);
+		this.setMin(dataSheet.getMinValueOf(this.parameter), dataSheet);
 		dataSheet.evaluateBoundsForAllDesigns(this.chart);
 	}
 
 	public Color getAxisLabelFontColor() {
-		return axisLabelFontColor;
-	}
-
-	public void setAxisLabelFontColor(Color axisLabelFontColor) {
-		this.axisLabelFontColor = axisLabelFontColor;
+		return this.settings.getColor(Key.PARALLEL_COORDINATES_AXIS_LABEL_FONT_COLOR);
 	}
 
 	public int getAxisLabelFontSize() {
-		return axisLabelFontSize;
+		return this.settings.getInteger(Key.PARALLEL_COORDINATES_AXIS_LABEL_FONT_SIZE);
 	}
 
 	public void setAxisLabelFontSize(int axisLabelFontSize, DataSheet dataSheet) {
@@ -124,7 +102,7 @@ public class Axis implements Serializable {
 			lowerFilterValues[i] = axis.getLowerFilter().getValue();
 			upperFilterValues[i] = axis.getUpperFilter().getValue();
 		}
-		this.axisLabelFontSize = axisLabelFontSize;
+		this.settings.getIntegerSetting(Key.PARALLEL_COORDINATES_AXIS_LABEL_FONT_SIZE).set(axisLabelFontSize);
 		for (int i = 0; i < this.chart.getAxisCount(); i++) {
 			Axis axis = this.chart.getAxis(i);
 			axis.getLowerFilter().setValue(lowerFilterValues[i], dataSheet);
@@ -132,40 +110,40 @@ public class Axis implements Serializable {
 		}
 	}
 
-	public double getMax(DataSheet dataSheet) {
+	public double getMax() {
 		if (!this.parameter.isNumeric())
-			return dataSheet.getMaxValueOf(this.parameter);
+			return this.parameter.getDiscreteLevelCount() - 1;
 		else
-			return max;
+			return this.settings.getDouble(Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MAX);
 	}
 
 	public void setMax(double max, DataSheet dataSheet) {
-		this.max = max;
+		this.settings.getDoubleSetting(Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MAX).set(max);
 		dataSheet.evaluateBoundsForAllDesigns(this.chart);
 	}
 
-	public double getMin(DataSheet dataSheet) {
+	public double getMin() {
 		if (!this.parameter.isNumeric())
-			return dataSheet.getMinValueOf(this.parameter);
+			return 0.0;
 		else
-			return min;
+			return this.settings.getDouble(Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MIN);
 	}
 
 	public void setMin(double min, DataSheet dataSheet) {
-		this.min = min;
+		this.settings.getDoubleSetting(Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MIN).set(min);
 		dataSheet.evaluateBoundsForAllDesigns(this.chart);
 	}
 
 	public double getRange() {
 		if (this.parameter.isNumeric())
-			return max - min;
+			return getMax() - getMin();
 		else
 			return this.parameter.getDiscreteLevelCount() - 1;
 	}
 
 	public int getTicCount() {
 		if (this.parameter.isNumeric() && this.getRange() > 0)
-			return ticCount;
+			return this.settings.getInteger(Key.PARALLEL_COORDINATES_AXIS_TIC_COUNT);
 		else if (this.parameter.isNumeric())
 			return 1;
 		else
@@ -173,26 +151,14 @@ public class Axis implements Serializable {
 	}
 
 	public void setTicCount(int ticCount, DataSheet dataSheet) {
-		this.ticCount = ticCount;
+		this.settings.getIntegerSetting(Key.PARALLEL_COORDINATES_AXIS_TIC_COUNT).set(ticCount);
 		if (ticCount < 2) {
 			this.applyFilters(dataSheet);
 		}
 	}
 
-	public void setTicLabelDigitCount(int value) {
-		this.parameter.setTicLabelDigitCount(value);
-	}
-
-	public int getTicLabelDigitCount(){
-		return this.parameter.getTicLabelDigitCount();
-	}
-
 	public int getTicLabelFontSize() {
-		return ticLabelFontSize;
-	}
-
-	public void setTicLabelFontSize(int ticLabelFontSize) {
-		this.ticLabelFontSize = ticLabelFontSize;
+		return settings.getInteger(Key.TIC_LABEL_FONT_SIZE);
 	}
 
 	public String getTicLabelFormat() {
@@ -200,27 +166,23 @@ public class Axis implements Serializable {
 	}
 
 	public int getTicLength() {
-		return ticLength;
-	}
-
-	public void setTicLength(int ticLength) {
-		this.ticLength = ticLength;
+		return settings.getInteger(Key.PARALLEL_COORDINATES_AXIS_TIC_LENGTH);
 	}
 
 	public int getWidth() {
-		return width;
+		return settings.getInteger(Key.PARALLEL_COORDINATES_AXIS_WIDTH);
 	}
 
 	public void setWidth(int width) {
-		this.width = width;
+		this.getSettings().getIntegerSetting(Key.PARALLEL_COORDINATES_AXIS_WIDTH).set(width);
 	}
 
 	public boolean isActive() {
-		return active;
+		return settings.getBoolean(Key.PARALLEL_COORDINATES_AXIS_ACTIVE);
 	}
 
 	public void setActive(boolean active) {
-		this.active = active;
+		this.settings.getBooleanSetting(Key.PARALLEL_COORDINATES_AXIS_ACTIVE).set(active);
 	}
 
 	public Parameter getParameter() {
@@ -232,19 +194,11 @@ public class Axis implements Serializable {
 	}
 
 	public Color getAxisColor() {
-		return axisColor;
-	}
-
-	public void setAxisColor(Color axisColor) {
-		this.axisColor = axisColor;
+		return this.settings.getColor(Key.PARALLEL_COORDINATES_AXIS_COLOR);
 	}
 
 	public Color getAxisTicLabelFontColor() {
-		return ticLabelFontColor;
-	}
-
-	public void setTicLabelFontColor(Color ticLabelFontColor) {
-		this.ticLabelFontColor = ticLabelFontColor;
+		return this.settings.getColor(Key.PARALLEL_COORDINATES_AXIS_LABEL_FONT_COLOR);
 	}
 
 	public String getName() {
@@ -278,34 +232,31 @@ public class Axis implements Serializable {
 	}
 
 	public boolean isFilterInverted() {
-		return filterInverted;
-	}
-
-	public void setFilterInverted(boolean filterInverted) {
-		this.filterInverted = filterInverted;
+		return this.settings.getBoolean(Key.PARALLEL_COORDINATES_FILTER_INVERTED);
 	}
 
 	public boolean isAxisInverted() {
-		return this.axisInverted;
+		return this.settings.getBoolean(Key.PARALLEL_COORDINATES_AXIS_INVERTED);
 	}
 
 	public void setAxisInverted(boolean axisInverted, DataSheet dataSheet) {
 		double maxFilterValue = this.getMaximumFilter().getValue();
 		double minFilterValue = this.getMinimumFilter().getValue();
-		this.axisInverted = axisInverted;
+		this.settings.getBooleanSetting(Key.PARALLEL_COORDINATES_AXIS_INVERTED).set(axisInverted);
 		this.getMaximumFilter().setValue(maxFilterValue, dataSheet);
 		this.getMinimumFilter().setValue(minFilterValue, dataSheet);
 	}
 
 	public boolean isAutoFit() {
-		if (this.parameter.isNumeric())
-			return autoFit;
-		else
+		if (this.parameter.isNumeric()) {
+			return this.settings.getBoolean(Key.PARALLEL_COORDINATES_AUTO_FIT_AXIS);
+		} else {
 			return true;
+		}
 	}
 
 	public void setAutoFit(boolean autoFit) {
-		this.autoFit = autoFit;
+		this.settings.getBooleanSetting(Key.PARALLEL_COORDINATES_AUTO_FIT_AXIS).set(autoFit);
 	}
 
 	public void setFilterAsNewRange(DataSheet dataSheet) {
@@ -330,4 +281,11 @@ public class Axis implements Serializable {
 		this.lowerFilter.reset(dataSheet);
 	}
 
+	public void initTransientData(){
+		this.settings.getSettings().values().forEach(Setting::initTransientData);
+	}
+
+	public SettingsGroup getSettings() {
+		return this.settings;
+	}
 }

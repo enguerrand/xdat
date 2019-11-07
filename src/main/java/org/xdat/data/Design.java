@@ -120,8 +120,8 @@ public class Design implements Serializable {
 
 	private boolean isInsideBounds(Axis axis, DataSheet dataSheet) {
 		double value = this.getDoubleValue(axis.getParameter());
-		double max = axis.getMax(dataSheet);
-		double min = axis.getMin(dataSheet);
+		double max = axis.getMax();
+		double min = axis.getMin();
 		if (min <= value && value <= max) {
 			return true;
 		} else {

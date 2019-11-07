@@ -4,6 +4,7 @@ import org.xdat.gui.buttons.ColorChoiceButton;
 import org.xdat.gui.buttons.MinMaxSpinnerModel;
 import org.xdat.settings.BooleanSetting;
 import org.xdat.settings.ColorSetting;
+import org.xdat.settings.DoubleSetting;
 import org.xdat.settings.IntegerSetting;
 import org.xdat.settings.Setting;
 import org.xdat.settings.SettingsType;
@@ -12,6 +13,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import java.awt.Color;
 import java.awt.FlowLayout;
 
@@ -30,7 +32,7 @@ public class SettingsPanelFactory {
             case INTEGER:
                 return new SettingComponents(label, buildIntegerControl((IntegerSetting) setting));
             case DOUBLE:
-                // FIXME
+                return new SettingComponents(label, buildDoubleControl((DoubleSetting) setting));
             case STRING:
                 // FIXME
                 throw new IllegalStateException("Setting type " + type + " not yet implemented!");
@@ -74,6 +76,34 @@ public class SettingsPanelFactory {
         };
         spinner.setValue(setting.get());
         outer.add(spinner);
+        return outer;
+    }
+
+    private static SettingControlPanel buildDoubleControl(DoubleSetting setting) {
+        JTextField textField = new JTextField();
+
+        SettingControlPanel outer = new SettingControlPanel(new FlowLayout(FlowLayout.LEFT)) {
+            @Override
+            public boolean applyValue() {
+                String text = textField.getText();
+                double previous = setting.get();
+                try {
+                    double d = Double.parseDouble(text);
+                    setting.set(d);
+                    return d != previous;
+                } catch (NumberFormatException e) {
+                    textField.setText(String.valueOf(previous));
+                    return false;
+                }
+            }
+
+            @Override
+            public void setEnabled(boolean enabled) {
+                textField.setEnabled(enabled);
+            }
+        };
+        textField.setText(String.valueOf(setting.get()));
+        outer.add(textField);
         return outer;
     }
 

@@ -42,7 +42,6 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 		this.mainWindow = mainWindow;
 		this.chartFrame = chartFrame;
 		this.axis = axis;
-
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -119,7 +118,7 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 			ParallelCoordinatesChart chart = (ParallelCoordinatesChart) this.chartFrame.getChart();
 			DataSheet datasheet = chart.getDataSheet();
 
-			double axisRange = this.axis.getMax(mainWindow.getDataSheet()) - this.axis.getMin(mainWindow.getDataSheet());
+			double axisRange = this.axis.getMax() - this.axis.getMin();
 
 			for (int designID = 0; designID < datasheet.getDesignCount(); designID++) {
 				Design currentDesign = datasheet.getDesign(designID);
@@ -131,9 +130,9 @@ public class ParallelChartContextMenuActionListener implements ActionListener {
 					double ratio;
 					int alpha = 255;
 					if (axis.isAxisInverted()) {
-						ratio = (axis.getMax(mainWindow.getDataSheet()) - value) / axisRange;
+						ratio = (axis.getMax() - value) / axisRange;
 					} else {
-						ratio = (value - axis.getMin(mainWindow.getDataSheet())) / axisRange;
+						ratio = (value - axis.getMin()) / axisRange;
 					}
 
 					if (ratio > 1 || ratio < 0) {

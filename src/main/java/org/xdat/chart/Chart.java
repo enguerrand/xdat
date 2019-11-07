@@ -37,7 +37,7 @@ public abstract class Chart implements Serializable {
 	private final DataSheet dataSheet;
 	private boolean antiAliasing;
 	private boolean useAlpha;
-	
+
 	public Chart(DataSheet dataSheet, int id) {
 		this.dataSheet = dataSheet;
 		this.id = id;
@@ -98,4 +98,6 @@ public abstract class Chart implements Serializable {
 	public void setUseAlpha(boolean useAlpha) {
 		this.useAlpha = useAlpha;
 	}
+
+	public abstract void initTransientData();
 }

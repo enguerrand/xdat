@@ -79,6 +79,7 @@ public class Session implements Serializable {
 	private void initTransientData() {
 		this.currentDataSheet.initTransientData();
 		this.currentClusterSet.initTransientData();
+		this.charts.forEach(Chart::initTransientData);
 	}
 
 	public Chart getChart(int index) {

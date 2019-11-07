@@ -29,6 +29,7 @@ import org.xdat.data.DataSheet;
 import org.xdat.data.Design;
 import org.xdat.data.Parameter;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -85,6 +86,7 @@ public class ScatterChart2DPanel extends ChartPanel {
 		double maxX = chart.getScatterPlot2D().getMax(AxisType.X);
 		double minY = chart.getScatterPlot2D().getMin(AxisType.Y);
 		double maxY = chart.getScatterPlot2D().getMax(AxisType.Y);
+		boolean useAlpha = chart.isUseAlpha();
 
 		for (int i = 0; i < dataSheet.getDesignCount(); i++) {
 			xValues[i] = dataSheet.getDesign(i).getDoubleValue(paramX);
@@ -147,6 +149,10 @@ public class ScatterChart2DPanel extends ChartPanel {
 		switch (chart.getScatterPlot2D().getDisplayedDesignSelectionMode()) {
 			case (ScatterPlot2D.SHOW_DESIGNS_ACTIVE_IN_PARALLEL_CHART): {
 				ParallelCoordinatesChart parallelChart = chart.getScatterPlot2D().getParallelCoordinatesChartForFiltering();
+				Color activeDesignColor = parallelChart.getActiveDesignColor();
+				Color activeDesignColorNoAlpha = parallelChart.getActiveDesignColorNoAlpha();
+				Color filteredDesignColor = parallelChart.getFilteredDesignColor();
+				Color filteredDesignColorNoAlpha = parallelChart.getFilteredDesignColorNoAlpha();
 				if (chart.getScatterPlot2D().getParallelCoordinatesChartForFiltering() != null) {
 					for (int i = 0; i < dataSheet.getDesignCount(); i++) {
 						Design design = dataSheet.getDesign(i);
@@ -160,7 +166,7 @@ public class ScatterChart2DPanel extends ChartPanel {
 							if (design.isSelected()) {
 								g.setColor(chart.getScatterPlot2D().getSelectedDesignColor());
 							} else if (design.hasGradientColor()){
-								g.setColor(parallelChart.getDesignColor(design, true, chart.isUseAlpha()));
+								g.setColor(parallelChart.getDesignColor(design, true, useAlpha, activeDesignColor, activeDesignColorNoAlpha, filteredDesignColor, filteredDesignColorNoAlpha));
 							} else {
 								g.setColor(chart.getScatterPlot2D().getDesignColor(design));
 							}

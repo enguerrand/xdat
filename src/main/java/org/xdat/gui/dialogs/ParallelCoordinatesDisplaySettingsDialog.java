@@ -21,60 +21,53 @@
 package org.xdat.gui.dialogs;
 
 import org.xdat.Main;
-import org.xdat.actionListeners.parallelCoordinatesDisplaySettings.AxisDisplaySettingsActionListener;
-import org.xdat.actionListeners.parallelCoordinatesDisplaySettings.ParallelChartDisplaySettingsActionListener;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.gui.WindowClosingAdapter;
 import org.xdat.gui.frames.ChartFrame;
 import org.xdat.gui.panels.AxisDisplaySettingsPanel;
-import org.xdat.gui.panels.ParallelCoordinatesChartDisplaySettingsPanel;
+import org.xdat.gui.panels.SettingsGroupPanel;
+import org.xdat.settings.SettingsGroup;
 
+import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import java.awt.BorderLayout;
-import java.awt.HeadlessException;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 
 public class ParallelCoordinatesDisplaySettingsDialog extends JDialog {
 
 	static final long serialVersionUID = 2L;
 	private Main mainWindow;
-	private ParallelCoordinatesChartDisplaySettingsPanel chartDisplaySettingsPanel;
 	private AxisDisplaySettingsPanel axisDisplaySettingsPanel;
-	public ParallelCoordinatesDisplaySettingsDialog(Main mainWindow) throws HeadlessException {
+	public ParallelCoordinatesDisplaySettingsDialog(Main mainWindow) {
 		super(mainWindow, "Parallel Coord Settings", true);
 		this.mainWindow = mainWindow;
 
-		chartDisplaySettingsPanel = new ParallelCoordinatesChartDisplaySettingsPanel(this.mainWindow, this);
-		axisDisplaySettingsPanel = new AxisDisplaySettingsPanel(this.mainWindow, this);
-		chartDisplaySettingsPanel.setActionListener(new ParallelChartDisplaySettingsActionListener(mainWindow, chartDisplaySettingsPanel, this));
-		axisDisplaySettingsPanel.setActionListener(new AxisDisplaySettingsActionListener(mainWindow, this, axisDisplaySettingsPanel));
-		buildDialog();
-
-		chartDisplaySettingsPanel.setOkCancelButtonTargetDefaultSettings();
-		axisDisplaySettingsPanel.setOkCancelButtonTargetDefaultSettings();
+		SettingsGroup generalSettingsGroup = this.mainWindow.getGeneralSettingsGroup();
+		SettingsGroupPanel chartDisplaySettingsPanel = new SettingsGroupPanel(generalSettingsGroup);
+		axisDisplaySettingsPanel = new AxisDisplaySettingsPanel(mainWindow.getParallelCoordinatesAxisSettingsGroup());
+		buildDialog(chartDisplaySettingsPanel);
 
 		this.setVisible(true);
 	}
 
-	public ParallelCoordinatesDisplaySettingsDialog(Main mainWindow, ParallelCoordinatesChart chart, ChartFrame chartFrame) throws HeadlessException {
+	public ParallelCoordinatesDisplaySettingsDialog(Main mainWindow, ParallelCoordinatesChart chart, ChartFrame chartFrame) {
 		super(chartFrame, "Display Settings");
 		this.setModal(true);
 		this.mainWindow = mainWindow;
 
-		chartDisplaySettingsPanel = new ParallelCoordinatesChartDisplaySettingsPanel(this.mainWindow, this, chartFrame);
-		axisDisplaySettingsPanel = new AxisDisplaySettingsPanel(this.mainWindow, this, chartFrame);
-		chartDisplaySettingsPanel.setActionListener(new ParallelChartDisplaySettingsActionListener(mainWindow, chartDisplaySettingsPanel, chart, this));
-		axisDisplaySettingsPanel.setActionListener(new AxisDisplaySettingsActionListener(this, axisDisplaySettingsPanel, chart));
+		SettingsGroup settingsGroup = chart.getChartSettingsGroup();
+		SettingsGroupPanel chartDisplaySettingsPanel = new SettingsGroupPanel(settingsGroup);
+		axisDisplaySettingsPanel = new AxisDisplaySettingsPanel(chart.getAxes());
 
-		buildDialog();
-
-		chartDisplaySettingsPanel.setOkCancelButtonTargetChart(chart);
-		axisDisplaySettingsPanel.setOkCancelButtonTargetChart(chart);
+		buildDialog(chartDisplaySettingsPanel);
 
 		this.setVisible(true);
 	}
 
-	private void buildDialog() {
+	private void buildDialog(SettingsGroupPanel generalSettingsGroupPanel) {
 		this.addWindowListener(new WindowClosingAdapter(false));
 		this.setResizable(false);
 
@@ -87,8 +80,31 @@ public class ParallelCoordinatesDisplaySettingsDialog extends JDialog {
 		// add components
 		this.add(tabbedPane, BorderLayout.CENTER);
 
-		tabbedPane.add("General", chartDisplaySettingsPanel);
+		tabbedPane.add("General", generalSettingsGroupPanel);
 		tabbedPane.add("Axis-specific", axisDisplaySettingsPanel);
+
+		JButton cancelButton = new JButton("Cancel");
+		JButton okButton = new JButton("Ok");
+		JPanel mainButtonsPanel = new JPanel();
+		JPanel okButtonPanel = new JPanel();
+		JPanel cancelButtonPanel = new JPanel();
+		cancelButtonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		cancelButtonPanel.add(cancelButton);
+		okButtonPanel.add(okButton);
+		okButtonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		mainButtonsPanel.setLayout(new GridLayout(1, 2));
+		mainButtonsPanel.add(cancelButtonPanel);
+		mainButtonsPanel.add(okButtonPanel);
+		okButton.addActionListener(actionEvent -> {
+			generalSettingsGroupPanel.applyAll();
+			axisDisplaySettingsPanel.applyAll();
+			this.dispose();
+		});
+		cancelButton.addActionListener(actionEvent ->
+				this.dispose()
+		);
+
+		this.add(mainButtonsPanel, BorderLayout.SOUTH);
 		// pack
 		this.pack();
 
@@ -96,13 +112,5 @@ public class ParallelCoordinatesDisplaySettingsDialog extends JDialog {
 		int left = (int) (0.5 * this.mainWindow.getSize().width) - (int) (this.getSize().width * 0.5) + this.mainWindow.getLocation().x;
 		int top = (int) (0.5 * this.mainWindow.getSize().height) - (int) (this.getSize().height * 0.5) + this.mainWindow.getLocation().y;
 		this.setLocation(left, top);
-	}
-
-	public AxisDisplaySettingsPanel getAxisDisplaySettingsPanel() {
-		return axisDisplaySettingsPanel;
-	}
-
-	public ParallelCoordinatesChartDisplaySettingsPanel getChartDisplaySettingsPanel() {
-		return chartDisplaySettingsPanel;
 	}
 }

@@ -86,4 +86,9 @@ public class ScatterChart2D extends Chart {
 		this.scatterPlot2D.resetDisplaySettingsToDefault();
 	}
 
+	@Override
+	public void initTransientData() {
+
+	}
+
 }

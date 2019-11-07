@@ -84,8 +84,8 @@ public class Filter implements Serializable {
 		if (this.axis.getTicCount() == 1)
 			return this.getAxis().getChart().getAxisTopPos() + (int) (this.getAxis().getChart().getAxisHeight() * 0.5);
 		else {
-			double upperLimit = this.axis.getMax(dataSheet);
-			double lowerLimit = this.axis.getMin(dataSheet);
+			double upperLimit = this.axis.getMax();
+			double lowerLimit = this.axis.getMin();
 			if (value > upperLimit)
 				value = upperLimit;
 			else if (value < lowerLimit)
@@ -109,9 +109,9 @@ public class Filter implements Serializable {
 	}
 
 	public void setYPos(int pos, DataSheet dataSheet) {
-		double upperLimit = this.axis.getMax(dataSheet);
+		double upperLimit = this.axis.getMax();
 		// log("getValue: upperLimit of filter "+filterType+": "+upperLimit);
-		double lowerLimit = this.axis.getMin(dataSheet);
+		double lowerLimit = this.axis.getMin();
 		// log("getValue: lowerLimit of filter "+filterType+": "+lowerLimit);
 		double valueRange = upperLimit - lowerLimit;
 		int topPos = this.axis.getChart().getAxisTopPos() - 1;
@@ -228,14 +228,14 @@ public class Filter implements Serializable {
 
 	public void reset(DataSheet dataSheet) {
 		if (this.filterType == UPPER_FILTER && this.axis.isAxisInverted()) {
-			this.setValue(this.axis.getMax(dataSheet), dataSheet);
+			this.setValue(this.axis.getMax(), dataSheet);
 		} else if (this.filterType == UPPER_FILTER) {
-			double value = this.axis.getMax(dataSheet);
+			double value = this.axis.getMax();
 			this.setValue(value, dataSheet);
 		} else if (this.filterType == LOWER_FILTER && this.axis.isAxisInverted()) {
-			this.setValue(this.axis.getMax(dataSheet), dataSheet);
+			this.setValue(this.axis.getMax(), dataSheet);
 		} else {
-			this.setValue(this.axis.getMin(dataSheet), dataSheet);
+			this.setValue(this.axis.getMin(), dataSheet);
 		}
 	}
 

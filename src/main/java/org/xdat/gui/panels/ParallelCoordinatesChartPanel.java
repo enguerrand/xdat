@@ -188,14 +188,23 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		boolean[] axisInversionFlags = new boolean[axisCount];
 		for (int i = 0; i < axisCount; i++) // read all the display settings and put them into arrays to improve rendering speed of the chart
 		{
-			axisRanges[i] = chart.getAxis(i).getMax(mainWindow.getDataSheet()) - chart.getAxis(i).getMin(mainWindow.getDataSheet());
+			axisRanges[i] = chart.getAxis(i).getMax() - chart.getAxis(i).getMin();
 			axisHeights[i] = chart.getAxisHeight();
 			axisWidths[i] = chart.getAxis(i).getWidth();
-			axisMaxValues[i] = chart.getAxis(i).getMax(mainWindow.getDataSheet());
-			axisMinValues[i] = chart.getAxis(i).getMin(mainWindow.getDataSheet());
+			axisMaxValues[i] = chart.getAxis(i).getMax();
+			axisMinValues[i] = chart.getAxis(i).getMin();
 			axisActiveFlags[i] = chart.getAxis(i).isActive();
 			axisInversionFlags[i] = chart.getAxis(i).isAxisInverted();
 		}
+		Color activeDesignColor = chart.getActiveDesignColor();
+		Color activeDesignColorNoAlpha = chart.getActiveDesignColorNoAlpha();
+		Color filteredDesignColor = chart.getFilteredDesignColor();
+		Color filteredDesignColorNoAlpha = chart.getFilteredDesignColorNoAlpha();
+		Color selectedDesignColor = chart.getSelectedDesignColor();
+		boolean showFilteredDesigns = chart.isShowFilteredDesigns();
+		int chartLineThickness = chart.getLineThickness();
+		boolean showOnlySelectedDesigns = chart.isShowOnlySelectedDesigns();
+		int selectedDesignsLineThickness = chart.getSelectedDesignsLineThickness();
 
 		this.lineMap.clear();
 		boolean useAlpha = chart.isUseAlpha();
@@ -215,17 +224,22 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 
 			boolean displayDesign;
 
-			if (chart.isShowOnlySelectedDesigns()) {
-				displayDesign = currentDesign.isSelected() && (currentDesignActive || chart.isShowFilteredDesigns()) && (currentDesignClusterActive);
+			if (showOnlySelectedDesigns) {
+				displayDesign = currentDesign.isSelected() && (currentDesignActive || showFilteredDesigns) && (currentDesignClusterActive);
 			} else {
-				displayDesign = (currentDesignActive || chart.isShowFilteredDesigns()) && (currentDesignClusterActive);
+				displayDesign = (currentDesignActive || showFilteredDesigns) && (currentDesignClusterActive);
 			}
 
 			if (displayDesign) {
-				if ((chart.isShowOnlySelectedDesigns() || !currentDesign.isSelected())&&(!hoverList.contains(currentDesign.getId()))) {
-					g.setColor(chart.getDesignColor(currentDesign, currentDesignActive, useAlpha));
-				    int lineThickness = chart.getDesignLineThickness(currentDesign);
-                    drawDesign(g, chart, axisTopPos, designLabelFontSize, axisCount, axisRanges, axisHeights, axisWidths, axisMaxValues, axisMinValues, axisActiveFlags,
+				if ((showOnlySelectedDesigns || !currentDesign.isSelected())&&(!hoverList.contains(currentDesign.getId()))) {
+					g.setColor(chart.getDesignColor(currentDesign, currentDesignActive, useAlpha, activeDesignColor, activeDesignColorNoAlpha, filteredDesignColor, filteredDesignColorNoAlpha));
+					int lineThickness;
+					if (currentDesign.getCluster() != null) {
+						lineThickness = currentDesign.getCluster().getLineThickness();
+					} else {
+						lineThickness = chartLineThickness;
+					}
+					drawDesign(g, chart, axisTopPos, designLabelFontSize, axisCount, axisRanges, axisHeights, axisWidths, axisMaxValues, axisMinValues, axisActiveFlags,
                             axisInversionFlags, currentDesign, lineThickness);
 				} else {
                     highlightedDesigns.add(currentDesign);
@@ -233,8 +247,8 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 			}
 		}
         for (Design highlightedDesign : highlightedDesigns) {
-					g.setColor(chart.getSelectedDesignColor());
-            int lineThickness = chart.getSelectedDesignsLineThickness();
+			g.setColor(selectedDesignColor);
+			int lineThickness = selectedDesignsLineThickness;
                     drawDesign(g, chart, axisTopPos, designLabelFontSize, axisCount, axisRanges, axisHeights, axisWidths, axisMaxValues, axisMinValues, axisActiveFlags,
                             axisInversionFlags, highlightedDesign, lineThickness);
 
@@ -311,6 +325,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		Axis lastAxis = null;
 		Axis currentAxis;
 		int drawnAxisCount = 0;
+		Color filterColor = chart.getFilterColor();
         DataSheet dataSheet = mainWindow.getDataSheet();
         for (int i = 0; i < chart.getAxisCount(); i++) {
 			if (chart.getAxis(i).isActive()) {
@@ -346,8 +361,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 				lf.setXPos(xPosition);
 
 				// lower Filter triangle Drawing
-
-				g.setColor(chart.getFilterColor());
+				g.setColor(filterColor);
 				g.drawLine(uf.getXPos(), uf.getYPos(dataSheet), uf.getXPos() - chart.getFilterWidth(), uf.getYPos(dataSheet) - chart.getFilterHeight());
 				g.drawLine(uf.getXPos(), uf.getYPos(dataSheet), uf.getXPos() + chart.getFilterWidth(), uf.getYPos(dataSheet) - chart.getFilterHeight());
 				g.drawLine(uf.getXPos() - chart.getFilterWidth(), uf.getYPos(dataSheet) - chart.getFilterHeight(), uf.getXPos() + chart.getFilterWidth(), uf.getYPos(dataSheet) - chart.getFilterHeight());
@@ -402,21 +416,21 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 					if (currentAxis.getParameter().isNumeric()) {
 						Double ticValue;
 						if (ticCount > 1) {
-							ticValue = currentAxis.getMax(dataSheet) - ticValueDifference * ticID;
+							ticValue = currentAxis.getMax() - ticValueDifference * ticID;
 							ticLabel = String.format(currentAxis.getTicLabelFormat(), ticValue);
 							g.drawString(ticLabel, xPosition + ticSize + 7, currentTicYPos + (int) (0.5 * currentAxis.getTicLabelFontSize()));
 						} else {
-							ticValue = currentAxis.getMax(dataSheet);
+							ticValue = currentAxis.getMax();
 							ticLabel = String.format(currentAxis.getTicLabelFormat(), ticValue);
 							g.drawString(ticLabel, xPosition + 2 * ticSize, yPosition + ((int) (chart.getAxisHeight() / 2)) + (int) (0.5 * currentAxis.getTicLabelFontSize()));
 						}
 
 					} else {
 						if (ticCount > 1) {
-							ticLabel = currentAxis.getParameter().getStringValueOf(currentAxis.getMax(dataSheet) - ticValueDifference * ticID);
+							ticLabel = currentAxis.getParameter().getStringValueOf(currentAxis.getMax() - ticValueDifference * ticID);
 							g.drawString(ticLabel, xPosition + 2 * ticSize, currentTicYPos + (int) (0.5 * currentAxis.getTicLabelFontSize()));
 						} else {
-							ticLabel = currentAxis.getParameter().getStringValueOf(currentAxis.getMax(dataSheet));
+							ticLabel = currentAxis.getParameter().getStringValueOf(currentAxis.getMax());
 							g.drawString(ticLabel, xPosition + 2 * ticSize, yPosition + ((int) (chart.getAxisHeight() / 2)) + (int) (0.5 * currentAxis.getTicLabelFontSize()));
 						}
 					}

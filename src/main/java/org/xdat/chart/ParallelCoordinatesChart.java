@@ -20,15 +20,18 @@
 
 package org.xdat.chart;
 
-import org.xdat.UserPreferences;
 import org.xdat.data.DataSheet;
 import org.xdat.data.Design;
+import org.xdat.settings.Key;
+import org.xdat.settings.SettingsGroup;
+import org.xdat.settings.SettingsGroupFactory;
 
 import javax.swing.ProgressMonitor;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -64,48 +67,17 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 
 	static final long serialVersionUID = 4;
 	private static final int BOTTOM_PADDING = 60;
-	private Color backGroundColor;
 	private int topMargin = 10;
-	private boolean verticallyOffsetAxisLabels = true;
-	private int axisLabelVerticalDistance = 10;
 	private List<Axis> axes = new LinkedList<>();
-	private int designLabelFontSize;
-	private int lineThickness = 1;
-	private int selectedDesignsLineThickness = 1;
-	private Color activeDesignColor;
-	private Color activeDesignColorNoAlpha;
-	private Color selectedDesignColor;
-	private Color filteredDesignColor;
-	private Color filteredDesignColorNoAlpha;
-	private Color filterColor;
-	private boolean showDesignIDs;
-	private boolean showFilteredDesigns;
-	private boolean showOnlySelectedDesigns;
-	private int filterHeight;
-	private int filterWidth;
+	private SettingsGroup chartSettings;
 	public ParallelCoordinatesChart(DataSheet dataSheet, ProgressMonitor progressMonitor, int id) {
 		super(dataSheet, id);
+		this.chartSettings = SettingsGroupFactory.buildGeneralParallelCoordinatesChartSettingsGroup();
 		this.setLocation(new Point(100, 100));
 		this.setFrameSize(new Dimension(1280, 800));
-		UserPreferences userPreferences = UserPreferences.getInstance();
-		this.backGroundColor = userPreferences.getParallelCoordinatesDefaultBackgroundColor();
-		this.showDesignIDs = userPreferences.isParallelCoordinatesShowDesignIDs();
-		this.showFilteredDesigns = userPreferences.isParallelCoordinatesShowFilteredDesigns();
-		this.verticallyOffsetAxisLabels = userPreferences.isParallelCoordinatesVerticallyOffsetAxisLabels();
-		this.setActiveDesignColor(userPreferences.getParallelCoordinatesActiveDesignDefaultColor());
-		this.selectedDesignColor = userPreferences.getParallelCoordinatesSelectedDesignDefaultColor();
-		this.setFilteredDesignColor(userPreferences.getParallelCoordinatesFilteredDesignDefaultColor());
-		this.designLabelFontSize = userPreferences.getParallelCoordinatesDesignLabelFontSize();
-		this.lineThickness = userPreferences.getParallelCoordinatesLineThickness();
-		this.selectedDesignsLineThickness = userPreferences.getParallelCoordinatesSelectedDesignLineThickness();
-		this.filterColor = userPreferences.getParallelCoordinatesFilterDefaultColor();
-		this.showOnlySelectedDesigns = userPreferences.isParallelCoordinatesShowOnlySelectedDesigns();
-		this.filterHeight = userPreferences.getParallelCoordinatesFilterHeight();
-		this.filterWidth = userPreferences.getParallelCoordinatesFilterWidth();
 		progressMonitor.setMaximum(dataSheet.getParameterCount() - 1);
 		progressMonitor.setNote("Building Chart...");
 		for (int i = 0; i < dataSheet.getParameterCount() && !progressMonitor.isCanceled(); i++) {
-			// log("constructor: Creating axis "+dataSheet.getParameter(i).getName());
 			Axis newAxis = new Axis(dataSheet, this, dataSheet.getParameter(i));
 			this.addAxis(newAxis);
 			progressMonitor.setProgress(i);
@@ -155,28 +127,17 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 		return width;
 	}
 
-	public void setAxisWidth(int width) {
-		for (int i = 0; i < axes.size(); i++) {
-			axes.get(i).setWidth(width);
-		}
-	}
-
 	public void incrementAxisWidth(int deltaWidth) {
 		for (int i = 0; i < axes.size(); i++) {
 			axes.get(i).setWidth(Math.max(0, axes.get(i).getWidth() + deltaWidth));
 		}
 	}
 
-	public void setAxisColor(Color color) {
-		for (int i = 0; i < axes.size(); i++) {
-			axes.get(i).setAxisColor(color);
-		}
-	}
-
 	public int getAxisTopPos() {
+		boolean verticallyOffsetAxisLabels = this.chartSettings.getBoolean(Key.PARALLEL_COORDINATES_VERTICALLY_OFFSET_AXIS_LABELS);
 		int topPos;
-		if (this.verticallyOffsetAxisLabels) {
-			topPos = 2 * getMaxAxisLabelFontSize() + this.axisLabelVerticalDistance + this.getTopMargin() * 2 + this.getFilterHeight();
+		if (verticallyOffsetAxisLabels) {
+			topPos = 2 * getMaxAxisLabelFontSize() + this.getAxisLabelVerticalDistance() + this.getTopMargin() * 2 + this.getFilterHeight();
 		} else {
 			topPos = getMaxAxisLabelFontSize() + this.getTopMargin() * 2 + this.getFilterHeight();
 		}
@@ -184,7 +145,6 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 	}
 
 	public Axis getAxis(int index) {
-
 		return axes.get(index);
 	}
 
@@ -207,45 +167,20 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 		return maxAxisLabelFontSize;
 	}
 
-	public int getActiveAxisCount() {
-		int axesCount = 0;
-		for (int i = 0; i < axes.size(); i++) {
-			if (axes.get(i).isActive())
-				axesCount++;
-		}
-		return axesCount;
-	}
-
 	public int getAxisCount() {
 		return axes.size();
 	}
 
 	public int getAxisLabelVerticalDistance() {
-		return axisLabelVerticalDistance;
-	}
-
-	public void setAxisLabelVerticalDistance(int axisLabelVerticalDistance) {
-		this.axisLabelVerticalDistance = axisLabelVerticalDistance;
+		return chartSettings.getInteger(Key.PARALLEL_COORDINATES_LABELS_VERTICAL_DISTANCE);
 	}
 
 	public boolean isVerticallyOffsetAxisLabels() {
-		return verticallyOffsetAxisLabels;
-	}
-
-	public void setVerticallyOffsetAxisLabels(boolean verticallyOffsetAxisLabels) {
-		this.verticallyOffsetAxisLabels = verticallyOffsetAxisLabels;
+		return chartSettings.getBoolean(Key.PARALLEL_COORDINATES_VERTICALLY_OFFSET_AXIS_LABELS);
 	}
 
 	public void addAxis(Axis axis) {
 		this.axes.add(axis);
-	}
-
-	public void addAxis(int index, Axis axis) {
-		this.axes.add(index, axis);
-	}
-
-	public void removeAxis(int index) {
-		this.axes.remove(index);
 	}
 
 	public void removeAxis(String parameterName) {
@@ -268,22 +203,34 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 	}
 
 	public int getDesignLabelFontSize() {
-		return designLabelFontSize;
-	}
-
-	public void setDesignLabelFontSize(int designLabelFontSize) {
-		this.designLabelFontSize = designLabelFontSize;
+		return chartSettings.getInteger(Key.DESIGN_LABEL_FONT_SIZE);
 	}
 
 	public int getLineThickness() {
-		return lineThickness;
+		return chartSettings.getInteger(Key.LINE_THICKNESS);
 	}
 
-	public void setLineThickness(int lineThickness) {
-		this.lineThickness = lineThickness;
+	public void setActiveDesignColor(Color newColor) {
+		chartSettings.getColorSetting(Key.ACTIVE_DESIGN_DEFAULT_COLOR).set(newColor);
 	}
 
-	public Color getDesignColor(Design design, boolean designActive, boolean useAlpha) // design active is function argument to improve  performance
+	public Color getActiveDesignColor() {
+		return chartSettings.getColor(Key.ACTIVE_DESIGN_DEFAULT_COLOR);
+	}
+
+	public Color getActiveDesignColorNoAlpha() {
+		return new Color(getActiveDesignColor().getRGB());
+	}
+
+	public Color getFilteredDesignColor() {
+		return chartSettings.getColor(Key.IN_ACTIVE_DESIGN_DEFAULT_COLOR);
+	}
+
+	public Color getFilteredDesignColorNoAlpha() {
+		return new Color(getFilteredDesignColor().getRGB());
+	}
+
+	public Color getDesignColor(Design design, boolean designActive, boolean useAlpha, Color activeDesignColor, Color activeDesignColorNoAlpha, Color filteredDesignColor, Color filteredDesignColorNoAlpha) // design active is function argument to improve  performance
 	{
 		if (designActive && design.hasGradientColor()) {
 			return design.getGradientColor();
@@ -297,77 +244,35 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 		}
 	}
 
-	public int getDesignLineThickness(Design design) {
-		if (design.getCluster() != null) {
-			return design.getCluster().getLineThickness();
-		} else {
-			return this.lineThickness;
-		}
-	}
-
 	public int getSelectedDesignsLineThickness() {
-		return selectedDesignsLineThickness;
-	}
-
-	public void setSelectedDesignsLineThickness(int selectedDesignsLineThickness) {
-		this.selectedDesignsLineThickness = selectedDesignsLineThickness;
+		return chartSettings.getInteger(Key.SELECTED_DESIGN_LINE_THICKNESS);
 	}
 
 	public Color getDefaultDesignColor(boolean designActive, boolean useAlpha) {
 		if (designActive)
-			return useAlpha ? activeDesignColor : activeDesignColorNoAlpha;
+			return useAlpha ? getActiveDesignColor() : getActiveDesignColorNoAlpha();
 		else
-			return useAlpha ? filteredDesignColor : filteredDesignColorNoAlpha;
-	}
-
-	public void setActiveDesignColor(Color activeDesignColor) {
-		this.activeDesignColor = activeDesignColor;
-		this.activeDesignColorNoAlpha = new Color(activeDesignColor.getRed(), activeDesignColor.getGreen(), activeDesignColor.getBlue());
-	}
-
-	public void setFilteredDesignColor(Color filteredDesignColor) {
-		this.filteredDesignColor = filteredDesignColor;
-		this.filteredDesignColorNoAlpha = new Color(filteredDesignColor.getRed(), filteredDesignColor.getGreen(), filteredDesignColor.getBlue());
+			return useAlpha ? getFilteredDesignColor() : getFilteredDesignColorNoAlpha();
 	}
 
 	public Color getSelectedDesignColor() {
-		return selectedDesignColor;
-	}
-
-	public void setSelectedDesignColor(Color selectedDesignColor) {
-		this.selectedDesignColor = selectedDesignColor;
+		return chartSettings.getColor(Key.SELECTED_DESIGN_DEFAULT_COLOR);
 	}
 
 	public boolean isShowDesignIDs() {
-		return showDesignIDs;
-	}
-
-	public void setShowDesignIDs(boolean showDesignIDs) {
-		this.showDesignIDs = showDesignIDs;
+		return chartSettings.getBoolean(Key.SHOW_DESIGN_IDS);
 	}
 
 	public boolean isShowFilteredDesigns() {
-		return showFilteredDesigns;
-	}
-
-	public void setShowFilteredDesigns(boolean showFilteredDesigns) {
-		this.showFilteredDesigns = showFilteredDesigns;
+		return chartSettings.getBoolean(Key.SHOW_FILTERED_DESIGNS);
 	}
 
 	public boolean isShowOnlySelectedDesigns() {
-		return showOnlySelectedDesigns;
-	}
-
-	public void setShowOnlySelectedDesigns(boolean showOnlySelectedDesigns) {
-		this.showOnlySelectedDesigns = showOnlySelectedDesigns;
+		return chartSettings.getBoolean(Key.PARALLEL_COORDINATES_SHOW_ONLY_SELECTED_DESIGNS);
 	}
 
 	public Color getFilterColor() {
-		return filterColor;
-	}
-
-	public void setFilterColor(Color filterColor) {
-		this.filterColor = filterColor;
+		return chartSettings.getColor(Key.PARALLEL_COORDINATES_FILTER_COLOR);
 	}
 
 	public int getTopMargin() {
@@ -375,47 +280,40 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 	}
 
 	public void resetDisplaySettingsToDefault(DataSheet dataSheet) {
-		UserPreferences userPreferences = UserPreferences.getInstance();
-		this.backGroundColor = userPreferences.getParallelCoordinatesDefaultBackgroundColor();
-		this.showDesignIDs = userPreferences.isParallelCoordinatesShowDesignIDs();
-		this.showFilteredDesigns = userPreferences.isParallelCoordinatesShowFilteredDesigns();
-		this.showOnlySelectedDesigns = userPreferences.isParallelCoordinatesShowOnlySelectedDesigns();
-		this.setActiveDesignColor(userPreferences.getParallelCoordinatesActiveDesignDefaultColor());
-		this.selectedDesignColor = userPreferences.getParallelCoordinatesSelectedDesignDefaultColor();
-		this.setFilteredDesignColor(userPreferences.getParallelCoordinatesFilteredDesignDefaultColor());
-		this.designLabelFontSize = userPreferences.getParallelCoordinatesDesignLabelFontSize();
-		this.lineThickness = userPreferences.getParallelCoordinatesLineThickness();
-		this.selectedDesignsLineThickness = userPreferences.getParallelCoordinatesSelectedDesignLineThickness();
-		this.verticallyOffsetAxisLabels = userPreferences.isParallelCoordinatesVerticallyOffsetAxisLabels();
-		this.filterColor = userPreferences.getParallelCoordinatesFilterDefaultColor();
-		this.filterHeight = userPreferences.getParallelCoordinatesFilterHeight();
-		this.filterWidth = userPreferences.getParallelCoordinatesFilterWidth();
+		this.chartSettings.resetToDefault();
 		for (int i = 0; i < axes.size(); i++) {
 			axes.get(i).resetSettingsToDefault(dataSheet);
 		}
 	}
 
 	public Color getBackGroundColor() {
-		return backGroundColor;
+		return chartSettings.getColor(Key.PARALLEL_CHART_BACKGROUND_COLOR);
 	}
 
+	@Override
 	public void setBackGroundColor(Color backGroundColor) {
-		this.backGroundColor = backGroundColor;
+		this.chartSettings.getColorSetting(Key.PARALLEL_CHART_BACKGROUND_COLOR).set(backGroundColor);
 	}
 
 	public int getFilterHeight() {
-		return filterHeight;
-	}
-
-	public void setFilterHeight(int filterHeight) {
-		this.filterHeight = filterHeight;
+		return chartSettings.getInteger(Key.PARALLEL_COORDINATES_FILTER_HEIGHT);
 	}
 
 	public int getFilterWidth() {
-		return filterWidth;
+		return chartSettings.getInteger(Key.PARALLEL_COORDINATES_FILTER_WIDTH);
 	}
 
-	public void setFilterWidth(int filterWidth) {
-		this.filterWidth = filterWidth;
+	@Override
+	public void initTransientData() {
+		this.chartSettings.initTransientData();
+		this.axes.forEach(Axis::initTransientData);
+	}
+
+	public SettingsGroup getChartSettingsGroup() {
+		return this.chartSettings;
+	}
+
+	public List<Axis> getAxes() {
+		return Collections.unmodifiableList(this.axes);
 	}
 }

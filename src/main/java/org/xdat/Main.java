@@ -32,6 +32,9 @@ import org.xdat.gui.WindowClosingAdapter;
 import org.xdat.gui.frames.ChartFrame;
 import org.xdat.gui.menus.mainWindow.MainMenuBar;
 import org.xdat.gui.panels.DataSheetTablePanel;
+import org.xdat.settings.Setting;
+import org.xdat.settings.SettingsGroup;
+import org.xdat.settings.SettingsGroupFactory;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -59,8 +62,10 @@ public class Main extends JFrame {
 	private final BuildProperties buildProperties;
 	private final ClusterFactory clusterFactory = new ClusterFactory();
 	private final DatasheetListener datasheetListener;
-	private transient DataSheetTablePanel dataSheetTablePanel;
-	private transient List<ParallelChartFrameComboModel> comboModels = new LinkedList<>();
+	private DataSheetTablePanel dataSheetTablePanel;
+	private final List<ParallelChartFrameComboModel> comboModels = new LinkedList<>();
+	private final SettingsGroup generalSettingsGroup;
+	private final SettingsGroup parallelCoordinatesAxisSettingsGroup;
 
 	private static final List<String> LOOK_AND_FEEL_ORDER_OF_PREF = Arrays.asList(
 			"com.sun.java.swing.plaf.gtk.GTKLookAndFeel",
@@ -70,6 +75,15 @@ public class Main extends JFrame {
 
 	public Main() {
 		super("xdat   -   Untitled");
+		generalSettingsGroup = SettingsGroupFactory.buildGeneralParallelCoordinatesChartSettingsGroup();
+		for (Setting<?> value : generalSettingsGroup.getSettings().values()) {
+			value.addListener(Setting::setCurrentToDefault);
+		}
+		parallelCoordinatesAxisSettingsGroup = SettingsGroupFactory.buildParallelCoordinatesChartAxisSettingsGroup();
+		for (Setting<?> value : parallelCoordinatesAxisSettingsGroup.getSettings().values()) {
+			value.addListener(Setting::setCurrentToDefault);
+		}
+
 		this.buildProperties = new BuildProperties();
 		this.datasheetListener = new DatasheetListener() {
 			@Override
@@ -408,5 +422,13 @@ public class Main extends JFrame {
 
 	public ClusterFactory getClusterFactory() {
 		return clusterFactory;
+	}
+
+	public SettingsGroup getGeneralSettingsGroup() {
+		return generalSettingsGroup;
+	}
+
+	public SettingsGroup getParallelCoordinatesAxisSettingsGroup() {
+		return parallelCoordinatesAxisSettingsGroup;
 	}
 }

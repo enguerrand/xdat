@@ -1,16 +1,18 @@
 package org.xdat.settings;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class Setting<T> {
+public abstract class Setting<T> implements Serializable {
+    static final long serialVersionUID = 1L;
     private final Key key;
     private final T hardCodedDefault;
     private T currentValue;
     private final String title;
     private final SettingsType type;
-    private final List<SettingsListener<T>> listeners = new ArrayList<>();
+    private transient List<SettingsListener<T>> listeners;
 
     Setting(String title, T hardCodedDefault, SettingsType type, Key key) {
         this.title = title;
@@ -18,6 +20,7 @@ public abstract class Setting<T> {
         this.key = key;
         this.hardCodedDefault = hardCodedDefault;
         this.currentValue = getDefault();
+        initTransientData();
     }
 
     public void addListener(SettingsListener<T> l) {
@@ -69,5 +72,13 @@ public abstract class Setting<T> {
 
     public Key getKey(){
         return key;
+    }
+
+    public void initTransientData() {
+        this.listeners = new ArrayList<>();
+    }
+
+    public void resetToDefault() {
+        set(getDefault());
     }
 }
