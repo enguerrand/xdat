@@ -8,14 +8,14 @@ import java.util.Objects;
 
 public abstract class Setting<T> {
     @Nullable
-    private final String defaultValuePreferenceKey;
+    private final Key defaultValuePreferenceKey;
     private final T hardCodedDefault;
     private T currentValue;
     private final String title;
     private final SettingsType type;
     private final List<SettingsListener<T>> listeners = new ArrayList<>();
 
-    Setting(String title, T hardCodedDefault, SettingsType type, @Nullable String defaultValuePreferenceKey) {
+    Setting(String title, T hardCodedDefault, SettingsType type, @Nullable Key defaultValuePreferenceKey) {
         this.title = title;
         this.type = type;
         this.defaultValuePreferenceKey = defaultValuePreferenceKey;
@@ -31,9 +31,9 @@ public abstract class Setting<T> {
         setDefault(currentValue);
     }
 
-    abstract T getDefaultImpl(String key, T fallback);
+    abstract T getDefaultImpl(Key key, T fallback);
 
-    abstract void setDefaultImpl(String key, T defaultValue);
+    abstract void setDefaultImpl(Key key, T defaultValue);
 
     public void setDefault(T defaultValue){
         if (this.defaultValuePreferenceKey == null) {

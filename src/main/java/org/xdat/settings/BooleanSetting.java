@@ -4,17 +4,17 @@ import org.jetbrains.annotations.Nullable;
 import org.xdat.UserPreferences;
 
 public class BooleanSetting extends Setting<Boolean> {
-    public BooleanSetting(String title, boolean hardCodedDefault, @Nullable String defaultValuePreferenceKey) {
+    public BooleanSetting(String title, boolean hardCodedDefault, @Nullable Key defaultValuePreferenceKey) {
         super(title, hardCodedDefault, SettingsType.BOOLEAN, defaultValuePreferenceKey);
     }
 
     @Override
-    void setDefaultImpl(String key, Boolean defaultValue) {
+    void setDefaultImpl(Key key, Boolean defaultValue) {
         UserPreferences.putBoolean(key, defaultValue);
     }
 
     @Override
-    Boolean getDefaultImpl(String key, Boolean fallback) {
+    Boolean getDefaultImpl(Key key, Boolean fallback) {
         return UserPreferences.getBoolean(key, fallback);
     }
 }
