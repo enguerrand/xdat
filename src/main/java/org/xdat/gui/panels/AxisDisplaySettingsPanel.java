@@ -21,6 +21,8 @@
 package org.xdat.gui.panels;
 
 import org.xdat.chart.Axis;
+import org.xdat.settings.BooleanSetting;
+import org.xdat.settings.Key;
 import org.xdat.settings.SettingsGroup;
 
 import javax.swing.JComboBox;
@@ -64,7 +66,16 @@ public class AxisDisplaySettingsPanel extends JPanel {
 			if (axis.isActive()) {
 				v.add(axis);
 				SettingsGroup settings = axis.getSettings();
-				axisSettingPanels.put(settings, new SettingsGroupPanel(settings));
+				SettingsGroupPanel settingsGroupPanel = new SettingsGroupPanel(settings);
+				Integer digitCount = settings.getInteger(Key.PARALLEL_COORDINATES_AXIS_TIC_LABEL_DIGIT_COUNT);
+				getMinTextField(settingsGroupPanel);
+				getMaxTextField(settingsGroupPanel);
+				BooleanSetting autoFitSetting = settings.getBooleanSetting(Key.PARALLEL_COORDINATES_AUTO_FIT_AXIS);
+				autoFitSetting.addListener(src -> {
+					setAxisRangeFieldsEnabled(!src.get(), settingsGroupPanel);
+				});
+				setAxisRangeFieldsEnabled(!autoFitSetting.get(), settingsGroupPanel);
+				axisSettingPanels.put(settings, settingsGroupPanel);
 			}
 		}
 		axisChoiceCombo = new JComboBox<>(v);
@@ -73,7 +84,6 @@ public class AxisDisplaySettingsPanel extends JPanel {
 			Axis selectedItem = (Axis) axisChoiceCombo.getSelectedItem();
 			if (selectedItem != null) {
 				setCurrentSettings(selectedItem.getSettings());
-				repaint();
 			}
 		});
 
@@ -95,17 +105,26 @@ public class AxisDisplaySettingsPanel extends JPanel {
 
 	private void setCurrentSettings(SettingsGroup settings) {
         this.settingsPanelWrapper.removeAll();
-		this.settingsPanelWrapper.add(this.axisSettingPanels.get(settings), BorderLayout.CENTER);
+		SettingsGroupPanel settingsGroupPanel = this.axisSettingPanels.get(settings);
+		this.settingsPanelWrapper.add(settingsGroupPanel, BorderLayout.CENTER);
 		this.revalidate();
 		this.repaint();
+	}
+
+	private JPanel getMaxTextField(SettingsGroupPanel settingsGroupPanel) {
+		return settingsGroupPanel.getComponents(Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MAX).getControl();
+	}
+
+	private JPanel getMinTextField(SettingsGroupPanel settingsGroupPanel) {
+		return settingsGroupPanel.getComponents(Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MIN).getControl();
 	}
 
 	public void applyAll() {
 		applyAll.run();
 	}
 
-	public void setAxisRangeFieldsEnabled(boolean fieldsEnabled) {
-//		this.axisMinTextField.setEnabled(fieldsEnabled);
-//		this.axisMaxTextField.setEnabled(fieldsEnabled);
+	public void setAxisRangeFieldsEnabled(boolean fieldsEnabled, SettingsGroupPanel settingsGroupPanel) {
+		getMinTextField(settingsGroupPanel).setEnabled(fieldsEnabled);
+		getMaxTextField(settingsGroupPanel).setEnabled(fieldsEnabled);
 	}
 }

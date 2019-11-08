@@ -47,6 +47,7 @@ public class SettingsGroupFactory {
     }
 
     public static SettingsGroup buildParallelCoordinatesChartAxisSettingsGroup() {
+        IntegerSetting digitCountSetting = new IntegerSetting("Tic Label Digit Count", 3, Key.PARALLEL_COORDINATES_AXIS_TIC_LABEL_DIGIT_COUNT, 0, 20);
         return SettingsGroup.newBuilder()
                 .addSetting(new BooleanSetting("Active", true, Key.PARALLEL_COORDINATES_AXIS_ACTIVE))
                 .addSetting(new ColorSetting("Axis Color", Color.BLACK, Key.PARALLEL_COORDINATES_AXIS_COLOR))
@@ -57,12 +58,12 @@ public class SettingsGroupFactory {
                 .addSetting(new IntegerSetting("Number of Tics", 11, Key.PARALLEL_COORDINATES_AXIS_TIC_COUNT, 0, 1000))
                 .addSetting(new ColorSetting("Tic Label Color", Color.BLACK, Key.PARALLEL_COORDINATES_AXIS_TIC_LABEL_FONT_COLOR))
                 .addSetting(new IntegerSetting("Tic Label Fontsize", 10, Key.TIC_LABEL_FONT_SIZE, 0, 100))
-                .addSetting(new IntegerSetting("Tic Label Digit Count", 3, Key.PARALLEL_COORDINATES_AXIS_TIC_LABEL_DIGIT_COUNT, 0, 20))
+                .addSetting(digitCountSetting)
                 .addSetting(new BooleanSetting("Invert Filter", false, Key.PARALLEL_COORDINATES_AXIS_INVERTED))
                 .addSetting(new BooleanSetting("Invert Axis", false, Key.PARALLEL_COORDINATES_FILTER_INVERTED))
                 .addSetting(new BooleanSetting("Autofit Axis", true, Key.PARALLEL_COORDINATES_AUTO_FIT_AXIS))
-                .addSetting(new DoubleSetting("Min", 0, Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MIN))
-                .addSetting(new DoubleSetting("Max", 1, Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MAX))
+                .addSetting(new DoubleSetting("Min", 0, Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MIN, digitCountSetting))
+                .addSetting(new DoubleSetting("Max", 1, Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MAX, digitCountSetting))
                 .build();
     }
 }

@@ -5,6 +5,7 @@ import org.xdat.gui.buttons.MinMaxSpinnerModel;
 import org.xdat.settings.BooleanSetting;
 import org.xdat.settings.ColorSetting;
 import org.xdat.settings.DoubleSetting;
+import org.xdat.settings.Formatting;
 import org.xdat.settings.IntegerSetting;
 import org.xdat.settings.Setting;
 import org.xdat.settings.SettingsType;
@@ -92,7 +93,7 @@ public class SettingsPanelFactory {
                     setting.set(d);
                     return d != previous;
                 } catch (NumberFormatException e) {
-                    textField.setText(String.valueOf(previous));
+                    textField.setText(Formatting.formatDouble(previous, setting.getDigitCountSetting().get()));
                     return false;
                 }
             }
@@ -102,7 +103,7 @@ public class SettingsPanelFactory {
                 textField.setEnabled(enabled);
             }
         };
-        textField.setText(String.valueOf(setting.get()));
+        textField.setText(String.valueOf(Formatting.formatDouble(setting.get(), setting.getDigitCountSetting().get())));
         outer.add(textField);
         return outer;
     }
