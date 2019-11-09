@@ -64,7 +64,7 @@ public class LicenseDisplayDialog extends JDialog {
 
 		licenseDisplayPanel.add(buttonsPanel, BorderLayout.SOUTH);
 		this.add(licenseDisplayPanel);
-		this.setSize((int) (500), (int) (getToolkit().getScreenSize().height * 0.6));
+		this.setSize(500, (int) (getToolkit().getScreenSize().height * 0.6));
 		int left = (int) (getToolkit().getScreenSize().width * 0.5 - this.getWidth() * 0.5);
 		int top = (int) (getToolkit().getScreenSize().height * 0.5 - this.getHeight() * 0.5);
 		setLocation(left, top);

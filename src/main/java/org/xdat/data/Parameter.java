@@ -143,7 +143,7 @@ public class Parameter implements Serializable {
 		Iterator<String> it = discreteLevels.iterator();
 		while (it.hasNext()) {
 			if (string.equalsIgnoreCase(it.next())) {
-				return (double) index;
+				return index;
 			}
 			index++;
 		}
@@ -155,7 +155,7 @@ public class Parameter implements Serializable {
 		while (it.hasNext()) {
 			String next = it.next();
 			if (string.equalsIgnoreCase(next)) {
-				return (double) index;
+				return index;
 			}
 			index++;
 		}

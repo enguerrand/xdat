@@ -33,7 +33,7 @@ import java.io.Serializable;
 
 /**
  * A serializable representation of all relevant settings for an Axis on a
- * Parallel coordinates shart.
+ * Parallel coordinates chart.
  * <p>
  * An Axis is used to represent a Parameter. Each Axis has an upper Filter and a
  * lower Filter, which are represented by triangles and can be dragged by the

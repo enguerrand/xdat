@@ -74,7 +74,7 @@ public class ChartFrameOptionsMenuActionListener implements ActionListener {
 					g.dispose();
 					ImageIO.write(bi, "png", new File(filepath));
 				} catch (IOException exc) {
-					JOptionPane.showMessageDialog(this.chartFrame, "IOException on saving image: " + exc.getMessage(), "Export to Image", JOptionPane.OK_OPTION);
+					JOptionPane.showMessageDialog(this.chartFrame, "IOException on saving image: " + exc.getMessage(), "Export to Image", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}

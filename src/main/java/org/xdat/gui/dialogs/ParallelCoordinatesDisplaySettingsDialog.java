@@ -71,13 +71,8 @@ public class ParallelCoordinatesDisplaySettingsDialog extends JDialog {
 		this.addWindowListener(new WindowClosingAdapter(false));
 		this.setResizable(false);
 
-		// create components
 		JTabbedPane tabbedPane = new JTabbedPane();
-
-		// set Layouts
 		this.setLayout(new BorderLayout());
-
-		// add components
 		this.add(tabbedPane, BorderLayout.CENTER);
 
 		tabbedPane.add("General", generalSettingsGroupPanel);
@@ -105,10 +100,8 @@ public class ParallelCoordinatesDisplaySettingsDialog extends JDialog {
 		);
 
 		this.add(mainButtonsPanel, BorderLayout.SOUTH);
-		// pack
 		this.pack();
 
-		// set location and make visible
 		int left = (int) (0.5 * this.mainWindow.getSize().width) - (int) (this.getSize().width * 0.5) + this.mainWindow.getLocation().x;
 		int top = (int) (0.5 * this.mainWindow.getSize().height) - (int) (this.getSize().height * 0.5) + this.mainWindow.getLocation().y;
 		this.setLocation(left, top);

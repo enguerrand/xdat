@@ -122,11 +122,7 @@ public class Design implements Serializable {
 		double value = this.getDoubleValue(axis.getParameter());
 		double max = axis.getMax();
 		double min = axis.getMin();
-		if (min <= value && value <= max) {
-			return true;
-		} else {
-			return false;
-		}
+		return min <= value && value <= max;
 	}
 
 	public boolean isInsideBounds(ParallelCoordinatesChart chart) {

@@ -46,7 +46,6 @@ public class ParameterSetSelectionDialog extends JDialog {
 		super(chartFrame, "Select active parameters");
 		this.setModal(true);
 
-		// create components
 		this.setLayout(new BorderLayout());
 		JPanel mainPanel = new JPanel(new BorderLayout());
 		JPanel controlsPanel = new JPanel(new BorderLayout());
@@ -59,10 +58,6 @@ public class ParameterSetSelectionDialog extends JDialog {
 		CustomButton selectAllButton = new CustomButton("Select All", "images" + "/selectAllButtonDefault.png", "images" + "/selectAllButtonPressed.png", "Select All");
 		CustomButton unselectAllButton = new CustomButton("Unselect All", "images" + "/UnSelectAllButtonDefault.png", "images" + "/UnSelectAllButtonPressed.png", "Unselect All");
 		CustomButton invertSelectionButton = new CustomButton("Invert Selection", "images" + "/reverseSelectionButtonDefault.png", "images" + "/reverseSelectionButtonPressed.png", "Invert Selection");
-
-		// JButton selectAllButton = new JButton("Select All");
-		// JButton unselectAllButton = new JButton("Unselect All");
-		// JButton invertSelectionButton = new JButton("Invert Selection");
 
 		JButton cancelButton = new JButton("Cancel");
 		JButton okButton = new JButton("Ok");

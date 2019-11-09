@@ -104,15 +104,14 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 		}
 		for (int i = 1; i < this.getAxisCount(); i++) {
 			if (this.getAxis(i).isActive()) {
-				width = width + (int) (this.getAxis(i).getWidth());
+				width = width + this.getAxis(i).getWidth();
 			}
 		}
 		return width;
 	}
 
 	public int getHeight() {
-		int height = getAxisTopPos() + getAxisHeight();
-		return height;
+		return getAxisTopPos() + getAxisHeight();
 	}
 
 	public int getAxisMaxWidth() {

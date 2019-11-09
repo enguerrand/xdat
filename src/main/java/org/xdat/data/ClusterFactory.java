@@ -30,8 +30,7 @@ public class ClusterFactory {
 
     public Cluster newCluster(List<Cluster> currentBuffer) {
         String newClusterName = getUniqueClusterName(currentBuffer);
-        Cluster newCluster = new Cluster(newClusterName, nextUid++);
-        return newCluster;
+        return new Cluster(newClusterName, nextUid++);
     }
 
     public String getUniqueClusterName(List<Cluster> currentBuffer) {

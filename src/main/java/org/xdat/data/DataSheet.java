@@ -234,19 +234,18 @@ public class DataSheet implements Serializable, ListModel {
 			progressMonitor.setProgress(idCounter - 1);
 			Design newDesign;
 			lineElements = line.split(this.delimiter);
-			if (lineElements.length < 1) {
-				// skip line
-			} else {
+			if (lineElements.length > 0) {
 				newDesign = new Design(idCounter++);
 				boolean newDesignContainsValues = false;
 				for (int i = 0; i < lineElements.length; i++) {
-					if (lineElements[i].length() > 0 && (!lineElements[i].equals(new String("\\s")))) {
+					if (lineElements[i].length() > 0 && (!lineElements[i].equals("\\s"))) {
 						newDesignContainsValues = true; // found non-empty empty
+						break;
 					}
 				}
 				if (newDesignContainsValues) {
 					for (int i = 0; i < this.parameters.size(); i++) {
-						if (lineElements.length <= i || lineElements[i].length() <= 0 || lineElements[i].equals(new String("\\s"))) {
+						if (lineElements.length <= i || lineElements[i].length() <= 0 || lineElements[i].equals("\\s")) {
 							newDesign.setValue(this.parameters.get(i), "-", this);
 						} else {
 							newDesign.setValue(this.parameters.get(i), lineElements[i], this);

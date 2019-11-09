@@ -72,7 +72,7 @@ public class SettingsGroup implements Serializable {
     }
 
     public String getString(Key key) {
-        return (String) getStringSetting(key).get();
+        return getStringSetting(key).get();
     }
 
     public static Builder newBuilder(){

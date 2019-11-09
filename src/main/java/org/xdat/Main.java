@@ -375,7 +375,7 @@ public class Main extends JFrame {
 		} catch (InvalidClassException | ClassNotFoundException e) {
 			JOptionPane.showMessageDialog(this, "The file " + pathToFile + " is not a proper xdat version " + buildProperties.getVersion() + " Session file", "Load Session", JOptionPane.OK_OPTION);
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(this, "Error on loading session: " + e.getMessage(), "Load Session", JOptionPane.OK_OPTION);
+			JOptionPane.showMessageDialog(this, "Error on loading session: " + e.getMessage(), "Load Session", JOptionPane.ERROR_MESSAGE);
 		}
 
 	}
@@ -384,7 +384,7 @@ public class Main extends JFrame {
 		try {
 			this.currentSession.saveToFile(pathToFile);
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(this, "IOException on saving session: " + e.getMessage(), "Save Session", JOptionPane.OK_OPTION);
+			JOptionPane.showMessageDialog(this, "IOException on saving session: " + e.getMessage(), "Save Session", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 

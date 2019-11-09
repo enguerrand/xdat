@@ -52,6 +52,7 @@ import java.awt.event.FocusListener;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 
@@ -277,7 +278,7 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 			JOptionPane.showMessageDialog(this, "Invalid cluster name: \"" + newName + "\"", "Error on renaming cluster", JOptionPane.ERROR_MESSAGE);
 			source.setText(cluster.getName());
 		}
-		if (newName.equals(cluster.getName())) {
+		if (Objects.equals(newName, cluster.getName())) {
 			return;
 		}
 		cluster.setName(newName);

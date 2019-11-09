@@ -287,15 +287,14 @@ public class UserPreferences {
 
 	public String getCurrentDir() {
 		switch (this.getDirToImportFrom()) {
-			case (IMPORT_FROM_HOMEDIR): {
-				return this.getHomeDir();
-			}
 			case (IMPORT_FROM_LASTDIR): {
 				return this.getLastFile();
 			}
 			case (IMPORT_FROM_USERDIR): {
 				return this.getUserDir();
 			}
+			case (IMPORT_FROM_HOMEDIR):
+				// deliberate fallthrough
 			default: {
 				return this.getHomeDir();
 			}

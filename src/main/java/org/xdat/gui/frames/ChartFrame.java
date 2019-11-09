@@ -126,14 +126,9 @@ public class ChartFrame extends JFrame implements ComponentListener {
 	}
 
 	public void unRegisterComponentForRepaint(JDialog comp) {
-		if (this.registeredDialog.contains(comp))
-			this.registeredDialog.remove(comp);
+		this.registeredDialog.remove(comp);
 	}
 
-	public SidebarPanel getSidePanel() {
-		return sidePanel;
-	}
-	
 	public Main getMainWindow() {
 		return mainWindow;
 	}

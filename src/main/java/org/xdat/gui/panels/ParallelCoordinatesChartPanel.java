@@ -248,9 +248,8 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		}
         for (Design highlightedDesign : highlightedDesigns) {
 			g.setColor(selectedDesignColor);
-			int lineThickness = selectedDesignsLineThickness;
-                    drawDesign(g, chart, axisTopPos, designLabelFontSize, axisCount, axisRanges, axisHeights, axisWidths, axisMaxValues, axisMinValues, axisActiveFlags,
-                            axisInversionFlags, highlightedDesign, lineThickness);
+			drawDesign(g, chart, axisTopPos, designLabelFontSize, axisCount, axisRanges, axisHeights, axisWidths, axisMaxValues, axisMinValues, axisActiveFlags,
+                            axisInversionFlags, highlightedDesign, selectedDesignsLineThickness);
 
         }
 	}
@@ -407,7 +406,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 					if (ticCount > 1)
 						g.drawLine(xPosition, currentTicYPos, xPosition + ticSize, currentTicYPos);
 					else
-						g.drawLine(xPosition, yPosition + (int) (chart.getAxisHeight() / 2), xPosition + ticSize, yPosition + (int) (chart.getAxisHeight() / 2));
+						g.drawLine(xPosition, yPosition + (chart.getAxisHeight() / 2), xPosition + ticSize, yPosition + (chart.getAxisHeight() / 2));
 
 					g.setColor(currentAxis.getAxisTicLabelFontColor());
 
@@ -422,7 +421,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 						} else {
 							ticValue = currentAxis.getMax();
 							ticLabel = String.format(currentAxis.getTicLabelFormat(), ticValue);
-							g.drawString(ticLabel, xPosition + 2 * ticSize, yPosition + ((int) (chart.getAxisHeight() / 2)) + (int) (0.5 * currentAxis.getTicLabelFontSize()));
+							g.drawString(ticLabel, xPosition + 2 * ticSize, yPosition + chart.getAxisHeight() / 2 + (int) (0.5 * currentAxis.getTicLabelFontSize()));
 						}
 
 					} else {
@@ -431,7 +430,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 							g.drawString(ticLabel, xPosition + 2 * ticSize, currentTicYPos + (int) (0.5 * currentAxis.getTicLabelFontSize()));
 						} else {
 							ticLabel = currentAxis.getParameter().getStringValueOf(currentAxis.getMax());
-							g.drawString(ticLabel, xPosition + 2 * ticSize, yPosition + ((int) (chart.getAxisHeight() / 2)) + (int) (0.5 * currentAxis.getTicLabelFontSize()));
+							g.drawString(ticLabel, xPosition + 2 * ticSize, yPosition + chart.getAxisHeight() / 2 + (int) (0.5 * currentAxis.getTicLabelFontSize()));
 						}
 					}
 				}

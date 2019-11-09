@@ -51,9 +51,7 @@ public abstract class ChartPanel extends JPanel {
 	public Dimension getPreferredSize() {
 		int width = marginLeft + marginRight + chart.getWidth();
 		int height = marginTop + marginBottom + chart.getHeight();
-		Dimension preferredSize = new Dimension(width, height);
-
-		return preferredSize;
+		return new Dimension(width, height);
 	}
 
 	int getMarginLeft() {
