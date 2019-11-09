@@ -27,7 +27,7 @@ import org.xdat.data.Cluster;
 import org.xdat.data.ClusterFactory;
 import org.xdat.data.ClusterSet;
 import org.xdat.data.DataSheet;
-import org.xdat.gui.buttons.ColorChoiceButton;
+import org.xdat.gui.controls.ColorChoiceButton;
 import org.xdat.gui.panels.ParallelCoordinatesChartPanel;
 import org.xdat.gui.panels.ParallelCoordinatesChartSidebarPanel;
 

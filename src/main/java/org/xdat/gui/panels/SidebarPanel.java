@@ -22,7 +22,7 @@ package org.xdat.gui.panels;
 
 import org.xdat.Main;
 import org.xdat.chart.Chart;
-import org.xdat.gui.buttons.CustomButton;
+import org.xdat.gui.controls.CustomButton;
 import org.xdat.gui.frames.ChartFrame;
 
 import javax.swing.JPanel;

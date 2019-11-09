@@ -21,15 +21,16 @@
 package org.xdat.gui.panels;
 
 import org.xdat.chart.Axis;
+import org.xdat.gui.UiDefines;
 import org.xdat.settings.BooleanSetting;
 import org.xdat.settings.Key;
 import org.xdat.settings.SettingsGroup;
 
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +68,6 @@ public class AxisDisplaySettingsPanel extends JPanel {
 				v.add(axis);
 				SettingsGroup settings = axis.getSettings();
 				SettingsGroupPanel settingsGroupPanel = new SettingsGroupPanel(settings);
-				Integer digitCount = settings.getInteger(Key.PARALLEL_COORDINATES_AXIS_TIC_LABEL_DIGIT_COUNT);
 				getMinTextField(settingsGroupPanel);
 				getMaxTextField(settingsGroupPanel);
 				BooleanSetting autoFitSetting = settings.getBooleanSetting(Key.PARALLEL_COORDINATES_AUTO_FIT_AXIS);
@@ -79,7 +79,6 @@ public class AxisDisplaySettingsPanel extends JPanel {
 			}
 		}
 		axisChoiceCombo = new JComboBox<>(v);
-		axisChoiceCombo.setRenderer((jList, axis, i, b, b1) -> new JLabel(axis.getName()));
 		axisChoiceCombo.addActionListener(actionEvent -> {
 			Axis selectedItem = (Axis) axisChoiceCombo.getSelectedItem();
 			if (selectedItem != null) {
@@ -95,7 +94,10 @@ public class AxisDisplaySettingsPanel extends JPanel {
 
 		axisChoiceCombo.setSelectedIndex(0);
 		axisChoiceCombo.setPreferredSize(new Dimension(100, 25));
-		this.add(axisChoiceCombo, BorderLayout.NORTH);
+		JPanel axisComboWrapper = new PaddedPanel(UiDefines.PADDING);
+		axisComboWrapper.setLayout(new GridLayout(1, 1));
+		axisComboWrapper.add(axisChoiceCombo);
+		this.add(axisComboWrapper, BorderLayout.NORTH);
         Axis first = axes.get(0);
         if(first != null) {
             setCurrentSettings(first.getSettings());

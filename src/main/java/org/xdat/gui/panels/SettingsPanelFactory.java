@@ -1,7 +1,8 @@
 package org.xdat.gui.panels;
 
-import org.xdat.gui.buttons.ColorChoiceButton;
-import org.xdat.gui.buttons.MinMaxSpinnerModel;
+import org.xdat.gui.controls.ColorChoiceButton;
+import org.xdat.gui.controls.MinMaxSpinnerModel;
+import org.xdat.gui.controls.RightAlignedSpinner;
 import org.xdat.settings.BooleanSetting;
 import org.xdat.settings.ColorSetting;
 import org.xdat.settings.DoubleSetting;
@@ -17,6 +18,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 
 public class SettingsPanelFactory {
 
@@ -46,7 +48,7 @@ public class SettingsPanelFactory {
 
     private static SettingControlPanel buildBooleanControl(BooleanSetting setting) {
         JCheckBox checkBox = new JCheckBox();
-        SettingControlPanel outer = new SettingControlPanel(new FlowLayout(FlowLayout.LEFT)) {
+        SettingControlPanel outer = new SettingControlPanel(new FlowLayout(FlowLayout.CENTER)) {
             @Override
             public boolean applyValue() {
                 return setting.set(checkBox.isSelected());
@@ -63,8 +65,9 @@ public class SettingsPanelFactory {
     }
 
     private static SettingControlPanel buildIntegerControl(IntegerSetting setting) {
-        JSpinner spinner = new JSpinner(new MinMaxSpinnerModel(setting.getMin(), setting.getMax()));
-        SettingControlPanel outer = new SettingControlPanel(new FlowLayout(FlowLayout.LEFT)) {
+        JSpinner spinner = new RightAlignedSpinner(new MinMaxSpinnerModel(setting.getMin(), setting.getMax()));
+        ((JSpinner.DefaultEditor)spinner.getEditor()).getTextField().setHorizontalAlignment(JTextField.RIGHT);
+        SettingControlPanel outer = new SettingControlPanel(new GridLayout(1,1)) {
             @Override
             public boolean applyValue() {
                 return setting.set((Integer)spinner.getValue());
@@ -83,7 +86,7 @@ public class SettingsPanelFactory {
     private static SettingControlPanel buildDoubleControl(DoubleSetting setting) {
         JTextField textField = new JTextField();
 
-        SettingControlPanel outer = new SettingControlPanel(new FlowLayout(FlowLayout.LEFT)) {
+        SettingControlPanel outer = new SettingControlPanel(new GridLayout(1,1)) {
             @Override
             public boolean applyValue() {
                 String text = textField.getText();
@@ -110,7 +113,7 @@ public class SettingsPanelFactory {
 
     private static SettingControlPanel buildColorControl(ColorSetting setting) {
         ColorChoiceButton colorChoiceButton = new ColorChoiceButton(setting.get());
-        SettingControlPanel outer = new SettingControlPanel(new FlowLayout(FlowLayout.LEFT)) {
+        SettingControlPanel outer = new SettingControlPanel(new FlowLayout(FlowLayout.CENTER)) {
             @Override
             public boolean applyValue() {
                 return setting.set(colorChoiceButton.getCurrentColor());

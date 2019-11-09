@@ -23,7 +23,7 @@ package org.xdat.gui.dialogs;
 import org.xdat.Main;
 import org.xdat.actionListeners.parallelCoordinatesChartFrame.ParameterSetSelectionDialogActionListener;
 import org.xdat.chart.ParallelCoordinatesChart;
-import org.xdat.gui.buttons.CustomButton;
+import org.xdat.gui.controls.CustomButton;
 import org.xdat.gui.frames.ChartFrame;
 
 import javax.swing.JButton;

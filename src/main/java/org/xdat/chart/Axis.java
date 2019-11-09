@@ -288,4 +288,9 @@ public class Axis implements Serializable {
 	public SettingsGroup getSettings() {
 		return this.settings;
 	}
+
+	@Override
+	public String toString() {
+		return parameter.getName();
+	}
 }

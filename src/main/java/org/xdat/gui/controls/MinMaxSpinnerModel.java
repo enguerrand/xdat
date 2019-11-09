@@ -18,25 +18,22 @@
  * 
  */
 
-package org.xdat.gui.panels;
+package org.xdat.gui.controls;
 
-import org.xdat.gui.UiDefines;
+import javax.swing.SpinnerNumberModel;
 
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
-import java.awt.Font;
+public class MinMaxSpinnerModel extends SpinnerNumberModel {
+	private final int min;
+	private final int max;
 
-public class TitledSubPanel extends JPanel {
+	public MinMaxSpinnerModel(int min, int max) {
+		this.min = min;
+		this.max = max;
+	}
 
-	public TitledSubPanel(String title) {
-		super();
-		TitledBorder titledBorder = BorderFactory.createTitledBorder(title);
-		titledBorder.setTitleFont(new Font("SansSerif", Font.BOLD, 16));
-		EmptyBorder emptyBorder = (new EmptyBorder(UiDefines.PADDING, UiDefines.PADDING, UiDefines.PADDING, UiDefines.PADDING));
-
-		this.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createCompoundBorder(emptyBorder, titledBorder), emptyBorder));
-
+	public void setValue(Object value) {
+		int integerValue = (Integer) value;
+		int upperBound = this.max;
+		super.setValue(Math.min(this.max, Math.max(integerValue, this.min)));
 	}
 }

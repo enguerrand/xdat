@@ -18,7 +18,7 @@
  * 
  */
 
-package org.xdat.gui.buttons;
+package org.xdat.gui.controls;
 
 import org.jetbrains.annotations.Nullable;
 

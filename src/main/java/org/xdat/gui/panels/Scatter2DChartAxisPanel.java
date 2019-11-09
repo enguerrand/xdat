@@ -20,8 +20,15 @@
 
 package org.xdat.gui.panels;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
+import org.xdat.Main;
+import org.xdat.actionListeners.scatter2DChartSettings.Scatter2DChartAxisPanelActionListener;
+import org.xdat.actionListeners.scatter2DChartSettings.Scatter2DChartAxisSelectionListener;
+import org.xdat.chart.ScatterChart2D;
+import org.xdat.data.AxisType;
+import org.xdat.data.Parameter;
+import org.xdat.gui.controls.MinMaxSpinnerModel;
+import org.xdat.gui.controls.RightAlignedSpinner;
+import org.xdat.gui.frames.ChartFrame;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -31,15 +38,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-
-import org.xdat.Main;
-import org.xdat.actionListeners.scatter2DChartSettings.Scatter2DChartAxisPanelActionListener;
-import org.xdat.actionListeners.scatter2DChartSettings.Scatter2DChartAxisSelectionListener;
-import org.xdat.chart.ScatterChart2D;
-import org.xdat.data.AxisType;
-import org.xdat.data.Parameter;
-import org.xdat.gui.buttons.MinMaxSpinnerModel;
-import org.xdat.gui.frames.ChartFrame;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
 
 public class Scatter2DChartAxisPanel extends JPanel {
 	private AxisType axisType;
@@ -47,7 +47,7 @@ public class Scatter2DChartAxisPanel extends JPanel {
 	private JTextField axisMinTextField = new JTextField();
 	private JTextField axisMaxTextField = new JTextField();
 	private JCheckBox autoFitAxisCheckbox = new JCheckBox();
-	private JSpinner ticCountSpinner = new JSpinner(new MinMaxSpinnerModel(1, 500));
+	private JSpinner ticCountSpinner = new RightAlignedSpinner(new MinMaxSpinnerModel(1, 500));
 	private final JSpinner ticLabelDigitCountSpinner;
 	private final JSpinner axisLabelFontSizeSpinner;
 	private final JSpinner ticLabelFontSizeSpinner;
@@ -111,7 +111,7 @@ public class Scatter2DChartAxisPanel extends JPanel {
 		labelPanel.add(ticLabelFontSizeLabel);
 		labelPanel.add(ticLabelDigitCountLabel);
 
-		axisLabelFontSizeSpinner = new JSpinner(new MinMaxSpinnerModel(0, 100));
+		axisLabelFontSizeSpinner = new RightAlignedSpinner(new MinMaxSpinnerModel(0, 100));
 		axisLabelFontSizeSpinner.addChangeListener(changeEvent -> {
 			if (updating) {
 				return;
@@ -124,7 +124,7 @@ public class Scatter2DChartAxisPanel extends JPanel {
 			}
 			cmd.ticCountUpdated((Integer) ticCountSpinner.getValue());
 		});
-		ticLabelFontSizeSpinner = new JSpinner(new MinMaxSpinnerModel(0, 100));
+		ticLabelFontSizeSpinner = new RightAlignedSpinner(new MinMaxSpinnerModel(0, 100));
 		ticLabelFontSizeSpinner.addChangeListener(changeEvent -> {
 			if (updating) {
 				return;
@@ -132,7 +132,7 @@ public class Scatter2DChartAxisPanel extends JPanel {
 			cmd.ticLabelFontsizeUpdated((Integer) ticLabelFontSizeSpinner.getValue());
 		});
 
-		ticLabelDigitCountSpinner = new JSpinner(new MinMaxSpinnerModel(0, 20));
+		ticLabelDigitCountSpinner = new RightAlignedSpinner(new MinMaxSpinnerModel(0, 20));
 
 		controlsPanel.add(autoFitAxisCheckbox);
 		controlsPanel.add(this.axisMinTextField);

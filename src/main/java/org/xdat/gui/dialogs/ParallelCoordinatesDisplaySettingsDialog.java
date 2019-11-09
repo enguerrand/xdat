@@ -22,10 +22,12 @@ package org.xdat.gui.dialogs;
 
 import org.xdat.Main;
 import org.xdat.chart.ParallelCoordinatesChart;
+import org.xdat.gui.UiDefines;
 import org.xdat.gui.WindowClosingAdapter;
 import org.xdat.gui.frames.ChartFrame;
 import org.xdat.gui.panels.AxisDisplaySettingsPanel;
 import org.xdat.gui.panels.SettingsGroupPanel;
+import org.xdat.gui.panels.PaddedPanel;
 import org.xdat.settings.SettingsGroup;
 
 import javax.swing.JButton;
@@ -33,7 +35,6 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 
 public class ParallelCoordinatesDisplaySettingsDialog extends JDialog {
@@ -80,16 +81,10 @@ public class ParallelCoordinatesDisplaySettingsDialog extends JDialog {
 
 		JButton cancelButton = new JButton("Cancel");
 		JButton okButton = new JButton("Ok");
-		JPanel mainButtonsPanel = new JPanel();
-		JPanel okButtonPanel = new JPanel();
-		JPanel cancelButtonPanel = new JPanel();
-		cancelButtonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-		cancelButtonPanel.add(cancelButton);
-		okButtonPanel.add(okButton);
-		okButtonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		JPanel mainButtonsPanel = new PaddedPanel(UiDefines.PADDING);
 		mainButtonsPanel.setLayout(new GridLayout(1, 2));
-		mainButtonsPanel.add(cancelButtonPanel);
-		mainButtonsPanel.add(okButtonPanel);
+		mainButtonsPanel.add(cancelButton);
+		mainButtonsPanel.add(okButton);
 		okButton.addActionListener(actionEvent -> {
 			generalSettingsGroupPanel.applyAll();
 			axisDisplaySettingsPanel.applyAll();

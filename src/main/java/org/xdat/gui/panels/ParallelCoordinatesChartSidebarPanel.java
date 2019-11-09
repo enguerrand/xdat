@@ -26,7 +26,7 @@ import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.data.Cluster;
 import org.xdat.data.ClusterListener;
 import org.xdat.data.ClusterSet;
-import org.xdat.gui.buttons.ColorChoiceButton;
+import org.xdat.gui.controls.ColorChoiceButton;
 import org.xdat.gui.frames.ChartFrame;
 
 import javax.swing.JButton;

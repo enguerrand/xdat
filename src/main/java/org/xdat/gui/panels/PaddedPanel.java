@@ -20,23 +20,22 @@
 
 package org.xdat.gui.panels;
 
-import org.xdat.gui.UiDefines;
-
-import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
-import java.awt.Font;
 
-public class TitledSubPanel extends JPanel {
+public class PaddedPanel extends JPanel {
 
-	public TitledSubPanel(String title) {
+	public PaddedPanel(int padding) {
+		this(padding, padding);
+	}
+
+	public PaddedPanel(int vPadding, int hPadding) {
+		this(vPadding, hPadding, vPadding, hPadding);
+	}
+
+	public PaddedPanel(int paddingTop, int paddingRight, int paddingBottom, int paddingLeft) {
 		super();
-		TitledBorder titledBorder = BorderFactory.createTitledBorder(title);
-		titledBorder.setTitleFont(new Font("SansSerif", Font.BOLD, 16));
-		EmptyBorder emptyBorder = (new EmptyBorder(UiDefines.PADDING, UiDefines.PADDING, UiDefines.PADDING, UiDefines.PADDING));
-
-		this.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createCompoundBorder(emptyBorder, titledBorder), emptyBorder));
-
+		EmptyBorder emptyBorder = (new EmptyBorder(paddingTop, paddingLeft, paddingBottom, paddingRight));
+		this.setBorder(emptyBorder);
 	}
 }

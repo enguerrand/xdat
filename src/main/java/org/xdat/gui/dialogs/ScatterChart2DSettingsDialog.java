@@ -26,8 +26,9 @@ import org.xdat.actionListeners.scatter2DChartSettings.Scatter2DChartDisplaySett
 import org.xdat.chart.ScatterChart2D;
 import org.xdat.chart.ScatterPlot2D;
 import org.xdat.data.AxisType;
-import org.xdat.gui.buttons.ColorChoiceButton;
-import org.xdat.gui.buttons.MinMaxSpinnerModel;
+import org.xdat.gui.controls.ColorChoiceButton;
+import org.xdat.gui.controls.MinMaxSpinnerModel;
+import org.xdat.gui.controls.RightAlignedSpinner;
 import org.xdat.gui.frames.ChartFrame;
 import org.xdat.gui.panels.Scatter2DChartAxisPanel;
 import org.xdat.gui.panels.TitledSubPanel;
@@ -134,7 +135,7 @@ public class ScatterChart2DSettingsDialog extends JDialog {
 		this.bgColorButton = new ColorChoiceButton(scatterChart2D.getScatterPlot2D().getBackGroundColor(), "Background Color");
 		this.standardDesignColorButton = new ColorChoiceButton(scatterChart2D.getScatterPlot2D().getActiveDesignColor(), "Active Design Color");
 		this.selectedDesignColorButton = new ColorChoiceButton(scatterChart2D.getScatterPlot2D().getSelectedDesignColor(), "Selected Design Color");
-		JSpinner dataPointSizeSpinner = new JSpinner(new MinMaxSpinnerModel(1, 20));
+		JSpinner dataPointSizeSpinner = new RightAlignedSpinner(new MinMaxSpinnerModel(1, 20));
 		dataPointSizeSpinner.setName("dataPointSizeSpinner");
 		dataPointSizeSpinner.addChangeListener(cmd);
 		dataPointSizeSpinner.setValue(scatterChart2D.getScatterPlot2D().getDotRadius());

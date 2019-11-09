@@ -1,6 +1,6 @@
 /*
- *  Copyright 2014, Enguerrand de Rochefort
- * 
+ *  Copyright 2019, Enguerrand de Rochefort
+ *
  * This file is part of xdat.
  *
  * xdat is free software: you can redistribute it and/or modify
@@ -15,25 +15,22 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with xdat.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  */
 
-package org.xdat.gui.buttons;
+package org.xdat.gui.controls;
 
-import javax.swing.SpinnerNumberModel;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerModel;
 
-public class MinMaxSpinnerModel extends SpinnerNumberModel {
-	private final int min;
-	private final int max;
+public class RightAlignedSpinner extends JSpinner {
+    public RightAlignedSpinner(SpinnerModel spinnerModel) {
+        super(spinnerModel);
+        align();
+    }
 
-	public MinMaxSpinnerModel(int min, int max) {
-		this.min = min;
-		this.max = max;
-	}
-
-	public void setValue(Object value) {
-		int integerValue = (Integer) value;
-		int upperBound = this.max;
-		super.setValue(Math.min(this.max, Math.max(integerValue, this.min)));
-	}
+    private void align() {
+        ((JSpinner.DefaultEditor)getEditor()).getTextField().setHorizontalAlignment(JTextField.RIGHT);
+    }
 }
