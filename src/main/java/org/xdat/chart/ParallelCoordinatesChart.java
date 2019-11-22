@@ -20,11 +20,13 @@
 
 package org.xdat.chart;
 
+import org.jetbrains.annotations.Nullable;
 import org.xdat.data.DataSheet;
 import org.xdat.data.Design;
 import org.xdat.settings.Key;
 import org.xdat.settings.SettingsGroup;
 import org.xdat.settings.SettingsGroupFactory;
+import org.xdat.settings.SettingsTransaction;
 
 import javax.swing.ProgressMonitor;
 import java.awt.Color;
@@ -34,6 +36,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * A serializable representation of all relevant settings for a Parallel
@@ -90,6 +93,24 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 				this.axes.get(i).addFilters(dataSheet);
 				progressMonitor.setProgress(i);
 			}
+		}
+		Runnable changeHandler = this::fireChanged;
+		Stream.concat(
+				this.chartSettings.getSettings().values().stream(),
+				axes.stream()
+						.map(Axis::getSettings)
+						.flatMap(g -> g.getSettings().values().stream())
+		).forEach(s ->
+				s.addListener((source, transaction) ->
+						handleSettingChange(changeHandler, transaction))
+		);
+	}
+
+	private void handleSettingChange(Runnable changeHandler, @Nullable SettingsTransaction transaction) {
+		if (transaction == null) {
+			this.fireChanged();
+		} else {
+			transaction.handleOnce(changeHandler);
 		}
 	}
 

@@ -1,5 +1,7 @@
 package org.xdat.settings;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,11 +56,18 @@ public abstract class Setting<T> implements Serializable {
     }
 
     public boolean set(T value) {
+        return set(value, null);
+    }
+
+    public boolean set(T value, @Nullable SettingsTransaction transaction) {
         if (Objects.equals(value, this.currentValue)) {
             return false;
         }
         this.currentValue = value;
-        this.listeners.forEach(l -> l.onValueChanged(this));
+        if (transaction != null) {
+            transaction.addChanged(this);
+        }
+        this.listeners.forEach(l -> l.onValueChanged(this, transaction));
         return true;
     }
 
@@ -78,7 +87,7 @@ public abstract class Setting<T> implements Serializable {
         this.listeners = new ArrayList<>();
     }
 
-    public void resetToDefault() {
-        set(getDefault());
+    public boolean resetToDefault(@Nullable SettingsTransaction t) {
+        return set(getDefault(), t);
     }
 }

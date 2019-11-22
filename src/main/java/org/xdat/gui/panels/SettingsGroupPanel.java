@@ -24,6 +24,7 @@ import org.xdat.gui.UiDefines;
 import org.xdat.settings.Key;
 import org.xdat.settings.Setting;
 import org.xdat.settings.SettingsGroup;
+import org.xdat.settings.SettingsTransaction;
 
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
@@ -32,10 +33,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 public class SettingsGroupPanel extends PaddedPanel {
-    private final List<Supplier<Boolean>> applyActions;
+    private final List<Function<SettingsTransaction, Boolean>> applyActions;
     private SettingsGroup settingsGroup;
     private final Map<Key, SettingComponents> map = new LinkedHashMap<>();
 
@@ -55,16 +56,12 @@ public class SettingsGroupPanel extends PaddedPanel {
             this.map.put(setting.getKey(), settingComponents);
             labelPanel.add(settingComponents.getLabel());
             controlsPanel.add(settingComponents.getControl());
-            this.applyActions.add(settingComponents.getControl()::applyValue);
+            this.applyActions.add(transaction -> settingComponents.getControl().applyValue(transaction));
         }
     }
 
-    public boolean applyAll() {
-        boolean changed = false;
-        for (Supplier<Boolean> applyAction : this.applyActions) {
-            changed |= applyAction.get();
-        }
-        return changed;
+    public void applyAll() {
+        new SettingsTransaction().execute(this.applyActions);
     }
 
     public void applyAllAsDefault() {

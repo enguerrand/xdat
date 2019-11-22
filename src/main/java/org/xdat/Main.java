@@ -77,11 +77,11 @@ public class Main extends JFrame {
 		super("xdat   -   Untitled");
 		generalSettingsGroup = SettingsGroupFactory.buildGeneralParallelCoordinatesChartSettingsGroup();
 		for (Setting<?> value : generalSettingsGroup.getSettings().values()) {
-			value.addListener(Setting::setCurrentToDefault);
+			value.addListener((source, transaction) -> source.setCurrentToDefault());
 		}
 		parallelCoordinatesAxisSettingsGroup = SettingsGroupFactory.buildParallelCoordinatesChartAxisSettingsGroup();
 		for (Setting<?> value : parallelCoordinatesAxisSettingsGroup.getSettings().values()) {
-			value.addListener(Setting::setCurrentToDefault);
+			value.addListener((source, transaction) -> source.setCurrentToDefault());
 		}
 
 		this.buildProperties = new BuildProperties();

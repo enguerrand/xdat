@@ -18,10 +18,8 @@
  *
  */
 
-package org.xdat.settings;
+package org.xdat.chart;
 
-import org.jetbrains.annotations.Nullable;
-
-public interface SettingsListener<T> {
-    void onValueChanged(Setting<T> source, @Nullable SettingsTransaction transaction);
+public interface ChartListener {
+    void onChartChanged(Chart source);
 }

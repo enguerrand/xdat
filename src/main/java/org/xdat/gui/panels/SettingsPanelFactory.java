@@ -9,6 +9,7 @@ import org.xdat.settings.DoubleSetting;
 import org.xdat.settings.Formatting;
 import org.xdat.settings.IntegerSetting;
 import org.xdat.settings.Setting;
+import org.xdat.settings.SettingsTransaction;
 import org.xdat.settings.SettingsType;
 
 import javax.swing.JCheckBox;
@@ -50,8 +51,8 @@ public class SettingsPanelFactory {
         JCheckBox checkBox = new JCheckBox();
         SettingControlPanel outer = new SettingControlPanel(new FlowLayout(FlowLayout.CENTER)) {
             @Override
-            public boolean applyValue() {
-                return setting.set(checkBox.isSelected());
+            public boolean applyValue(SettingsTransaction transaction) {
+                return setting.set(checkBox.isSelected(), transaction);
             }
 
             @Override
@@ -69,8 +70,8 @@ public class SettingsPanelFactory {
         ((JSpinner.DefaultEditor)spinner.getEditor()).getTextField().setHorizontalAlignment(JTextField.RIGHT);
         SettingControlPanel outer = new SettingControlPanel(new GridLayout(1,1)) {
             @Override
-            public boolean applyValue() {
-                return setting.set((Integer)spinner.getValue());
+            public boolean applyValue(SettingsTransaction transaction) {
+                return setting.set((Integer)spinner.getValue(), transaction);
             }
 
             @Override
@@ -88,12 +89,12 @@ public class SettingsPanelFactory {
 
         SettingControlPanel outer = new SettingControlPanel(new GridLayout(1,1)) {
             @Override
-            public boolean applyValue() {
+            public boolean applyValue(SettingsTransaction transaction) {
                 String text = textField.getText();
                 double previous = setting.get();
                 try {
                     double d = Double.parseDouble(text);
-                    setting.set(d);
+                    setting.set(d, transaction);
                     return d != previous;
                 } catch (NumberFormatException e) {
                     textField.setText(Formatting.formatDouble(previous, setting.getDigitCountSetting().get()));
@@ -115,8 +116,8 @@ public class SettingsPanelFactory {
         ColorChoiceButton colorChoiceButton = new ColorChoiceButton(setting.get());
         SettingControlPanel outer = new SettingControlPanel(new FlowLayout(FlowLayout.CENTER)) {
             @Override
-            public boolean applyValue() {
-                return setting.set(colorChoiceButton.getCurrentColor());
+            public boolean applyValue(SettingsTransaction transaction) {
+                return setting.set(colorChoiceButton.getCurrentColor(), transaction);
             }
 
             @Override

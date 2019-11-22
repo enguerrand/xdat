@@ -8,27 +8,29 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class SettingsGroup implements Serializable {
 
     static final long serialVersionUID = 1L;
 
-    private final Map<Key, Setting> settingsMap;
+    private final Map<Key, Setting<?>> settingsMap;
 
-    private SettingsGroup(Collection<Setting> settings) {
-        LinkedHashMap<Key, Setting> m = new LinkedHashMap<>();
+    private SettingsGroup(Collection<Setting<?>> settings) {
+        LinkedHashMap<Key, Setting<?>> m = new LinkedHashMap<>();
         for (Setting setting : settings) {
             m.put(setting.getKey(), setting);
         }
         this.settingsMap = Collections.unmodifiableMap(m);
     }
 
-    public Map<Key, Setting> getSettings() {
+    public Map<Key, Setting<?>> getSettings() {
         return settingsMap;
     }
 
-    public Setting getSetting(Key key) {
-        Setting setting = settingsMap.get(key);
+    public Setting<?> getSetting(Key key) {
+        Setting<?> setting = settingsMap.get(key);
         if (setting == null) {
             throw new IllegalArgumentException("No setting stored under key "+key);
         }
@@ -80,12 +82,19 @@ public class SettingsGroup implements Serializable {
     }
 
     public void resetToDefault() {
-        this.settingsMap.values().forEach(Setting::resetToDefault);
+        SettingsTransaction transaction = new SettingsTransaction();
+
+        transaction.execute(this.settingsMap.values().stream()
+                .map(s ->
+                    (Function<SettingsTransaction, Boolean>) s::resetToDefault
+                )
+                .collect(Collectors.toList())
+        );
     }
 
     public static class Builder {
         private boolean built = false;
-        private List<Setting> settings = new ArrayList<>();
+        private List<Setting<?>> settings = new ArrayList<>();
         private Builder() {
         }
 

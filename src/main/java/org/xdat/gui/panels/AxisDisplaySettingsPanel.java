@@ -71,7 +71,7 @@ public class AxisDisplaySettingsPanel extends JPanel {
 				getMinTextField(settingsGroupPanel);
 				getMaxTextField(settingsGroupPanel);
 				BooleanSetting autoFitSetting = settings.getBooleanSetting(Key.PARALLEL_COORDINATES_AUTO_FIT_AXIS);
-				autoFitSetting.addListener(src -> {
+				autoFitSetting.addListener((src, transaction)-> {
 					setAxisRangeFieldsEnabled(!src.get(), settingsGroupPanel);
 				});
 				setAxisRangeFieldsEnabled(!autoFitSetting.get(), settingsGroupPanel);

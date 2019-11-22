@@ -27,6 +27,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Chart implements Serializable {
 
@@ -37,6 +39,7 @@ public abstract class Chart implements Serializable {
 	private final DataSheet dataSheet;
 	private boolean antiAliasing;
 	private boolean useAlpha;
+	private final List<ChartListener> listeners = new ArrayList<>();
 
 	public Chart(DataSheet dataSheet, int id) {
 		this.dataSheet = dataSheet;
@@ -45,6 +48,16 @@ public abstract class Chart implements Serializable {
 		this.frameSize = new Dimension(800, 600);
 		this.antiAliasing = UserPreferences.getInstance().isAntiAliasing();
 		this.useAlpha = UserPreferences.getInstance().isUseAlpha();
+	}
+
+	public void addListener(ChartListener l) {
+		this.listeners.add(l);
+	}
+
+	protected void fireChanged(){
+		for (ChartListener listener : listeners) {
+			listener.onChartChanged(this);
+		}
 	}
 
 	public abstract String getTitle();

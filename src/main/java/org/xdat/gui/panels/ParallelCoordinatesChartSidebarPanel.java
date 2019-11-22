@@ -28,6 +28,7 @@ import org.xdat.data.ClusterListener;
 import org.xdat.data.ClusterSet;
 import org.xdat.gui.controls.ColorChoiceButton;
 import org.xdat.gui.frames.ChartFrame;
+import org.xdat.settings.Key;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -86,6 +87,9 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 		this.activeDesignColorButton = new ColorChoiceButton(chart.getDefaultDesignColor(true, chart.isUseAlpha()), "Active Design Color");
 		this.activeDesignColorButton.addActionListener(cmd);
 		activeDesignColorButtonPanel.add(activeDesignColorButton);
+		chart.getChartSettingsGroup().getColorSetting(Key.ACTIVE_DESIGN_DEFAULT_COLOR).addListener(
+				(source, transaction) -> activeDesignColorButton.setCurrentColor(source.get())
+		);
 		generalControlsPanel.add(activeDesignColorButtonPanel);
 
 		JPanel activeDesignAlphaSliderLabelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -100,6 +104,9 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 		this.activeDesignAlphaSlider.addChangeListener(cmd);
 		this.activeDesignAlphaSlider.setName("activeDesignAlphaSlider");
 		this.activeDesignAlphaSlider.setPreferredSize(new Dimension(120, 30));
+		chart.getChartSettingsGroup().getBooleanSetting(Key.USE_ALPHA).addListener(
+				(source, transaction) -> setAlphaSlidersEnabled(source.get())
+		);
 		activeDesignAlphaSliderPanel.add(activeDesignAlphaSlider);
 
 		JPanel addClusterButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));

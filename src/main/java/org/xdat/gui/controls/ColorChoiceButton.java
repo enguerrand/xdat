@@ -64,6 +64,7 @@ public class ColorChoiceButton extends JButton {
 
 	public void setCurrentColor(Color currentColor) {
 		this.currentColor = currentColor;
+		this.repaint();
 	}
 
 	public Color getCurrentColor() {

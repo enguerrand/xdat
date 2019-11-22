@@ -63,7 +63,7 @@ public class Axis implements Serializable {
 		}
 		IntegerSetting ticLabelDigitCountSetting = this.settings.getIntegerSetting(Key.PARALLEL_COORDINATES_AXIS_TIC_LABEL_DIGIT_COUNT);
 		ticLabelDigitCountSetting.set(parameter.getTicLabelDigitCount());
-		ticLabelDigitCountSetting.addListener(source -> parameter.setTicLabelDigitCount(source.get()));
+		ticLabelDigitCountSetting.addListener((source, transaction) -> parameter.setTicLabelDigitCount(source.get()));
 	}
 
 	private void initialiseSettings(DataSheet dataSheet) {
