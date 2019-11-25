@@ -21,6 +21,7 @@
 package org.xdat;
 
 import org.xdat.chart.Chart;
+import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.data.ClusterSet;
 import org.xdat.data.DataSheet;
 
@@ -30,6 +31,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -82,12 +85,8 @@ public class Session implements Serializable {
 		this.charts.forEach(Chart::initTransientData);
 	}
 
-	public Chart getChart(int index) {
-		return this.charts.get(index);
-	}
-
-	public int getChartCount() {
-		return this.charts.size();
+	public Collection<Chart> getCharts() {
+		return Collections.unmodifiableList(this.charts);
 	}
 
 	public void addChart(Chart chart) {
@@ -100,6 +99,14 @@ public class Session implements Serializable {
 
 	public void clearAllCharts() {
 		this.charts.clear();
+	}
+
+	public void removeParameter(String paramName) {
+		for (Chart chart : charts) {
+			if (chart instanceof ParallelCoordinatesChart) {
+				((ParallelCoordinatesChart) chart).removeAxis(paramName);
+			}
+		}
 	}
 
 	public DataSheet getCurrentDataSheet() {

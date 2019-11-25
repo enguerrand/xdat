@@ -252,6 +252,10 @@ public class Main extends JFrame {
 		this.removeChartFromComboboxes(chartFrame);
 	}
 
+	public void removeParameter(String paramName) {
+		getCurrentSession().removeParameter(paramName);
+	}
+
 	public ChartFrame getChartFrame(int index) {
 		return this.chartFrames.get(index);
 	}
@@ -288,19 +292,15 @@ public class Main extends JFrame {
 		this.currentSession.clearAllCharts();
 	}
 
-	public void rebuildAllChartFrames() {
+	private void rebuildAllChartFrames() {
 		SwingUtilities.invokeLater(() -> {
-			Chart[] charts = new Chart[currentSession.getChartCount()];
-			for (int i = 0; i < charts.length; i++) {
-				charts[i] = (currentSession.getChart(i));
-			}
+			List<Chart> chartsSnapshot = new ArrayList<>(currentSession.getCharts());
 			disposeAllChartFrames();
-			for (int i = 0; i < charts.length; i++) {
-
+			for (Chart chart : chartsSnapshot) {
 				try {
-					ChartFrame newFrame = new ChartFrame(Main.this, charts[i]);
+					ChartFrame newFrame = new ChartFrame(Main.this, chart);
 					chartFrames.add(newFrame);
-					currentSession.addChart(charts[i]);
+					currentSession.addChart(chart);
 				} catch (NoParametersDefinedException e) {
 					JOptionPane.showMessageDialog(Main.this, "Cannot create chart when no parameters are defined.", "No parameters defined!", JOptionPane.ERROR_MESSAGE);
 				}
@@ -356,15 +356,14 @@ public class Main extends JFrame {
 
 			this.setTitle("xdat   -   " + pathToFile);
 
-			ChartFrame[] chartFrames = new ChartFrame[this.currentSession.getChartCount()];
-			for (int i = 0; i < chartFrames.length; i++) {
+			for (Chart chart : getCurrentSession().getCharts()) {
 				try {
-					new ChartFrame(this, this.currentSession.getChart(i));
-
+					new ChartFrame(this, chart);
 				} catch (NoParametersDefinedException e) {
 					JOptionPane.showMessageDialog(this, "Cannot create chart when no parameters are defined.", "No parameters defined!", JOptionPane.ERROR_MESSAGE);
 				}
 			}
+
 			if (this.currentSession.getCurrentDataSheet() != null) {
 				this.getMainMenuBar().setItemsRequiringDataSheetEnabled(true);
 			} else {

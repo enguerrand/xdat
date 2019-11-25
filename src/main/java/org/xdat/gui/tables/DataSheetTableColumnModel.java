@@ -26,6 +26,7 @@ import org.xdat.chart.ParallelCoordinatesChart;
 
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
+import java.util.Collection;
 
 public class DataSheetTableColumnModel extends DefaultTableColumnModel {
 
@@ -49,11 +50,11 @@ public class DataSheetTableColumnModel extends DefaultTableColumnModel {
 				for (int i = 0; i < this.getColumnCount(); i++) {
 					this.getColumn(i).setModelIndex(i);
 				}
-				Chart[] charts = new Chart[this.mainWindow.getCurrentSession().getChartCount()];
-				for (int i = 0; i < charts.length; i++) {
-					charts[i] = (this.mainWindow.getCurrentSession().getChart(i));
-					if (charts[i].getClass().equals(ParallelCoordinatesChart.class)) {
-						((ParallelCoordinatesChart) charts[i]).moveAxis(src - 1, tar - 1);
+
+				Collection<Chart> charts = this.mainWindow.getCurrentSession().getCharts();
+				for (Chart chart : charts) {
+					if (chart instanceof ParallelCoordinatesChart) {
+						((ParallelCoordinatesChart) charts).moveAxis(src - 1, tar - 1);
 					}
 				}
 				this.mainWindow.repaintAllChartFrames();

@@ -20,7 +20,6 @@
 package org.xdat.gui.menus.mainWindow;
 
 import org.xdat.Main;
-import org.xdat.actionListeners.mainMenu.MainDataRemoveParameterMenuActionListener;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -42,12 +41,12 @@ public class MainDataRemoveParameterMenu extends JMenu implements MenuListener {
 
 	private void updateParameterList() {
 		this.removeAll();
-		MainDataRemoveParameterMenuActionListener cmd = new MainDataRemoveParameterMenuActionListener(mainWindow);
-		// List of parameters
 		JMenuItem[] menuItems = new JMenuItem[mainWindow.getDataSheet().getParameterCount()];
 		for (int i = 0; i < menuItems.length; i++) {
-			menuItems[i] = new JMenuItem(mainWindow.getDataSheet().getParameterName(i));
-			menuItems[i].addActionListener(cmd);
+			String parameterName = mainWindow.getDataSheet().getParameterName(i);
+			menuItems[i] = new JMenuItem(parameterName);
+			menuItems[i].addActionListener(actionEvent ->
+					mainWindow.removeParameter(parameterName));
 			this.add(menuItems[i]);
 		}
 	}
