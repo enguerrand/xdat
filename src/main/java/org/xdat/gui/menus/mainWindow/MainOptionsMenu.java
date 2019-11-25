@@ -21,10 +21,13 @@
 package org.xdat.gui.menus.mainWindow;
 
 import org.xdat.Main;
-import org.xdat.actionListeners.mainMenu.MainOptionsMenuActionListener;
+import org.xdat.UserPreferences;
+import org.xdat.gui.dialogs.FileImportSettingsDialog;
+import org.xdat.gui.dialogs.ParallelCoordinatesDisplaySettingsDialog;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import java.awt.event.KeyEvent;
 
 class MainOptionsMenu extends JMenu {
@@ -33,23 +36,32 @@ class MainOptionsMenu extends JMenu {
 		super("Options");
 		this.setMnemonic(KeyEvent.VK_O);
 		JMenuItem mi;
-		MainOptionsMenuActionListener cmd = new MainOptionsMenuActionListener(mainWindow);
-		//
+
 		mi = new JMenuItem("Import Settings", 'i');
 		mi.setMnemonic(KeyEvent.VK_I);
-		mi.addActionListener(cmd);
+		mi.addActionListener(actionEvent -> new FileImportSettingsDialog(mainWindow));
 		this.add(mi);
-		//
+
 		mi = new JMenuItem("Parallel Coordinate Settings", 'd');
 		mi.setMnemonic(KeyEvent.VK_D);
-		mi.addActionListener(cmd);
+		mi.addActionListener(actionEvent -> new ParallelCoordinatesDisplaySettingsDialog(mainWindow));
 		this.add(mi);
-		//
+
 		this.addSeparator();
-		//
+
 		mi = new JMenuItem("Reset to Default", 'r');
 		mi.setMnemonic(KeyEvent.VK_R);
-		mi.addActionListener(cmd);
+		mi.addActionListener(actionEvent -> {
+			int userDecision = JOptionPane.showConfirmDialog (
+					mainWindow,
+					"This resets all settings to default! Are you sure?",
+					"Reset to Default",
+					JOptionPane.OK_CANCEL_OPTION
+			);
+			if (userDecision == JOptionPane.OK_OPTION) {
+				UserPreferences.getInstance().resetToDefault();
+			}
+		});
 		this.add(mi);
 	}
 }
