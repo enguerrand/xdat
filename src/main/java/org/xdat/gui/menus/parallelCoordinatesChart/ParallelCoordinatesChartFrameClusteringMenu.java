@@ -21,7 +21,7 @@
 package org.xdat.gui.menus.parallelCoordinatesChart;
 
 import org.xdat.Main;
-import org.xdat.actionListeners.parallelCoordinatesChartFrame.ChartFrameClusteringMenuActionListener;
+import org.xdat.gui.dialogs.ClusterDialog;
 import org.xdat.gui.frames.ChartFrame;
 
 import javax.swing.JMenu;
@@ -34,11 +34,9 @@ class ParallelCoordinatesChartFrameClusteringMenu extends JMenu {
 		super("Clustering");
 		this.setMnemonic(KeyEvent.VK_C);
 
-		ChartFrameClusteringMenuActionListener cmd = new ChartFrameClusteringMenuActionListener(mainWindow, chartFrame);
-
 		JMenuItem mi;
 		mi = new JMenuItem("Edit Clusters");
-		mi.addActionListener(cmd);
+		mi.addActionListener(actionEvent -> new ClusterDialog(chartFrame, mainWindow));
 		this.add(mi);
 
 		ParallelCoordinatesChartFrameAddDesignToClusterMenu clustersMenu;

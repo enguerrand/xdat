@@ -35,7 +35,6 @@ public class MainOptionsMenuActionListener implements ActionListener {
 
 	public MainOptionsMenuActionListener(Main mainWindow) {
 		this.mainWindow = mainWindow;
-
 	}
 
 	public void actionPerformed(ActionEvent e) {

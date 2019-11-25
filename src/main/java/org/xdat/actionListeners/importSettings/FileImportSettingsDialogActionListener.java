@@ -32,8 +32,8 @@ import java.io.File;
 
 public class FileImportSettingsDialogActionListener implements ActionListener {
 
-	Main mainWindow;
-	private FileImportSettingsDialog dialog;
+	private final Main mainWindow;
+	private final FileImportSettingsDialog dialog;
 
 	public FileImportSettingsDialogActionListener(Main mainWindow, FileImportSettingsDialog dialog) {
 		this.mainWindow = mainWindow;
