@@ -324,7 +324,7 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 	}
 
 	@Override
-	public void initTransientData() {
+	public void initTransientDataImpl() {
 		this.chartSettings.initTransientData();
 		this.axes.forEach(Axis::initTransientData);
 	}

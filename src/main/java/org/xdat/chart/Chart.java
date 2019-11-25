@@ -39,7 +39,7 @@ public abstract class Chart implements Serializable {
 	private final DataSheet dataSheet;
 	private boolean antiAliasing;
 	private boolean useAlpha;
-	private final List<ChartListener> listeners = new ArrayList<>();
+	private transient List<ChartListener> listeners = new ArrayList<>();
 
 	public Chart(DataSheet dataSheet, int id) {
 		this.dataSheet = dataSheet;
@@ -112,5 +112,10 @@ public abstract class Chart implements Serializable {
 		this.useAlpha = useAlpha;
 	}
 
-	public abstract void initTransientData();
+	public void initTransientData() {
+		this.listeners = new ArrayList<>();
+		initTransientDataImpl();
+	}
+
+	protected abstract void initTransientDataImpl();
 }

@@ -87,7 +87,7 @@ public class ScatterChart2D extends Chart {
 	}
 
 	@Override
-	public void initTransientData() {
+	public void initTransientDataImpl() {
 
 	}
 
