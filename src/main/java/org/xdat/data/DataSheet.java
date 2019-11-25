@@ -499,4 +499,8 @@ public class DataSheet implements Serializable, ListModel {
 	public Collection<Design> getDesigns() {
 		return Collections.unmodifiableList(this.data);
 	}
+
+	public List<Parameter> getParameters() {
+		return Collections.unmodifiableList(this.parameters);
+	}
 }

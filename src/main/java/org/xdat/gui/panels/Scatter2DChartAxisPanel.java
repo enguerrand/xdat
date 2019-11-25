@@ -22,7 +22,6 @@ package org.xdat.gui.panels;
 
 import org.xdat.Main;
 import org.xdat.actionListeners.scatter2DChartSettings.Scatter2DChartAxisPanelActionListener;
-import org.xdat.actionListeners.scatter2DChartSettings.Scatter2DChartAxisSelectionListener;
 import org.xdat.chart.ScatterChart2D;
 import org.xdat.data.AxisType;
 import org.xdat.data.Parameter;
@@ -40,6 +39,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.util.Vector;
 
 public class Scatter2DChartAxisPanel extends JPanel {
 	private AxisType axisType;
@@ -71,18 +71,21 @@ public class Scatter2DChartAxisPanel extends JPanel {
 		mainPanel.setLayout(new BorderLayout());
 
 		// Parameter Selection
-		JList parameterSelectionList = new JList(mainWindow.getDataSheet());
+		Vector<Parameter> parametersList = new Vector<>(mainWindow.getDataSheet().getParameters());
+		JList<Parameter> parameterSelectionList = new JList<>(parametersList);
 		parameterSelectionList.setVisibleRowCount(6);
 		parameterSelectionList.setAutoscrolls(true);
 		parameterSelectionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		parameterSelectionList.setSelectedValue(selectedParam, true);
 
-		for (int i = 0; i < parameterSelectionList.getModel().getSize(); i++) {
-			if (parameterSelectionList.getModel().getElementAt(i).equals(selectedParam)) {
-				parameterSelectionList.setSelectedIndex(i);
-				break;
+		parameterSelectionList.addListSelectionListener(listSelectionEvent -> {
+			Parameter selectedValue = parameterSelectionList.getSelectedValue();
+			if (selectedValue != null) {
+				chart.getScatterPlot2D().setParameterForAxis(axisType, selectedValue);
+				currentParameterChanged();
+				chartFrame.repaint();
 			}
-		}
-		parameterSelectionList.addListSelectionListener(new Scatter2DChartAxisSelectionListener(chartFrame, chart, this, this.axisType));
+		});
 		JScrollPane scrollPane = new JScrollPane(parameterSelectionList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		mainPanel.add(scrollPane, BorderLayout.NORTH);
 
@@ -185,7 +188,7 @@ public class Scatter2DChartAxisPanel extends JPanel {
 		this.axisMinTextField.setText(Double.toString(this.chart.getScatterPlot2D().getMin(this.axisType)));
 	}
 
-	public void currentParameterChanged() {
+	private void currentParameterChanged() {
 		this.updating = true;
 		Parameter parameter = chart.getScatterPlot2D().getParameterForAxis(this.axisType);
 		boolean numeric = parameter.isNumeric();

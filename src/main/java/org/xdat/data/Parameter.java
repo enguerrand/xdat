@@ -263,11 +263,15 @@ public class Parameter implements Serializable {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return name;
+	}
+
 	private static class ReverseStringComparator implements Comparator<String>, Serializable {
 		static final long serialVersionUID = 0L;
 		public int compare(String s1, String s2) {
 			return (s2.compareToIgnoreCase(s1));
 		}
 	}
-
 }
