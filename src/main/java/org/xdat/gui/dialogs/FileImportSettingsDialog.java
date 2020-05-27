@@ -181,14 +181,12 @@ public class FileImportSettingsDialog extends JDialog {
 
 		// add action listener
 		FileImportSettingsDialogActionListener cmd = new FileImportSettingsDialogActionListener(mainWindow, this);
-		useThisBrowseButton.addActionListener(cmd);
-		cancelButton.addActionListener(cmd);
-		okButton.addActionListener(cmd);
-
-		// pack
-		this.pack();
+		useThisBrowseButton.addActionListener(cmd::onBrowse);
+		cancelButton.addActionListener(cmd::onCancel);
+		okButton.addActionListener(cmd::onOk);
 
 		// set location and make visible
+		this.pack();
 		int left = (int) (0.5 * this.mainWindow.getSize().width) - (int) (this.getSize().width * 0.5) + this.mainWindow.getLocation().x;
 		int top = (int) (0.5 * this.mainWindow.getSize().height) - (int) (this.getSize().height * 0.5) + this.mainWindow.getLocation().y;
 		this.setLocation(left, top);
