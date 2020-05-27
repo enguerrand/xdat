@@ -30,9 +30,8 @@ import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class MainChartMenuActionListener implements ActionListener {
+public class MainChartMenuActionListener {
 
 	private Main mainWindow;
 
@@ -40,29 +39,28 @@ public class MainChartMenuActionListener implements ActionListener {
 		this.mainWindow = mainWindow;
 	}
 
-	public void actionPerformed(ActionEvent e) {
-		if (e.getActionCommand().equals("Create Parallel Coordinates Chart")) {
-			if (mainWindow.getDataSheet() == null) {
-				JOptionPane.showMessageDialog(mainWindow, "Please create a data sheet first by selecting Data->Import.", "Create Chart", JOptionPane.INFORMATION_MESSAGE);
-			} else {
-				ProgressMonitor progressMonitor = new ProgressMonitor(mainWindow, "", "Building Chart...", 0, 100);
-				progressMonitor.setProgress(0);
-				ParallelCoordinatesChartCreationThread sw = new ParallelCoordinatesChartCreationThread(mainWindow, progressMonitor);
-				sw.execute();
+	public void createScatterChart2D(ActionEvent e) {
+		if (mainWindow.getDataSheet() == null) {
+			JOptionPane.showMessageDialog(mainWindow, "Please create a data sheet first by selecting Data->Import.", "Create Chart", JOptionPane.INFORMATION_MESSAGE);
+		} else {
+			ScatterChart2D chart = new ScatterChart2D(mainWindow.getDataSheet(), true, new Dimension(600, 600), mainWindow.getUniqueChartId(ScatterChart2D.class));
+			try {
+				new ChartFrame(mainWindow, chart);
+				this.mainWindow.getCurrentSession().addChart(chart);
+			} catch (NoParametersDefinedException e1) {
+				JOptionPane.showMessageDialog(mainWindow, "Cannot create chart when no parameters are defined.", "No parameters defined!", JOptionPane.ERROR_MESSAGE);
 			}
-		} else if (e.getActionCommand().equals("Create Scatter Chart 2D")) {
-			if (mainWindow.getDataSheet() == null) {
-				JOptionPane.showMessageDialog(mainWindow, "Please create a data sheet first by selecting Data->Import.", "Create Chart", JOptionPane.INFORMATION_MESSAGE);
-			} else {
-				ScatterChart2D chart = new ScatterChart2D(mainWindow.getDataSheet(), true, new Dimension(600, 600), mainWindow.getUniqueChartId(ScatterChart2D.class));
-				try {
-					new ChartFrame(mainWindow, chart);
-					this.mainWindow.getCurrentSession().addChart(chart);
-				} catch (NoParametersDefinedException e1) {
-					JOptionPane.showMessageDialog(mainWindow, "Cannot create chart when no parameters are defined.", "No parameters defined!", JOptionPane.ERROR_MESSAGE);
-				}
+		}
+	}
 
-			}
+	public void createParallelChart(ActionEvent e) {
+		if (mainWindow.getDataSheet() == null) {
+			JOptionPane.showMessageDialog(mainWindow, "Please create a data sheet first by selecting Data->Import.", "Create Chart", JOptionPane.INFORMATION_MESSAGE);
+		} else {
+			ProgressMonitor progressMonitor = new ProgressMonitor(mainWindow, "", "Building Chart...", 0, 100);
+			progressMonitor.setProgress(0);
+			ParallelCoordinatesChartCreationThread sw = new ParallelCoordinatesChartCreationThread(mainWindow, progressMonitor);
+			sw.execute();
 		}
 	}
 }

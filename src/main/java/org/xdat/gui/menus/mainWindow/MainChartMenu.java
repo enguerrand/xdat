@@ -38,12 +38,12 @@ public class MainChartMenu extends JMenu {
 		MainChartMenuActionListener cmd = new MainChartMenuActionListener(mainWindow);
 	
 		createPCChartMenuItem.setMnemonic(KeyEvent.VK_P);
-		createPCChartMenuItem.addActionListener(cmd);
+		createPCChartMenuItem.addActionListener(cmd::createParallelChart);
 		createPCChartMenuItem.setEnabled(false);
 		this.add(createPCChartMenuItem);
 
 		createScatter2DChartMenuItem.setMnemonic(KeyEvent.VK_S);
-		createScatter2DChartMenuItem.addActionListener(cmd);
+		createScatter2DChartMenuItem.addActionListener(cmd::createScatterChart2D);
 		createScatter2DChartMenuItem.setEnabled(false);
 		this.add(createScatter2DChartMenuItem);
 

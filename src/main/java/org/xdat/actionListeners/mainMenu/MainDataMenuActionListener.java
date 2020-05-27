@@ -31,10 +31,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitor;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 
-public class MainDataMenuActionListener implements ActionListener {
+public class MainDataMenuActionListener {
 
 	private Main mainWindow;
 
@@ -42,108 +41,73 @@ public class MainDataMenuActionListener implements ActionListener {
 		this.mainWindow = mainWindow;
 	}
 
-	public void actionPerformed(ActionEvent e) {
+	public void importData(boolean headers) {
+		if (mainWindow.getChartFrameCount() == 0 || JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(mainWindow, "This operation will close all charts.\n Are you sure you want to continue?", "Import Data", JOptionPane.OK_CANCEL_OPTION)) {
+			mainWindow.disposeAllChartFrames();
+			String filepath;
+			JFileChooser chooser = new JFileChooser();
+			if (UserPreferences.getInstance().getCurrentDir() != null)
+				chooser.setCurrentDirectory(new File(UserPreferences.getInstance().getCurrentDir()));
+			int returnVal = chooser.showOpenDialog(mainWindow);
 
-		if (e.getActionCommand().equals("Import Data with Headers")) {
-			if (mainWindow.getChartFrameCount() == 0 || JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(mainWindow, "This operation will close all charts.\n Are you sure you want to continue?", "Import Data", JOptionPane.OK_CANCEL_OPTION)) {
-				mainWindow.disposeAllChartFrames();
-				String filepath;
-				JFileChooser chooser = new JFileChooser();
-				if (UserPreferences.getInstance().getCurrentDir() != null)
-					chooser.setCurrentDirectory(new File(UserPreferences.getInstance().getCurrentDir()));
-				int returnVal = chooser.showOpenDialog(mainWindow);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				filepath = chooser.getSelectedFile().getAbsolutePath();
+				UserPreferences.getInstance().setLastFile(chooser.getSelectedFile().getAbsolutePath());
 
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					filepath = chooser.getSelectedFile().getAbsolutePath();
-					UserPreferences.getInstance().setLastFile(chooser.getSelectedFile().getAbsolutePath());
+				ProgressMonitor progressMonitor = new ProgressMonitor(mainWindow, "", "Importing Data...", 0, 100);
+				progressMonitor.setProgress(0);
 
-					ProgressMonitor progressMonitor = new ProgressMonitor(mainWindow, "", "Importing Data...", 0, 100);
-					progressMonitor.setProgress(0);
-
-					DataSheetCreationThread sw = new DataSheetCreationThread(filepath, true, this.mainWindow, progressMonitor);
-					sw.execute();
-				}
-			}
-
-		} else if (e.getActionCommand().equals("Import Data without Headers")) {
-			if (mainWindow.getChartFrameCount() == 0 || JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(mainWindow, "This operation will close all charts.\n Are you sure you want to continue?", "Import Data", JOptionPane.OK_CANCEL_OPTION)) {
-				mainWindow.disposeAllChartFrames();
-				String filepath;
-				JFileChooser chooser = new JFileChooser();
-				if (UserPreferences.getInstance().getCurrentDir() != null)
-					chooser.setCurrentDirectory(new File(UserPreferences.getInstance().getCurrentDir()));
-				int returnVal = chooser.showOpenDialog(mainWindow);
-
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					filepath = chooser.getSelectedFile().getAbsolutePath();
-					UserPreferences.getInstance().setLastFile(chooser.getSelectedFile().getAbsolutePath());
-					ProgressMonitor progressMonitor = new ProgressMonitor(mainWindow, "", "Importing Data...", 0, 100);
-					progressMonitor.setProgress(0);
-
-					DataSheetCreationThread sw = new DataSheetCreationThread(filepath, false, this.mainWindow, progressMonitor);
-					sw.execute();
-				}
+				DataSheetCreationThread sw = new DataSheetCreationThread(filepath, headers, this.mainWindow, progressMonitor);
+				sw.execute();
 			}
 		}
+	}
 
-		else if (e.getActionCommand().equals("Update Data from File with Headers")) {
-			String filepath;
-			JFileChooser chooser = new JFileChooser();
-			if (UserPreferences.getInstance().getCurrentDir() != null)
-				chooser.setCurrentDirectory(new File(UserPreferences.getInstance().getCurrentDir()));
-			int returnVal = chooser.showOpenDialog(mainWindow);
+	public void updateData(boolean headers) {
+		String filepath;
+		JFileChooser chooser = new JFileChooser();
+		if (UserPreferences.getInstance().getCurrentDir() != null)
+			chooser.setCurrentDirectory(new File(UserPreferences.getInstance().getCurrentDir()));
+		int returnVal = chooser.showOpenDialog(mainWindow);
 
-			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				filepath = chooser.getSelectedFile().getAbsolutePath();
-				UserPreferences.getInstance().setLastFile(chooser.getSelectedFile().getAbsolutePath());
-				ProgressMonitor progressMonitor = new ProgressMonitor(mainWindow, "", "Updating Data...", 0, 100);
-				progressMonitor.setProgress(0);
-				DataSheetUpdateThread sw = new DataSheetUpdateThread(filepath, true, mainWindow, progressMonitor);
-				sw.execute();
-			}
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			filepath = chooser.getSelectedFile().getAbsolutePath();
+			UserPreferences.getInstance().setLastFile(chooser.getSelectedFile().getAbsolutePath());
+			ProgressMonitor progressMonitor = new ProgressMonitor(mainWindow, "", "Updating Data...", 0, 100);
+			progressMonitor.setProgress(0);
+			DataSheetUpdateThread sw = new DataSheetUpdateThread(filepath, headers, mainWindow, progressMonitor);
+			sw.execute();
+		}
+	}
 
-		} else if (e.getActionCommand().equals("Update Data from File without Headers")) {
-			String filepath;
-			JFileChooser chooser = new JFileChooser();
-			if (UserPreferences.getInstance().getCurrentDir() != null)
-				chooser.setCurrentDirectory(new File(UserPreferences.getInstance().getCurrentDir()));
-			int returnVal = chooser.showOpenDialog(mainWindow);
+	public void unselectAllDesigns(ActionEvent e) {
+		DataSheet dataSheet = mainWindow.getDataSheet();
+		if (dataSheet == null)
+			JOptionPane.showMessageDialog(mainWindow, "Please create a data sheet first by selecting Data->Import.", "Clustering", JOptionPane.INFORMATION_MESSAGE);
+		else {
+			mainWindow.getDataSheetTablePanel().getDataTable().getSelectionModel().clearSelection();
+		}
+	}
 
-			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				filepath = chooser.getSelectedFile().getAbsolutePath();
-				UserPreferences.getInstance().setLastFile(chooser.getSelectedFile().getAbsolutePath());
-				ProgressMonitor progressMonitor = new ProgressMonitor(mainWindow, "", "Updating Data...", 0, 100);
-				progressMonitor.setProgress(0);
-				DataSheetUpdateThread sw = new DataSheetUpdateThread(filepath, false, mainWindow, progressMonitor);
-				sw.execute();
-			}
-		} else if (e.getActionCommand().equals("Remove selected designs")) {
-			DataSheet dataSheet = mainWindow.getDataSheet();
-			if (dataSheet == null)
-				JOptionPane.showMessageDialog(mainWindow, "Please create a data sheet first by selecting Data->Import.", "Clustering", JOptionPane.INFORMATION_MESSAGE);
-			else if (mainWindow.getDataSheetTablePanel().getDataTable().getSelectedRowCount() < 1)
-				JOptionPane.showMessageDialog(mainWindow, "Please select at least one design first.", "Remove Designs", JOptionPane.INFORMATION_MESSAGE);
-			else {
-				// get selection
-				int[] selection = mainWindow.getDataSheetTablePanel().getDataTable().getSelectedRows();
-				mainWindow.getDataSheetTablePanel().getDataTable().getSelectionModel().clearSelection();
-				mainWindow.getDataSheet().removeDesigns(selection);
-			}
+	public void removeSelectedDesigns(ActionEvent e) {
+		DataSheet dataSheet = mainWindow.getDataSheet();
+		if (dataSheet == null)
+			JOptionPane.showMessageDialog(mainWindow, "Please create a data sheet first by selecting Data->Import.", "Clustering", JOptionPane.INFORMATION_MESSAGE);
+		else if (mainWindow.getDataSheetTablePanel().getDataTable().getSelectedRowCount() < 1)
+			JOptionPane.showMessageDialog(mainWindow, "Please select at least one design first.", "Remove Designs", JOptionPane.INFORMATION_MESSAGE);
+		else {
+			// get selection
+			int[] selection = mainWindow.getDataSheetTablePanel().getDataTable().getSelectedRows();
+			mainWindow.getDataSheetTablePanel().getDataTable().getSelectionModel().clearSelection();
+			mainWindow.getDataSheet().removeDesigns(selection);
+		}
+	}
 
-		} else if (e.getActionCommand().equals("Unselect all designs")) {
-			DataSheet dataSheet = mainWindow.getDataSheet();
-			if (dataSheet == null)
-				JOptionPane.showMessageDialog(mainWindow, "Please create a data sheet first by selecting Data->Import.", "Clustering", JOptionPane.INFORMATION_MESSAGE);
-			else {
-				mainWindow.getDataSheetTablePanel().getDataTable().getSelectionModel().clearSelection();
-			}
-
-		} else if (e.getActionCommand().equals("Clustering")) {
-			if (mainWindow.getDataSheet() == null) {
-				JOptionPane.showMessageDialog(mainWindow, "Please create a data sheet first by selecting Data->Import.", "Clustering", JOptionPane.INFORMATION_MESSAGE);
-			} else {
-				new ClusterDialog(mainWindow, mainWindow);
-			}
+	public void clustering(ActionEvent e) {
+		if (mainWindow.getDataSheet() == null) {
+			JOptionPane.showMessageDialog(mainWindow, "Please create a data sheet first by selecting Data->Import.", "Clustering", JOptionPane.INFORMATION_MESSAGE);
+		} else {
+			new ClusterDialog(mainWindow, mainWindow);
 		}
 	}
 }

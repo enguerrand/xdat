@@ -28,9 +28,7 @@ import javax.swing.JMenuItem;
 import java.awt.Event;
 import java.awt.event.KeyEvent;
 
-public class MainDataMenu extends JMenu {
-
-	private final JMenuItem importDataWithHeadersMenuItem = new JMenuItem("Import Data with Headers", 'i');
+class MainDataMenu extends JMenu {
 	private final JMenuItem updateDataWithHeadersMenuItem = new JMenuItem("Update Data from File with Headers", 'u');
 	private final JMenuItem updateDataWithoutHeadersMenuItem = new JMenuItem("Update Data from File without Headers", 'o');
 	private final JMenuItem removeSelectedDesignsMenuItem = new JMenuItem("Remove selected designs", 'd');
@@ -41,48 +39,36 @@ public class MainDataMenu extends JMenu {
 	MainDataMenu(Main mainWindow) {
 		super("Data");
 		this.setMnemonic(KeyEvent.VK_D);
-
 		removeParametersMenu = new MainDataRemoveParameterMenu(mainWindow);
 		MainDataMenuActionListener cmd = new MainDataMenuActionListener(mainWindow);
-
-		// Import Data
+		JMenuItem importDataWithHeadersMenuItem = new JMenuItem("Import Data with Headers", 'i');
 		importDataWithHeadersMenuItem.setMnemonic(KeyEvent.VK_I);
-		importDataWithHeadersMenuItem.addActionListener(cmd);
+		importDataWithHeadersMenuItem.addActionListener(e -> cmd.importData(true));
 		this.add(importDataWithHeadersMenuItem);
 		JMenuItem importDataWithoutHeadersMenuItem = new JMenuItem("Import Data without Headers", 'w');
 		importDataWithoutHeadersMenuItem.setMnemonic(KeyEvent.VK_W);
-		importDataWithoutHeadersMenuItem.addActionListener(cmd);
+		importDataWithoutHeadersMenuItem.addActionListener(e -> cmd.importData(false));
 		this.add(importDataWithoutHeadersMenuItem);
-		// Separator
 		this.addSeparator();
-		// Update Data
 		updateDataWithHeadersMenuItem.setMnemonic(KeyEvent.VK_U);
-		updateDataWithHeadersMenuItem.addActionListener(cmd);
+		updateDataWithHeadersMenuItem.addActionListener(e -> cmd.updateData(true));
 		this.add(updateDataWithHeadersMenuItem);
 		updateDataWithoutHeadersMenuItem.setMnemonic(KeyEvent.VK_O);
-		updateDataWithoutHeadersMenuItem.addActionListener(cmd);
+		updateDataWithoutHeadersMenuItem.addActionListener(e -> cmd.updateData(false));
 		this.add(updateDataWithoutHeadersMenuItem);
-		// Separator
 		this.addSeparator();
-		// Edit Data
 		removeSelectedDesignsMenuItem.setMnemonic(KeyEvent.VK_DELETE);
-		removeSelectedDesignsMenuItem.addActionListener(cmd);
+		removeSelectedDesignsMenuItem.addActionListener(cmd::removeSelectedDesigns);
 		this.add(removeSelectedDesignsMenuItem);
 		this.add(removeParametersMenu);
-		// Separator
 		this.addSeparator();
-		// Unselect designs
-		unselectAllMenuItem.addActionListener(cmd);
+		unselectAllMenuItem.addActionListener(cmd::unselectAllDesigns);
 		this.add(unselectAllMenuItem);
-		// Separator
 		this.addSeparator();
-		// Clustering
 		clusteringMenuItem.setMnemonic(KeyEvent.VK_C);
-		clusteringMenuItem.addActionListener(cmd);
+		clusteringMenuItem.addActionListener(cmd::clustering);
 		this.add(clusteringMenuItem);
-
 		this.setItemsRequiringDataSheetEnabled(false);
-
 	}
 
 	void setItemsRequiringDataSheetEnabled(boolean enabled) {

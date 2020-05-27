@@ -34,23 +34,21 @@ public class MainFileMenu extends JMenu {
 		this.setMnemonic(KeyEvent.VK_F);
 		JMenuItem mi;
 		MainFileMenuActionListener cmd = new MainFileMenuActionListener(mainWindow);
-		// Save and Load Sessions
 		mi = new JMenuItem("Load Session", 'l');
 		mi.setMnemonic(KeyEvent.VK_L);
-		mi.addActionListener(cmd);
+		mi.addActionListener(cmd::loadSession);
 		this.add(mi);
 		mi = new JMenuItem("Save Session", 's');
 		mi.setMnemonic(KeyEvent.VK_S);
-		mi.addActionListener(cmd);
+		mi.addActionListener(cmd::saveSession);
 		this.add(mi);
 		mi = new JMenuItem("Save Session As...", 'a');
 		mi.setMnemonic(KeyEvent.VK_A);
-		mi.addActionListener(cmd);
+		mi.addActionListener(cmd::saveSessionAs);
 		this.add(mi);
-		// Exit
 		mi = new JMenuItem("Exit", 'x');
 		mi.setMnemonic(KeyEvent.VK_X);
-		mi.addActionListener(cmd);
+		mi.addActionListener(cmd::exit);
 		this.add(mi);
 	}
 }

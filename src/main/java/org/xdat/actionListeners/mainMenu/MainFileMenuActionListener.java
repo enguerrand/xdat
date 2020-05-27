@@ -27,65 +27,44 @@ import org.xdat.UserPreferences;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 
-public class MainFileMenuActionListener implements ActionListener {
+public class MainFileMenuActionListener {
 
 	private Main mainWindow;
 	public MainFileMenuActionListener(Main mainWindow) {
 		this.mainWindow = mainWindow;
 	}
 
-	public void actionPerformed(ActionEvent e) {
-		if (e.getActionCommand().equals("Load Session")) {
-			String filepath;
-			JFileChooser chooser = new JFileChooser();
-			FileNameExtensionFilter filter = new FileNameExtensionFilter("*.ses files", "ses");
-			chooser.setFileFilter(filter);
-			chooser.addChoosableFileFilter(filter);
-			if (UserPreferences.getInstance().getCurrentDir() != null) {
-				chooser.setCurrentDirectory(new File(UserPreferences.getInstance().getCurrentDir()));
-			}
-			int returnVal = chooser.showOpenDialog(mainWindow);
+	public void loadSession(ActionEvent e) {
+		JFileChooser chooser = buildFileChooser();
+		if (UserPreferences.getInstance().getCurrentDir() != null) {
+			chooser.setCurrentDirectory(new File(UserPreferences.getInstance().getCurrentDir()));
+		}
+		int returnVal = chooser.showOpenDialog(mainWindow);
 
-			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				filepath = chooser.getSelectedFile().getAbsolutePath();
-				UserPreferences.getInstance().setLastFile(chooser.getSelectedFile().getAbsolutePath());
-				this.mainWindow.loadSession(filepath);
-				this.mainWindow.initialiseDataPanel();
-			}
-
-		} else if (e.getActionCommand().equals("Save Session As...")) {
-			saveSessionAs();
-
-		} else if (e.getActionCommand().equals("Save Session")) {
-			Session session = mainWindow.getCurrentSession();
-			if (session.getSessionDirectory() == null || session.getSessionName() == null) {
-				saveSessionAs();
-			} else {
-				String filepath = session.getSessionDirectory() + System.getProperty("file.separator") + session.getSessionName() + Session.sessionFileExtension;
-				this.mainWindow.saveSessionAs(filepath);
-			}
-		} else if (e.getActionCommand().equals("Exit")) {
-			mainWindow.setVisible(false);
-			mainWindow.dispose();
-			System.exit(0);
-		} else {
-			System.out.println(e.getActionCommand());
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			String filepath = chooser.getSelectedFile().getAbsolutePath();
+			UserPreferences.getInstance().setLastFile(chooser.getSelectedFile().getAbsolutePath());
+			this.mainWindow.loadSession(filepath);
+			this.mainWindow.initialiseDataPanel();
 		}
 	}
 
-	/**
-	 * Save session as.
-	 */
-	private void saveSessionAs() {
+	public void saveSession(ActionEvent e) {
+		Session session = mainWindow.getCurrentSession();
+		if (session.getSessionDirectory() == null || session.getSessionName() == null) {
+			saveSessionAs(e);
+		} else {
+			String filepath = session.getSessionDirectory() + System.getProperty("file.separator") + session.getSessionName() + Session.sessionFileExtension;
+			this.mainWindow.saveSessionAs(filepath);
+		}
+	}
+
+	public void saveSessionAs(ActionEvent e) {
 		Session session = mainWindow.getCurrentSession();
 		String filepath;
-		JFileChooser chooser = new JFileChooser();
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("*.ses files", "ses");
-		chooser.setFileFilter(filter);
-		chooser.addChoosableFileFilter(filter);
+		JFileChooser chooser = buildFileChooser();
 		if (UserPreferences.getInstance().getCurrentDir() != null) {
 			chooser.setCurrentDirectory(new File(UserPreferences.getInstance().getCurrentDir()));
 		}
@@ -105,5 +84,19 @@ public class MainFileMenuActionListener implements ActionListener {
 			UserPreferences.getInstance().setLastFile(filepath);
 			this.mainWindow.setTitle("xdat   -   " + filepath + Session.sessionFileExtension);
 		}
+	}
+
+	public void exit(ActionEvent e) {
+		mainWindow.setVisible(false);
+		mainWindow.dispose();
+		System.exit(0);
+	}
+
+	private JFileChooser buildFileChooser() {
+		JFileChooser chooser = new JFileChooser();
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("*.ses files", "ses");
+		chooser.setFileFilter(filter);
+		chooser.addChoosableFileFilter(filter);
+		return chooser;
 	}
 }
