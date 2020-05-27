@@ -21,7 +21,7 @@
 package org.xdat.gui.menus.parallelCoordinatesChart;
 
 import org.xdat.Main;
-import org.xdat.actionListeners.parallelCoordinatesChartFrame.ChartFrameOptionsMenuActionListener;
+import org.xdat.actionListeners.chartFrames.ParallelChartFrameOptionsMenuActionListener;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.gui.frames.ChartFrame;
 
@@ -31,27 +31,25 @@ import java.awt.event.KeyEvent;
 
 class ParallelCoordinatesChartFrameOptionsMenu extends JMenu {
 
-	private ChartFrameOptionsMenuActionListener cmd;
-
 	ParallelCoordinatesChartFrameOptionsMenu(Main mainWindow, ChartFrame chartFrame) {
 		super("Options");
 		this.setMnemonic(KeyEvent.VK_O);
 		JMenuItem mi;
-		cmd = new ChartFrameOptionsMenuActionListener(mainWindow, (ParallelCoordinatesChart) chartFrame.getChart(), chartFrame);
-		//
+		ParallelChartFrameOptionsMenuActionListener cmd = new ParallelChartFrameOptionsMenuActionListener(mainWindow, (ParallelCoordinatesChart) chartFrame.getChart(), chartFrame);
+
 		mi = new JMenuItem("Display Settings", 'd');
 		mi.setMnemonic(KeyEvent.VK_D);
-		mi.addActionListener(cmd);
+		mi.addActionListener(cmd::displaySettings);
 		this.add(mi);
-		//
+
 		mi = new JMenuItem("Reset to Default", 'r');
 		mi.setMnemonic(KeyEvent.VK_R);
-		mi.addActionListener(cmd);
+		mi.addActionListener(cmd::resetToDefault);
 		this.add(mi);
-		//
+
 		mi = new JMenuItem("Export to png", 'x');
 		mi.setMnemonic(KeyEvent.VK_X);
-		mi.addActionListener(cmd);
+		mi.addActionListener(cmd::exportToPng);
 		this.add(mi);
 	}
 }

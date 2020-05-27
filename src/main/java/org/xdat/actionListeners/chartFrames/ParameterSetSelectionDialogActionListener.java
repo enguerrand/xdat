@@ -18,7 +18,7 @@
  * 
  */
 
-package org.xdat.actionListeners.parallelCoordinatesChartFrame;
+package org.xdat.actionListeners.chartFrames;
 
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.gui.dialogs.ParameterSetSelectionDialog;

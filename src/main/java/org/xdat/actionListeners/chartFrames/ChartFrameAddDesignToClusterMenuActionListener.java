@@ -17,7 +17,7 @@
  * along with xdat.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.xdat.actionListeners.parallelCoordinatesChartFrame;
+package org.xdat.actionListeners.chartFrames;
 
 import org.xdat.Main;
 import org.xdat.chart.ParallelCoordinatesChart;

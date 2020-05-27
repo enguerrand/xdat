@@ -21,7 +21,7 @@
 package org.xdat.gui.menus.ScatterChart2D;
 
 import org.xdat.Main;
-import org.xdat.actionListeners.scatter2DChartFrame.Scatter2DChartFrameOptionsMenuActionListener;
+import org.xdat.actionListeners.chartFrames.Scatter2DChartFrameOptionsMenuActionListener;
 import org.xdat.chart.ScatterChart2D;
 import org.xdat.gui.frames.ChartFrame;
 
@@ -31,27 +31,25 @@ import java.awt.event.KeyEvent;
 
 public class ScatterChart2DFrameOptionsMenu extends JMenu {
 
-	private Scatter2DChartFrameOptionsMenuActionListener cmd;
-
 	ScatterChart2DFrameOptionsMenu(Main mainWindow, ChartFrame chartFrame) {
 		super("Options");
 		this.setMnemonic(KeyEvent.VK_O);
 		JMenuItem mi;
-		cmd = new Scatter2DChartFrameOptionsMenuActionListener(mainWindow, (ScatterChart2D) chartFrame.getChart(), chartFrame);
-		//
+		Scatter2DChartFrameOptionsMenuActionListener cmd = new Scatter2DChartFrameOptionsMenuActionListener(mainWindow, (ScatterChart2D) chartFrame.getChart(), chartFrame);
+
 		mi = new JMenuItem("Settings", 's');
 		mi.setMnemonic(KeyEvent.VK_S);
-		mi.addActionListener(cmd);
+		mi.addActionListener(cmd::settings);
 		this.add(mi);
-		//
+
 		mi = new JMenuItem("Reset to Default", 'r');
 		mi.setMnemonic(KeyEvent.VK_R);
-		mi.addActionListener(cmd);
+		mi.addActionListener(cmd::resetToDefault);
 		this.add(mi);
-		//
+
 		mi = new JMenuItem("Export to png", 'x');
 		mi.setMnemonic(KeyEvent.VK_X);
-		mi.addActionListener(cmd);
+		mi.addActionListener(cmd::exportToPng);
 		this.add(mi);
 	}
 }

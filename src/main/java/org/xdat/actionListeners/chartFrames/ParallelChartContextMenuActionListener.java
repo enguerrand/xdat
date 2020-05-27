@@ -18,7 +18,7 @@
  * 
  */
 
-package org.xdat.actionListeners.parallelCoordinatesChartFrame;
+package org.xdat.actionListeners.chartFrames;
 
 import org.xdat.Main;
 import org.xdat.chart.Axis;

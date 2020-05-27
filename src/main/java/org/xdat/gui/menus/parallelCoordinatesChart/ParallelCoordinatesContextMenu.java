@@ -20,7 +20,7 @@
 package org.xdat.gui.menus.parallelCoordinatesChart;
 
 import org.xdat.Main;
-import org.xdat.actionListeners.parallelCoordinatesChartFrame.ParallelChartContextMenuActionListener;
+import org.xdat.actionListeners.chartFrames.ParallelChartContextMenuActionListener;
 import org.xdat.chart.Axis;
 import org.xdat.gui.frames.ChartFrame;
 

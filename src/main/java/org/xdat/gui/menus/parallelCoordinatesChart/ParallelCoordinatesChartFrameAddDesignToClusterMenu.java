@@ -21,7 +21,7 @@
 package org.xdat.gui.menus.parallelCoordinatesChart;
 
 import org.xdat.Main;
-import org.xdat.actionListeners.parallelCoordinatesChartFrame.ChartFrameAddDesignToClusterMenuActionListener;
+import org.xdat.actionListeners.chartFrames.ChartFrameAddDesignToClusterMenuActionListener;
 import org.xdat.data.ClusterSet;
 import org.xdat.gui.frames.ChartFrame;
 

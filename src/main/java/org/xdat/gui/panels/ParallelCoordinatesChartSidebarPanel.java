@@ -21,7 +21,7 @@
 package org.xdat.gui.panels;
 
 import org.xdat.Main;
-import org.xdat.actionListeners.parallelCoordinatesChartFrame.ParallelChartSidebarActionListener;
+import org.xdat.actionListeners.chartFrames.ParallelChartSidebarActionListener;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.data.Cluster;
 import org.xdat.data.ClusterListener;

@@ -21,7 +21,7 @@
 package org.xdat.gui.dialogs;
 
 import org.xdat.Main;
-import org.xdat.actionListeners.parallelCoordinatesChartFrame.ParameterSetSelectionDialogActionListener;
+import org.xdat.actionListeners.chartFrames.ParameterSetSelectionDialogActionListener;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.gui.controls.CustomButton;
 import org.xdat.gui.frames.ChartFrame;

@@ -21,7 +21,7 @@
 package org.xdat.gui.menus.parallelCoordinatesChart;
 
 import org.xdat.Main;
-import org.xdat.actionListeners.parallelCoordinatesChartFrame.ChartFrameSelectParametersMenuActionListener;
+import org.xdat.actionListeners.chartFrames.ChartFrameSelectParametersMenuActionListener;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.gui.frames.ChartFrame;
 
