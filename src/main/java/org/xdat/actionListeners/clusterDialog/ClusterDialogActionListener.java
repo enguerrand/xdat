@@ -27,13 +27,12 @@ import org.xdat.gui.dialogs.ClusterDialog;
 import org.xdat.gui.tables.ClusterTableModel;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
-public class ClusterDialogActionListener implements ActionListener {
-	private Main mainWindow;
-	private ClusterDialog dialog;
-	private ClusterTableModel tableModel;
+public class ClusterDialogActionListener {
+	private final Main mainWindow;
+	private final ClusterDialog dialog;
+	private final ClusterTableModel tableModel;
 
 	public ClusterDialogActionListener(Main mainWindow, ClusterDialog dialog, ClusterTableModel tableModel) {
 		this.mainWindow = mainWindow;
@@ -41,36 +40,39 @@ public class ClusterDialogActionListener implements ActionListener {
 		this.tableModel = tableModel;
 	}
 
-	public void actionPerformed(ActionEvent e) {
-		String actionCommand = e.getActionCommand();
-		if (actionCommand.equals("Add")) {
-			this.tableModel.addCluster();
-		} else if (actionCommand.equals("Remove")) {
-			int[] selectedRows = this.dialog.getClusterTable().getSelectedRows();
-			for (int i = selectedRows.length - 1; i >= 0; i--) {
-				this.tableModel.removeCluster(selectedRows[i]);
-			}
-		} else if (actionCommand.equals("Cancel")) {
-			dialog.setVisible(false);
-			dialog.dispose();
-		} else if (actionCommand.equals("Ok")) {
-			// make sure the cell is not in editing mode anymore
-			if (this.dialog.getClusterTable().isEditing() && this.dialog.getClusterTable().getCellEditor() != null) {
-				this.dialog.getClusterTable().getCellEditor().stopCellEditing();
-			}
-
-			List<Cluster> clustersBuffer = this.tableModel.getClustersBuffer();
-            DataSheet dataSheet = this.mainWindow.getDataSheet();
-
-			mainWindow.getCurrentClusterSet().applyClustersBuffer(clustersBuffer);
-
-			this.tableModel.applyBuffer(this.mainWindow.getCurrentClusterSet().getClusters(), dataSheet);
-			for (int i = 0; i < this.mainWindow.getChartFrameCount(); i++) {
-				this.mainWindow.getChartFrame(i).validate();
-				this.mainWindow.getChartFrame(i).repaint();
-			}
-			dialog.setVisible(false);
-			dialog.dispose();
+	public void onOk(ActionEvent e) {
+		// make sure the cell is not in editing mode anymore
+		if (this.dialog.getClusterTable().isEditing() && this.dialog.getClusterTable().getCellEditor() != null) {
+			this.dialog.getClusterTable().getCellEditor().stopCellEditing();
 		}
+
+		List<Cluster> clustersBuffer = this.tableModel.getClustersBuffer();
+		DataSheet dataSheet = this.mainWindow.getDataSheet();
+
+		mainWindow.getCurrentClusterSet().applyClustersBuffer(clustersBuffer);
+
+		this.tableModel.applyBuffer(this.mainWindow.getCurrentClusterSet().getClusters(), dataSheet);
+		for (int i = 0; i < this.mainWindow.getChartFrameCount(); i++) {
+			this.mainWindow.getChartFrame(i).validate();
+			this.mainWindow.getChartFrame(i).repaint();
+		}
+		dialog.setVisible(false);
+		dialog.dispose();
+	}
+
+	public void onCancel(ActionEvent e) {
+		dialog.setVisible(false);
+		dialog.dispose();
+	}
+
+	public void onRemove(ActionEvent e) {
+		int[] selectedRows = this.dialog.getClusterTable().getSelectedRows();
+		for (int i = selectedRows.length - 1; i >= 0; i--) {
+			this.tableModel.removeCluster(selectedRows[i]);
+		}
+	}
+
+	public void onAdd(ActionEvent e) {
+		this.tableModel.addCluster();
 	}
 }

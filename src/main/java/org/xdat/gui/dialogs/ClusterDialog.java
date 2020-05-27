@@ -90,10 +90,10 @@ public class ClusterDialog extends JDialog {
 
 		// add action listener
 		ClusterDialogActionListener cmd = new ClusterDialogActionListener(mainWindow, this, tableModel);
-		addButton.addActionListener(cmd);
-		removeButton.addActionListener(cmd);
-		cancelButton.addActionListener(cmd);
-		okButton.addActionListener(cmd);
+		addButton.addActionListener(cmd::onAdd);
+		removeButton.addActionListener(cmd::onRemove);
+		cancelButton.addActionListener(cmd::onCancel);
+		okButton.addActionListener(cmd::onOk);
 
 		// add components
 		this.add(mainPanel, BorderLayout.CENTER);
