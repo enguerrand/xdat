@@ -28,7 +28,7 @@ import org.xdat.gui.frames.ChartFrame;
 import java.awt.event.ActionEvent;
 
 public class Scatter2DChartFrameOptionsMenuActionListener extends ChartFrameOptionsMenuActionListener {
-	private ScatterChart2D chart;
+	private final ScatterChart2D chart;
 
 	public Scatter2DChartFrameOptionsMenuActionListener(Main mainWindow, ScatterChart2D chart, ChartFrame chartFrame) {
 		super(mainWindow, chartFrame);

@@ -32,11 +32,11 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import java.awt.event.KeyEvent;
 
-public class ParallelCoordinatesChartFrameSelectParametersMenu extends JMenu implements MenuListener {
+class ParallelCoordinatesChartFrameSelectParametersMenu extends JMenu implements MenuListener {
 
-	private Main mainWindow;
-	private ChartFrameSelectParametersMenuActionListener cmd;
-	private ParallelCoordinatesChart chart;
+	private final Main mainWindow;
+	private final ChartFrameSelectParametersMenuActionListener cmd;
+	private final ParallelCoordinatesChart chart;
 
 	ParallelCoordinatesChartFrameSelectParametersMenu(Main mainWindow, ChartFrame chartFrame, ParallelCoordinatesChart chart) {
 		super("Parameters");
@@ -52,37 +52,31 @@ public class ParallelCoordinatesChartFrameSelectParametersMenu extends JMenu imp
 		this.removeAll();
 
 		JMenuItem mi;
-		// select all
 		mi = new JMenuItem("Select All");
 		mi.setMnemonic(KeyEvent.VK_S);
-		mi.addActionListener(cmd);
+		mi.addActionListener(e -> cmd.setAllSelected(true));
 		this.add(mi);
 
-		// unselect all
 		mi = new JMenuItem("Unselect All");
 		mi.setMnemonic(KeyEvent.VK_U);
-		mi.addActionListener(cmd);
+		mi.addActionListener(e -> cmd.setAllSelected(false));
 		this.add(mi);
 
-		// reverse selection
 		mi = new JMenuItem("Reverse Selection");
 		mi.setMnemonic(KeyEvent.VK_R);
-		mi.addActionListener(cmd);
+		mi.addActionListener(cmd::reverseSelection);
 		this.add(mi);
 
-		// selection dialog
 		mi = new JMenuItem("Custom Selection");
 		mi.setMnemonic(KeyEvent.VK_C);
-		mi.addActionListener(cmd);
+		mi.addActionListener(cmd::customSelection);
 		this.add(mi);
 
-		// Separator
 		this.addSeparator();
 		JCheckBoxMenuItem[] checkBoxMenuItems = new JCheckBoxMenuItem[this.mainWindow.getDataSheet().getParameterCount()];
 		for (int i = 0; i < checkBoxMenuItems.length; i++) {
 			checkBoxMenuItems[i] = new JCheckBoxMenuItem(this.mainWindow.getDataSheet().getParameter(i).getName());
-			checkBoxMenuItems[i].addActionListener(cmd);
-			// menuItems.add(jcbmi);
+			checkBoxMenuItems[i].addActionListener(cmd::toggleParameter);
 			this.chart.getAxis(0);
 			checkBoxMenuItems[i].setState(this.chart.getAxis(this.mainWindow.getDataSheet().getParameter(i).getName()).isActive());
 

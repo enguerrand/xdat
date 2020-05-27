@@ -30,8 +30,8 @@ import java.awt.event.ActionListener;
 
 public class ChartFrameAddDesignToClusterMenuActionListener implements ActionListener {
 
-	private Main mainWindow;
-	private ChartFrame chartFrame;
+	private final Main mainWindow;
+	private final ChartFrame chartFrame;
 	public ChartFrameAddDesignToClusterMenuActionListener(Main mainWindow, ChartFrame chartFrame) {
 		this.mainWindow = mainWindow;
 		this.chartFrame = chartFrame;

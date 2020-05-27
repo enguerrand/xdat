@@ -34,8 +34,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class ChartFrameOptionsMenuActionListener {
-    private Main mainWindow;
-    private ChartFrame chartFrame;
+    private final Main mainWindow;
+    private final ChartFrame chartFrame;
 
     protected ChartFrameOptionsMenuActionListener(Main mainWindow, ChartFrame chartFrame) {
         this.mainWindow = mainWindow;

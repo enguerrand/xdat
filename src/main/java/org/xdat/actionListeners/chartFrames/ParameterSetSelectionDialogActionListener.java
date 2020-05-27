@@ -29,8 +29,8 @@ import java.awt.event.ActionListener;
 
 public class ParameterSetSelectionDialogActionListener implements ActionListener {
 
-	private ChartFrame chartFrame;
-	private ParameterSetSelectionDialog dialog;
+	private final ChartFrame chartFrame;
+	private final ParameterSetSelectionDialog dialog;
 
 	public ParameterSetSelectionDialogActionListener(ChartFrame chartFrame, ParameterSetSelectionDialog dialog) {
 		this.chartFrame = chartFrame;

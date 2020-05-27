@@ -42,10 +42,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class ParallelChartSidebarActionListener implements ActionListener, ChangeListener {
-	private ParallelCoordinatesChartSidebarPanel sidePanel;
-	private Main mainWindow;
-	private ParallelCoordinatesChartPanel chartPanel;
-	private ClusterFactory clusterFactory;
+	private final ParallelCoordinatesChartSidebarPanel sidePanel;
+	private final Main mainWindow;
+	private final ParallelCoordinatesChartPanel chartPanel;
+	private final ClusterFactory clusterFactory;
 	private Color activeDesignColor;
 
 	public ParallelChartSidebarActionListener(Main mainWindow, ParallelCoordinatesChartSidebarPanel panel, ParallelCoordinatesChartPanel chartPanel, ClusterFactory clusterFactory) {
