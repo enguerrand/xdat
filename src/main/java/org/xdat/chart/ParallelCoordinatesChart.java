@@ -94,7 +94,6 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 				progressMonitor.setProgress(i);
 			}
 		}
-		Runnable changeHandler = this::fireChanged;
 		Stream.concat(
 				this.chartSettings.getSettings().values().stream(),
 				axes.stream()
@@ -102,13 +101,13 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 						.flatMap(g -> g.getSettings().values().stream())
 		).forEach(s ->
 				s.addListener((source, transaction) ->
-						handleSettingChange(changeHandler, transaction))
+						handleSettingChange(this::fireChanged, transaction))
 		);
 	}
 
 	private void handleSettingChange(Runnable changeHandler, @Nullable SettingsTransaction transaction) {
 		if (transaction == null) {
-			this.fireChanged();
+			changeHandler.run();
 		} else {
 			transaction.handleOnce(changeHandler);
 		}
@@ -148,8 +147,8 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 	}
 
 	public void incrementAxisWidth(int deltaWidth) {
-		for (int i = 0; i < axes.size(); i++) {
-			axes.get(i).setWidth(Math.max(0, axes.get(i).getWidth() + deltaWidth));
+		for (Axis axis : axes) {
+			axis.setWidth(Math.max(0, axis.getWidth() + deltaWidth));
 		}
 	}
 
@@ -169,9 +168,9 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 	}
 
 	public Axis getAxis(String parameterName) {
-		for (int i = 0; i < this.axes.size(); i++) {
-			if (parameterName.equals(this.axes.get(i).getParameter().getName())) {
-				return this.axes.get(i);
+		for (Axis axis : this.axes) {
+			if (parameterName.equals(axis.getParameter().getName())) {
+				return axis;
 			}
 		}
 		throw new IllegalArgumentException("Axis " + parameterName + " not found");
@@ -179,9 +178,9 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 
 	public int getMaxAxisLabelFontSize() {
 		int maxAxisLabelFontSize = 0;
-		for (int i = 0; i < axes.size(); i++) {
-			if (maxAxisLabelFontSize < axes.get(i).getAxisLabelFontSize()) {
-				maxAxisLabelFontSize = axes.get(i).getAxisLabelFontSize();
+		for (Axis axis : axes) {
+			if (maxAxisLabelFontSize < axis.getAxisLabelFontSize()) {
+				maxAxisLabelFontSize = axis.getAxisLabelFontSize();
 			}
 		}
 		return maxAxisLabelFontSize;
@@ -301,8 +300,8 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 
 	public void resetDisplaySettingsToDefault(DataSheet dataSheet) {
 		this.chartSettings.resetToDefault();
-		for (int i = 0; i < axes.size(); i++) {
-			axes.get(i).resetSettingsToDefault(dataSheet);
+		for (Axis axis : axes) {
+			axis.resetSettingsToDefault(dataSheet);
 		}
 	}
 
