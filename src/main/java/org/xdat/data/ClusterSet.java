@@ -77,15 +77,11 @@ public class ClusterSet implements Serializable {
         return new ClusterTableModel(clusters, factory);
     }
 
-    public void removeCluster(String clusterName) {
-        for (int i = 0; i < this.clusters.size(); i++) {
-            if (this.clusters.get(i).getName().equals(clusterName)) {
-                Cluster removed = this.clusters.remove(i);
-                this.dataSheet.onClustersUpdated(Collections.emptyList(), Collections.emptyList(), Collections.singletonList(removed));
-                return;
-            }
+    public void removeCluster(Cluster cluster) {
+        boolean removed = this.clusters.remove(cluster);
+        if (removed) {
+            this.dataSheet.onClustersUpdated(Collections.emptyList(), Collections.emptyList(), Collections.singletonList(cluster));
         }
-        throw new IllegalArgumentException("Could not find cluster " + clusterName);
     }
 
     public List<Cluster> getClusters() {

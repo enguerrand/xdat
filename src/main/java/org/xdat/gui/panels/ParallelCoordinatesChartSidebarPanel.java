@@ -39,15 +39,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.HashMap;
@@ -85,7 +81,7 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 		JLabel activeDesignColorLabel = new JLabel("Active Design Color");
 		activeDesignColorButtonPanel.add(activeDesignColorLabel);
 		this.activeDesignColorButton = new ColorChoiceButton(chart.getDefaultDesignColor(true, chart.isUseAlpha()), "Active Design Color");
-		this.activeDesignColorButton.addActionListener(cmd);
+		this.activeDesignColorButton.addActionListener(e -> cmd.changeActiveDesignColor(chart));
 		activeDesignColorButtonPanel.add(activeDesignColorButton);
 		chart.getChartSettingsGroup().getColorSetting(Key.ACTIVE_DESIGN_DEFAULT_COLOR).addListener(
 				(source, transaction) -> activeDesignColorButton.setCurrentColor(source.get())
@@ -101,7 +97,7 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 		JLabel activeDesignAlphaLabel = new JLabel("Transparency");
 		activeDesignAlphaSliderLabelPanel.add(activeDesignAlphaLabel);
 		this.activeDesignAlphaSlider = new JSlider(JSlider.HORIZONTAL, 0, 255, 0);
-		this.activeDesignAlphaSlider.addChangeListener(cmd);
+		this.activeDesignAlphaSlider.addChangeListener(e -> cmd.setActiveDesignColorAlpha(this.activeDesignAlphaSlider, chart));
 		this.activeDesignAlphaSlider.setName("activeDesignAlphaSlider");
 		this.activeDesignAlphaSlider.setPreferredSize(new Dimension(120, 30));
 		chart.getChartSettingsGroup().getBooleanSetting(Key.USE_ALPHA).addListener(
@@ -112,7 +108,7 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 		JPanel addClusterButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		addClusterButtonPanel.setPreferredSize(new Dimension(180, 35));
 		newClusterButton = new JButton("Add Cluster");
-		newClusterButton.addActionListener(cmd);
+		newClusterButton.addActionListener(e -> cmd.addCluster());
 		addClusterButtonPanel.add(newClusterButton);
 		generalControlsPanel.add(addClusterButtonPanel);
 
@@ -169,19 +165,17 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 			clusterNameTextField.setEditable(true);
 			clusterNameTextField.setBackground(CLUSTER_NAME_TEXT_FIELD_STANDARD_COLOR);
 			clusterNameTextField.setToolTipText("Click to edit cluster name");
-			clusterNameTextField.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent event) {
-					handleUpdateUpdatedClusterName(clusterNameTextField, cluster, event.getActionCommand());
-				}
-			});
+			clusterNameTextField.addActionListener(event ->
+					handleUpdatedClusterName(clusterNameTextField, cluster, event.getActionCommand())
+			);
+
 			clusterNameTextField.addFocusListener(new FocusListener() {
 
 				@Override
 				public void focusLost(FocusEvent arg0) {
 					clusterNameTextField.setBackground(CLUSTER_NAME_TEXT_FIELD_STANDARD_COLOR);
 					clusterNameTextField.setToolTipText("Click to edit cluster name");
-					handleUpdateUpdatedClusterName(clusterNameTextField, cluster, clusterNameTextField.getText());
+					handleUpdatedClusterName(clusterNameTextField, cluster, clusterNameTextField.getText());
 				}
 
 				@Override
@@ -197,15 +191,15 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 			wrapperPanel.add(clusterButtonPanel);
 
 			final ColorChoiceButton clusterColorButton = new ColorChoiceButton(cluster.getActiveDesignColor(true), "clusterColor", 20, 25);
-			clusterColorButton.addActionListener(this.cmd);
+			clusterColorButton.addActionListener(e -> cmd.changeClusterColor(clusterColorButton, cluster));
 			clusterButtonPanel.add(clusterColorButton, BorderLayout.WEST);
 
 			final JButton removeClusterButton = new JButton("Remove");
-			removeClusterButton.addActionListener(this.cmd);
+			removeClusterButton.addActionListener(e -> cmd.removeCluster(cluster));
 			clusterButtonPanel.add(removeClusterButton, BorderLayout.CENTER);
 
 			final JButton applyClusterButton = new JButton("Apply");
-			applyClusterButton.addActionListener(this.cmd);
+			applyClusterButton.addActionListener(e -> cmd.applySettings((ParallelCoordinatesChart) getChart(), cluster));
 			clusterButtonPanel.add(applyClusterButton, BorderLayout.EAST);
 
 			JLabel clusterAlphaLabel = new JLabel("Transparency");
@@ -214,13 +208,13 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 			final JSlider clusterAlphaSlider = new JSlider(JSlider.HORIZONTAL, 0, 255, cluster.getActiveDesignColor(true).getAlpha());
 			this.clusterAlphaSliders.put(cluster, clusterAlphaSlider);
 			clusterAlphaSlider.setPreferredSize(new Dimension(150, 10));
-			clusterAlphaSlider.addChangeListener(cmd);
+			clusterAlphaSlider.addChangeListener(e -> cmd.setClusterAlpha(clusterAlphaSlider, cluster));
 			wrapperPanel.add(clusterAlphaSlider);
 
 			linkColorButtonToSlider(clusterColorButton, clusterAlphaSlider);
 
 			final JCheckBox clusterActiveCheckbox = new JCheckBox("Active");
-			clusterActiveCheckbox.addActionListener(cmd);
+			clusterActiveCheckbox.addActionListener(e -> cmd.toggleClusterActive(clusterActiveCheckbox, cluster));
 			clusterActiveCheckbox.setSelected(cluster.isActive());
 			wrapperPanel.add(clusterActiveCheckbox);
 
@@ -252,16 +246,9 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 	}
 
 	private void linkColorButtonToSlider(final ColorChoiceButton colorButton, final JSlider clusterAlphaSlider) {
-		clusterAlphaSlider.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent event) {
-				Object source = event.getSource();
-				if (source instanceof JSlider) {
-					JSlider slider = (JSlider) source;
-					int value = Math.min(slider.getValue(), 255);
-					colorButton.setAlpha(value);
-				}
-			}
+		clusterAlphaSlider.addChangeListener(event -> {
+			int value = Math.min(clusterAlphaSlider.getValue(), 255);
+			colorButton.setAlpha(value);
 		});
 	}
 
@@ -280,7 +267,7 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 		clusterColorButton.setCurrentColor(color);
 	}
 
-	private void handleUpdateUpdatedClusterName(JTextField source, Cluster cluster, String newName) {
+	private void handleUpdatedClusterName(JTextField source, Cluster cluster, String newName) {
 		if (newName == null || newName.isEmpty()) {
 			JOptionPane.showMessageDialog(this, "Invalid cluster name: \"" + newName + "\"", "Error on renaming cluster", JOptionPane.ERROR_MESSAGE);
 			source.setText(cluster.getName());

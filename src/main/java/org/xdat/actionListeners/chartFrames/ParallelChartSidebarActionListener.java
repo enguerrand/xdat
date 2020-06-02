@@ -31,17 +31,12 @@ import org.xdat.gui.controls.ColorChoiceButton;
 import org.xdat.gui.panels.ParallelCoordinatesChartPanel;
 import org.xdat.gui.panels.ParallelCoordinatesChartSidebarPanel;
 
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class ParallelChartSidebarActionListener implements ActionListener, ChangeListener {
+public class ParallelChartSidebarActionListener {
 	private final ParallelCoordinatesChartSidebarPanel sidePanel;
 	private final Main mainWindow;
 	private final ParallelCoordinatesChartPanel chartPanel;
@@ -56,105 +51,94 @@ public class ParallelChartSidebarActionListener implements ActionListener, Chang
 		this.clusterFactory = clusterFactory;
 	}
 
-	public void actionPerformed(ActionEvent e) {
-		String actionCommand = e.getActionCommand();
-		ParallelCoordinatesChart chart = (ParallelCoordinatesChart) chartPanel.getChart();
-		ClusterSet clusterSet = mainWindow.getCurrentClusterSet();
-
-		if (actionCommand.equals("Active Design Color")) {
-			Color newColor = JColorChooser.showDialog(sidePanel.getChartFrame(), "Background Color", this.activeDesignColor);
-			if (newColor != null) {
-				if (newColor.getAlpha() == 255) {
-					int alphaValue = sidePanel.getActiveDesignAlphaSlider().getValue();
-					newColor = new Color(newColor.getRed(), newColor.getGreen(), newColor.getBlue(), alphaValue);
-				}
-
-				this.activeDesignColor = newColor;
-				chart.setActiveDesignColor(newColor);
-				this.sidePanel.getActiveDesignColorButton().setCurrentColor(this.activeDesignColor);
-				this.sidePanel.getActiveDesignAlphaSlider().setValue(newColor.getAlpha());
-				chartPanel.repaint();
+	public void changeClusterColor(ColorChoiceButton source, Cluster cluster) {
+		Color newColor = JColorChooser.showDialog(sidePanel.getChartFrame(), "Cluster Color", cluster.getActiveDesignColor(true));
+		if (newColor != null) {
+			if (newColor.getAlpha() == 255) {
+				int alpha = sidePanel.getClusterAlphaSlider(cluster).getValue();
+				newColor = new Color(newColor.getRed(), newColor.getGreen(), newColor.getBlue(), alpha);
 			}
-		} else if (actionCommand.equals("Add Cluster")) {
-			clusterSet.newCluster(clusterFactory);
-			this.sidePanel.updateClusterList(clusterSet);
-		} else if (actionCommand.equals("Remove")) {
-			JButton button = (JButton) e.getSource();
-			clusterSet.removeCluster(button.getName());
 
-			this.sidePanel.updateClusterList(clusterSet);
-			this.chartPanel.revalidate();
-			this.chartPanel.repaint();
-
-		} else if (actionCommand.equals("Apply")) {
-			JButton button = (JButton) e.getSource();
-			DataSheet dataSheet = chart.getDataSheet();
-			Cluster cluster = clusterSet.getCluster(button.getName());
-			for (int i = 0; i < dataSheet.getDesignCount(); i++) {
-				if (dataSheet.getDesign(i).isActive(chart)) {
-					dataSheet.getDesign(i).setCluster(cluster);
-				}
-			}
-			this.chartPanel.setPreferredSize(this.chartPanel.getPreferredSize());
-
-			for (int i = 0; i < this.mainWindow.getChartFrameCount(); i++) {
-				this.mainWindow.getChartFrame(i).validate();
-				this.mainWindow.getChartFrame(i).repaint();
-			}
-		} else if (actionCommand.equals("Active")) {
-			JCheckBox checkBox = (JCheckBox) e.getSource();
-			clusterSet.getCluster(checkBox.getName()).setActive(checkBox.isSelected());
-
-			for (int i = 0; i < this.mainWindow.getChartFrameCount(); i++) {
-				this.mainWindow.getChartFrame(i).validate();
-				this.mainWindow.getChartFrame(i).repaint();
-			}
-		} else if (actionCommand.equals("clusterColor")) {
-			ColorChoiceButton button = (ColorChoiceButton) e.getSource();
-			Cluster cluster = clusterSet.getCluster(button.getName());
-
-			Color newColor = JColorChooser.showDialog(sidePanel.getChartFrame(), "Cluster Color", cluster.getActiveDesignColor(true));
-			if (newColor != null) {
-				if (newColor.getAlpha() == 255) {
-					int alpha = sidePanel.getClusterAlphaSlider(cluster).getValue();
-					newColor = new Color(newColor.getRed(), newColor.getGreen(), newColor.getBlue(), alpha);
-				}
-
-				cluster.setActiveDesignColor(newColor);
-				button.setCurrentColor(newColor);
-				sidePanel.getClusterAlphaSlider(cluster).setValue(newColor.getAlpha());
-				chartPanel.repaint();
-			}
+			cluster.setActiveDesignColor(newColor);
+			source.setCurrentColor(newColor);
+			sidePanel.getClusterAlphaSlider(cluster).setValue(newColor.getAlpha());
+			chartPanel.repaint();
 		}
 	}
 
-	@Override
-	public void stateChanged(ChangeEvent e) {
-		Object source = e.getSource();
-		ParallelCoordinatesChart chart = (ParallelCoordinatesChart) chartPanel.getChart();
+	public void toggleClusterActive(JCheckBox source, Cluster cluster) {
+		cluster.setActive(source.isSelected());
+		for (int i = 0; i < this.mainWindow.getChartFrameCount(); i++) {
+			this.mainWindow.getChartFrame(i).validate();
+			this.mainWindow.getChartFrame(i).repaint();
+		}
+	}
 
-		if (source instanceof JSlider) {
-			JSlider slider = (JSlider) source;
-			int value = slider.getValue();
-
-			if (slider.getName().equals("activeDesignAlphaSlider")) {
-				Color newColor = new Color(activeDesignColor.getRed(), activeDesignColor.getGreen(), activeDesignColor.getBlue(), value);
-				this.activeDesignColor = newColor;
-				chart.setActiveDesignColor(newColor);
-				this.sidePanel.getActiveDesignColorButton().setCurrentColor(this.activeDesignColor);
-				this.sidePanel.getActiveDesignAlphaSlider().setValue(slider.getValue());
-				chartPanel.repaint();
-				Color oldDefaultColor = UserPreferences.getInstance().getParallelCoordinatesActiveDesignDefaultColor();
-				UserPreferences.getInstance().setParallelCoordinatesActiveDesignDefaultColor(new Color(oldDefaultColor.getRed(), oldDefaultColor.getGreen(), oldDefaultColor.getBlue(), value));
-			} else {
-				Cluster cluster = mainWindow.getCurrentClusterSet().getCluster(slider.getName());
-				if(cluster != null){
-					Color newColor = new Color(cluster.getActiveDesignColor(true).getRed(), cluster.getActiveDesignColor(true).getGreen(), cluster.getActiveDesignColor(true).getBlue(), value);
-					cluster.setActiveDesignColor(newColor);
-					chartPanel.repaint();
-				}
+	public void applySettings(ParallelCoordinatesChart chart, Cluster cluster) {
+		DataSheet dataSheet = chart.getDataSheet();
+		for (int i = 0; i < dataSheet.getDesignCount(); i++) {
+			if (dataSheet.getDesign(i).isActive(chart)) {
+				dataSheet.getDesign(i).setCluster(cluster);
 			}
 		}
+		this.chartPanel.setPreferredSize(this.chartPanel.getPreferredSize());
+
+		for (int i = 0; i < this.mainWindow.getChartFrameCount(); i++) {
+			this.mainWindow.getChartFrame(i).validate();
+			this.mainWindow.getChartFrame(i).repaint();
+		}
+	}
+
+	public void removeCluster(Cluster cluster) {
+		ClusterSet clusterSet = mainWindow.getCurrentClusterSet();
+		clusterSet.removeCluster(cluster);
+
+		this.sidePanel.updateClusterList(clusterSet);
+		this.chartPanel.revalidate();
+		this.chartPanel.repaint();
+	}
+
+	public void addCluster() {
+		ClusterSet clusterSet = mainWindow.getCurrentClusterSet();
+		clusterSet.newCluster(clusterFactory);
+		this.sidePanel.updateClusterList(clusterSet);
+	}
+
+	public void changeActiveDesignColor(ParallelCoordinatesChart chart) {
+		Color newColor = JColorChooser.showDialog(sidePanel.getChartFrame(), "Background Color", this.activeDesignColor);
+		if (newColor != null) {
+			if (newColor.getAlpha() == 255) {
+				int alphaValue = sidePanel.getActiveDesignAlphaSlider().getValue();
+				newColor = new Color(newColor.getRed(), newColor.getGreen(), newColor.getBlue(), alphaValue);
+			}
+
+			this.activeDesignColor = newColor;
+			chart.setActiveDesignColor(newColor);
+			this.sidePanel.getActiveDesignColorButton().setCurrentColor(this.activeDesignColor);
+			this.sidePanel.getActiveDesignAlphaSlider().setValue(newColor.getAlpha());
+			chartPanel.repaint();
+		}
+	}
+
+	public void setClusterAlpha(JSlider slider, Cluster cluster) {
+		int value = slider.getValue();
+		if(cluster != null){
+			Color newColor = new Color(cluster.getActiveDesignColor(true).getRed(), cluster.getActiveDesignColor(true).getGreen(), cluster.getActiveDesignColor(true).getBlue(), value);
+			cluster.setActiveDesignColor(newColor);
+			chartPanel.repaint();
+		}
+	}
+
+	public void setActiveDesignColorAlpha(JSlider slider, ParallelCoordinatesChart chart) {
+		int value = slider.getValue();
+		Color newColor = new Color(activeDesignColor.getRed(), activeDesignColor.getGreen(), activeDesignColor.getBlue(), value);
+		this.activeDesignColor = newColor;
+		chart.setActiveDesignColor(newColor);
+		this.sidePanel.getActiveDesignColorButton().setCurrentColor(this.activeDesignColor);
+		this.sidePanel.getActiveDesignAlphaSlider().setValue(slider.getValue());
+		chartPanel.repaint();
+		Color oldDefaultColor = UserPreferences.getInstance().getParallelCoordinatesActiveDesignDefaultColor();
+		UserPreferences.getInstance().setParallelCoordinatesActiveDesignDefaultColor(new Color(oldDefaultColor.getRed(), oldDefaultColor.getGreen(), oldDefaultColor.getBlue(), value));
 	}
 
 	public Color getActiveDesignColor() {
