@@ -101,7 +101,11 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 		this.activeDesignAlphaSlider.setName("activeDesignAlphaSlider");
 		this.activeDesignAlphaSlider.setPreferredSize(new Dimension(120, 30));
 		chart.getChartSettingsGroup().getBooleanSetting(Key.USE_ALPHA).addListener(
-				(source, transaction) -> setAlphaSlidersEnabled(source.get())
+				(source, transaction) -> {
+					boolean enabled = source.get();
+					setAlphaSlidersEnabled(enabled);
+					chart.setUseAlpha(enabled);
+				}
 		);
 		activeDesignAlphaSliderPanel.add(activeDesignAlphaSlider);
 
