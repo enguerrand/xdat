@@ -64,6 +64,14 @@ public class Axis implements Serializable {
 		IntegerSetting ticLabelDigitCountSetting = this.settings.getIntegerSetting(Key.PARALLEL_COORDINATES_AXIS_TIC_LABEL_DIGIT_COUNT);
 		ticLabelDigitCountSetting.set(parameter.getTicLabelDigitCount());
 		ticLabelDigitCountSetting.addListener((source, transaction) -> parameter.setTicLabelDigitCount(source.get()));
+		this.settings.getBooleanSetting(Key.PARALLEL_COORDINATES_AXIS_INVERTED).addListener((source, transaction) ->
+				onAxisInverted(dataSheet)
+		);
+
+		this.settings.getBooleanSetting(Key.PARALLEL_COORDINATES_FILTER_INVERTED).addListener((source, transaction) ->
+				applyFilters(dataSheet)
+		);
+
 	}
 
 	private void initialiseSettings(DataSheet dataSheet) {
@@ -240,11 +248,15 @@ public class Axis implements Serializable {
 	}
 
 	public void setAxisInverted(boolean axisInverted, DataSheet dataSheet) {
+		this.settings.getBooleanSetting(Key.PARALLEL_COORDINATES_AXIS_INVERTED).set(axisInverted);
+		onAxisInverted(dataSheet);
+	}
+
+	private void onAxisInverted(DataSheet dataSheet) {
 		double maxFilterValue = this.getMaximumFilter().getValue();
 		double minFilterValue = this.getMinimumFilter().getValue();
-		this.settings.getBooleanSetting(Key.PARALLEL_COORDINATES_AXIS_INVERTED).set(axisInverted);
-		this.getMaximumFilter().setValue(maxFilterValue, dataSheet);
-		this.getMinimumFilter().setValue(minFilterValue, dataSheet);
+		this.getMaximumFilter().setValue(minFilterValue, dataSheet);
+		this.getMinimumFilter().setValue(maxFilterValue, dataSheet);
 	}
 
 	public boolean isAutoFit() {
