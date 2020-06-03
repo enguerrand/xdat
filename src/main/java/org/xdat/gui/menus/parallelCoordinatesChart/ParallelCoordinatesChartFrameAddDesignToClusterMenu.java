@@ -22,6 +22,7 @@ package org.xdat.gui.menus.parallelCoordinatesChart;
 
 import org.xdat.Main;
 import org.xdat.actionListeners.chartFrames.ChartFrameAddDesignToClusterMenuActionListener;
+import org.xdat.data.Cluster;
 import org.xdat.data.ClusterSet;
 import org.xdat.gui.frames.ChartFrame;
 
@@ -46,17 +47,16 @@ public class ParallelCoordinatesChartFrameAddDesignToClusterMenu extends JMenu i
 
 	private void updateClusterList() {
 		this.removeAll();
-		ChartFrameAddDesignToClusterMenuActionListener cmd = new ChartFrameAddDesignToClusterMenuActionListener(mainWindow, chartFrame);
-
-		JMenuItem mi;
 		ClusterSet clusterSet = mainWindow.getCurrentClusterSet();
 		if (clusterSet.getClusterCount() == 0) {
-			mi = new JMenuItem("No clusters defined");
+			JMenuItem mi = new JMenuItem("No clusters defined");
 			this.add(mi);
 			mi.setEnabled(false);
 		} else {
 			for (int i = 0; i < clusterSet.getClusterCount(); i++) {
-				mi = new JMenuItem(clusterSet.getCluster(i).getName());
+				Cluster cluster = clusterSet.getCluster(i);
+				ChartFrameAddDesignToClusterMenuActionListener cmd = new ChartFrameAddDesignToClusterMenuActionListener(mainWindow, chartFrame, cluster);
+				JMenuItem mi = new JMenuItem(cluster.getName());
 				mi.addActionListener(cmd);
 				this.add(mi);
 			}

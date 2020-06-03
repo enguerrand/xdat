@@ -32,15 +32,15 @@ public class ChartFrameAddDesignToClusterMenuActionListener implements ActionLis
 
 	private final Main mainWindow;
 	private final ChartFrame chartFrame;
-	public ChartFrameAddDesignToClusterMenuActionListener(Main mainWindow, ChartFrame chartFrame) {
+	private final Cluster cluster;
+	public ChartFrameAddDesignToClusterMenuActionListener(Main mainWindow, ChartFrame chartFrame, Cluster cluster) {
 		this.mainWindow = mainWindow;
 		this.chartFrame = chartFrame;
+		this.cluster = cluster;
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		String actionCommand = e.getActionCommand();
 		DataSheet dataSheet = chartFrame.getChart().getDataSheet();
-		Cluster cluster = mainWindow.getCurrentClusterSet().getCluster(actionCommand);
 		ParallelCoordinatesChart chart = (ParallelCoordinatesChart) chartFrame.getChart();
 		for (int i = 0; i < dataSheet.getDesignCount(); i++) {
 			if (dataSheet.getDesign(i).isActive(chart)) {
