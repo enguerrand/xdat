@@ -53,6 +53,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 public class Main extends JFrame {
 	public static final long serialVersionUID = 10L;
@@ -62,6 +64,7 @@ public class Main extends JFrame {
 	private final BuildProperties buildProperties;
 	private final ClusterFactory clusterFactory = new ClusterFactory();
 	private final DatasheetListener datasheetListener;
+	private final List<DatasheetListener> subListeners = new CopyOnWriteArrayList<>();
 	private DataSheetTablePanel dataSheetTablePanel;
 	private final List<ParallelChartFrameComboModel> comboModels = new LinkedList<>();
 	private final SettingsGroup generalSettingsGroup;
@@ -89,11 +92,13 @@ public class Main extends JFrame {
 			@Override
 			public void onClustersChanged() {
 				repaintAllChartFrames();
+				fireSubListeners(DatasheetListener::onClustersChanged);
 			}
 
 			@Override
 			public void onDataPanelUpdateRequired() {
 				updateDataPanel();
+				fireSubListeners(DatasheetListener::onDataPanelUpdateRequired);
 			}
 
 			@Override
@@ -122,6 +127,8 @@ public class Main extends JFrame {
 				progressMonitor.close();
 
 				repaintAllChartFrames();
+
+				fireSubListeners(l -> l.onDataChanged(autoFitRequired, filterResetRequired, applyFiltersRequired));
 			}
 		};
 		this.currentSession = new Session();
@@ -429,5 +436,31 @@ public class Main extends JFrame {
 
 	public SettingsGroup getParallelCoordinatesAxisSettingsGroup() {
 		return parallelCoordinatesAxisSettingsGroup;
+	}
+
+	public void addDataSheetSubListener(DatasheetListener listener) {
+		this.subListeners.add(listener);
+	}
+
+	public void removeDataSheetSubListener(DatasheetListener listener) {
+		this.subListeners.remove(listener);
+	}
+
+	private void fireSubListeners(Consumer<DatasheetListener> action) {
+		for (DatasheetListener l : this.subListeners) {
+			action.accept(l);
+		}
+	}
+
+	public void fireClustersChanged() {
+		this.datasheetListener.onClustersChanged();
+	}
+
+	public void fireDataPanelUpdateRequired() {
+		this.datasheetListener.onDataPanelUpdateRequired();
+	}
+
+	public void fireOnDataChanged(boolean[] axisAutofitRequired, boolean[] axisResetFilterRequired, boolean[] axisApplyFiltersRequired) {
+		this.datasheetListener.onDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired);
 	}
 }

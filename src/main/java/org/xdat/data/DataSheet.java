@@ -194,8 +194,8 @@ public class DataSheet implements Serializable, ListModel {
 
 		restoreClustersFromHashes(clustersToDesignHashes, this.data, clusterSet);
 
-		fireListeners(l -> l.onDataChanged(initialiseBooleanArray(true), initialiseBooleanArray(true), initialiseBooleanArray(true)));
-		fireListeners(DatasheetListener::onDataPanelUpdateRequired);
+		fireOnDataChanged(initialiseBooleanArray(true), initialiseBooleanArray(true), initialiseBooleanArray(true));
+		fireDataPanelUpdateRequired();
 
 	}
 
@@ -284,7 +284,7 @@ public class DataSheet implements Serializable, ListModel {
 		}
 
 		axisApplyFiltersRequired[columnIndex - 1] = true;
-		fireListeners(l -> l.onDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired));
+		fireOnDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired);
 	}
 
 	private int getLineCount(String pathToInputFile) throws IOException {
@@ -335,8 +335,8 @@ public class DataSheet implements Serializable, ListModel {
 			axisApplyFiltersRequired[i] = true;
 		}
 
-		fireListeners(l -> l.onDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired));
-		fireListeners(DatasheetListener::onDataPanelUpdateRequired);
+		fireOnDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired);
+		fireDataPanelUpdateRequired();
 	}
 
 	public int getParameterCount() {
@@ -493,7 +493,7 @@ public class DataSheet implements Serializable, ListModel {
 		if (changed.isEmpty() && added.isEmpty() && removed.isEmpty()) {
 			return;
 		}
-		fireListeners(DatasheetListener::onClustersChanged);
+		fireClustersChanged();
 	}
 
 	public Collection<Design> getDesigns() {
@@ -502,5 +502,17 @@ public class DataSheet implements Serializable, ListModel {
 
 	public List<Parameter> getParameters() {
 		return Collections.unmodifiableList(this.parameters);
+	}
+
+	public void fireClustersChanged() {
+		fireListeners(DatasheetListener::onClustersChanged);
+	}
+
+	public void fireDataPanelUpdateRequired() {
+		fireListeners(DatasheetListener::onDataPanelUpdateRequired);
+	}
+
+	public void fireOnDataChanged(boolean[] axisAutofitRequired, boolean[] axisResetFilterRequired, boolean[] axisApplyFiltersRequired) {
+		fireListeners(l -> l.onDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired));
 	}
 }
