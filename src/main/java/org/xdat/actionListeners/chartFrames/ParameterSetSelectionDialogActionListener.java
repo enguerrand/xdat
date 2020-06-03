@@ -25,9 +25,8 @@ import org.xdat.gui.dialogs.ParameterSetSelectionDialog;
 import org.xdat.gui.frames.ChartFrame;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class ParameterSetSelectionDialogActionListener implements ActionListener {
+public class ParameterSetSelectionDialogActionListener {
 
 	private final ChartFrame chartFrame;
 	private final ParameterSetSelectionDialog dialog;
@@ -35,35 +34,32 @@ public class ParameterSetSelectionDialogActionListener implements ActionListener
 	public ParameterSetSelectionDialogActionListener(ChartFrame chartFrame, ParameterSetSelectionDialog dialog) {
 		this.chartFrame = chartFrame;
 		this.dialog = dialog;
-
 	}
 
-	public void actionPerformed(ActionEvent e) {
-		String actionCommand = e.getActionCommand();
-		if (actionCommand.equals("Select All")) {
-			for (int i = 0; i < dialog.getCheckBoxCount(); i++) {
-				dialog.getCheckBox(i).setSelected(true);
-			}
-		} else if (actionCommand.equals("Unselect All")) {
-			for (int i = 0; i < dialog.getCheckBoxCount(); i++) {
-				dialog.getCheckBox(i).setSelected(false);
-			}
-		} else if (actionCommand.equals("Invert Selection")) {
-			for (int i = 0; i < dialog.getCheckBoxCount(); i++) {
-				dialog.getCheckBox(i).setSelected(!dialog.getCheckBox(i).isSelected());
-			}
-		} else if (actionCommand.equals("Cancel")) {
-			dialog.dispose();
-		} else if (actionCommand.equals("Ok")) {
-
-			ParallelCoordinatesChart c = (ParallelCoordinatesChart) chartFrame.getChart();
-			for (int i = 0; i < dialog.getCheckBoxCount(); i++) {
-				c.getAxis(i).setActive(dialog.getCheckBox(i).isSelected());
-			}
-			dialog.dispose();
+	public void ok(ActionEvent e) {
+		ParallelCoordinatesChart c = (ParallelCoordinatesChart) chartFrame.getChart();
+		for (int i = 0; i < dialog.getCheckBoxCount(); i++) {
+			c.getAxis(i).setActive(dialog.getCheckBox(i).isSelected());
 		}
+		dialog.dispose();
 		this.chartFrame.getChartPanel().setSize(this.chartFrame.getChartPanel().getPreferredSize());
 		this.chartFrame.validate();
 		this.chartFrame.repaint();
+	}
+
+	public void cancel(ActionEvent e) {
+		dialog.dispose();
+	}
+
+	public void invertSelection(ActionEvent e) {
+		for (int i = 0; i < dialog.getCheckBoxCount(); i++) {
+			dialog.getCheckBox(i).setSelected(!dialog.getCheckBox(i).isSelected());
+		}
+	}
+
+	public void setAllSelected(boolean b) {
+		for (int i = 0; i < dialog.getCheckBoxCount(); i++) {
+			dialog.getCheckBox(i).setSelected(b);
+		}
 	}
 }

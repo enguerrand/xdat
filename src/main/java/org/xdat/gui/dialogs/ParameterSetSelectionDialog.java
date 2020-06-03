@@ -64,11 +64,11 @@ public class ParameterSetSelectionDialog extends JDialog {
 
 		// add action listener
 		ParameterSetSelectionDialogActionListener cmd = new ParameterSetSelectionDialogActionListener(chartFrame, this);
-		selectAllButton.addActionListener(cmd);
-		unselectAllButton.addActionListener(cmd);
-		invertSelectionButton.addActionListener(cmd);
-		cancelButton.addActionListener(cmd);
-		okButton.addActionListener(cmd);
+		selectAllButton.addActionListener(e -> cmd.setAllSelected(true));
+		unselectAllButton.addActionListener(e -> cmd.setAllSelected(false));
+		invertSelectionButton.addActionListener(cmd::invertSelection);
+		cancelButton.addActionListener(cmd::cancel);
+		okButton.addActionListener(cmd::ok);
 
 		// add components
 		this.add(mainPanel, BorderLayout.CENTER);
