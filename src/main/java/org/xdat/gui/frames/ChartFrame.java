@@ -32,18 +32,15 @@ import org.xdat.gui.panels.ChartPanel;
 import org.xdat.gui.panels.ParallelCoordinatesChartPanel;
 import org.xdat.gui.panels.ParallelCoordinatesChartSidebarPanel;
 import org.xdat.gui.panels.ScatterChart2DPanel;
-import org.xdat.gui.panels.SidebarPanel;
 
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import java.awt.BorderLayout;
-import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ChartFrame extends JFrame implements ComponentListener {
@@ -51,8 +48,7 @@ public class ChartFrame extends JFrame implements ComponentListener {
 	private Main mainWindow;
 	private Chart chart;
 	private ChartPanel chartPanel;
-	private SidebarPanel sidePanel;
-	private List<JDialog> registeredDialog = new LinkedList<>();
+	private final List<Runnable> closeHooks = new ArrayList<>();
 
 	public ChartFrame(Main mainWindow, Chart chart) throws NoParametersDefinedException {
 		super(chart.getTitle());
@@ -81,10 +77,8 @@ public class ChartFrame extends JFrame implements ComponentListener {
 
 			wrapper.add(scrollPane, BorderLayout.CENTER);
 			wrapper.add(sidebar, BorderLayout.EAST);
-
+			closeHooks.add(sidebar::onClosed);
 			this.add(wrapper);
-			
-			this.sidePanel = sidebar;
 		} else if (chart.getClass().equals(ScatterChart2D.class)) {
 			this.chartPanel = new ScatterChart2DPanel(mainWindow, (ScatterChart2D) this.chart);
 			this.setJMenuBar(new ScatterChart2DFrameMenuBar(mainWindow, this, (ScatterChart2D) chart));
@@ -92,6 +86,7 @@ public class ChartFrame extends JFrame implements ComponentListener {
 		} else {
 			throw new RuntimeException("Unknown Chart Type!");
 		}
+		this.closeHooks.add(() -> mainWindow.removeChartFrame(this));
 
 		this.setLocation(this.chart.getLocation());
 		this.getContentPane().setPreferredSize(this.chart.getFrameSize());
@@ -109,24 +104,8 @@ public class ChartFrame extends JFrame implements ComponentListener {
 	}
 
 	public void dispose() {
-		mainWindow.removeChartFrame(this);
+		closeHooks.forEach(Runnable::run);
 		super.dispose();
-	}
-
-	@Override
-	public void paint(Graphics g) {
-		super.paint(g);
-		for (JDialog jDialog : this.registeredDialog) {
-			jDialog.repaint();
-		}
-	}
-
-	public void registerComponentForRepaint(JDialog comp) {
-		this.registeredDialog.add(comp);
-	}
-
-	public void unRegisterComponentForRepaint(JDialog comp) {
-		this.registeredDialog.remove(comp);
 	}
 
 	public Main getMainWindow() {

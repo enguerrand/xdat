@@ -44,12 +44,10 @@ public class ParallelChartContextMenuActionListener {
 
 	public void setCurrentFiltersAsNewRange(ActionEvent e) {
 		this.axis.setFilterAsNewRange(mainWindow.getDataSheet());
-		this.chartFrame.repaint();
 	}
 
 	public void resetFilter(ActionEvent e) {
 		this.axis.resetFilters(this.mainWindow.getDataSheet());
-		this.chartFrame.repaint();
 	}
 
 	public void autofit(ActionEvent e) {
@@ -104,7 +102,6 @@ public class ParallelChartContextMenuActionListener {
 		for (int i = 0; i < chart.getAxisCount(); i++) {
 			chart.getAxis(i).resetFilters(this.mainWindow.getDataSheet());
 		}
-		this.chartFrame.repaint();
 	}
 
 	public void reduceDistanceAllAxes(ActionEvent e) {
@@ -125,7 +122,6 @@ public class ParallelChartContextMenuActionListener {
 
 	public void invertAxis(ActionEvent e) {
 		this.axis.setAxisInverted(!this.axis.isAxisInverted(), this.mainWindow.getDataSheet());
-		this.chartFrame.repaint();
 	}
 
 	public void applyColorGradient(ActionEvent e) {

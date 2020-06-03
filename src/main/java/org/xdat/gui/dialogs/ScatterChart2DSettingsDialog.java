@@ -26,6 +26,7 @@ import org.xdat.actionListeners.scatter2DChartSettings.Scatter2DChartDisplaySett
 import org.xdat.chart.ScatterChart2D;
 import org.xdat.chart.ScatterPlot2D;
 import org.xdat.data.AxisType;
+import org.xdat.data.DatasheetListener;
 import org.xdat.gui.controls.ColorChoiceButton;
 import org.xdat.gui.controls.MinMaxSpinnerModel;
 import org.xdat.gui.controls.RightAlignedSpinner;
@@ -52,11 +53,28 @@ public class ScatterChart2DSettingsDialog extends JDialog {
 	private ColorChoiceButton standardDesignColorButton;
 	private ColorChoiceButton selectedDesignColorButton;
 	private ChartFrame chartFrame;
+	private final Runnable onClosed;
 
 	public ScatterChart2DSettingsDialog(Main mainWindow, ChartFrame chartFrame, ScatterChart2D scatterChart2D) {
 		super(chartFrame, scatterChart2D.getTitle() + " Settings");
 		this.chartFrame = chartFrame;
-		chartFrame.registerComponentForRepaint(this);
+		DatasheetListener listener = new DatasheetListener() {
+			@Override
+			public void onClustersChanged() {
+				repaint();
+			}
+
+			@Override
+			public void onDataPanelUpdateRequired() {
+			}
+
+			@Override
+			public void onDataChanged(boolean[] autoFitRequired, boolean[] filterResetRequired, boolean[] applyFiltersRequired) {
+				repaint();
+			}
+		};
+		mainWindow.addDataSheetSubListener(listener);
+		onClosed = () -> mainWindow.removeDataSheetSubListener(listener);
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		this.setModal(false);
 		buildPanel(mainWindow, chartFrame, scatterChart2D);
@@ -180,8 +198,8 @@ public class ScatterChart2DSettingsDialog extends JDialog {
 
 	@Override
 	public void dispose() {
-		this.chartFrame.unRegisterComponentForRepaint(this);
 		super.dispose();
+		onClosed.run();
 	}
 
 	public ColorChoiceButton getFgColorButton() {

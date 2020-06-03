@@ -68,10 +68,7 @@ public class ParallelChartSidebarActionListener {
 
 	public void toggleClusterActive(JCheckBox source, Cluster cluster) {
 		cluster.setActive(source.isSelected());
-		for (int i = 0; i < this.mainWindow.getChartFrameCount(); i++) {
-			this.mainWindow.getChartFrame(i).validate();
-			this.mainWindow.getChartFrame(i).repaint();
-		}
+		this.mainWindow.fireClustersChanged();
 	}
 
 	public void applySettings(ParallelCoordinatesChart chart, Cluster cluster) {

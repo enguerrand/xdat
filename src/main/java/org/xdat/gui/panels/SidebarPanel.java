@@ -22,13 +22,12 @@ package org.xdat.gui.panels;
 
 import org.xdat.Main;
 import org.xdat.chart.Chart;
+import org.xdat.data.DatasheetListener;
 import org.xdat.gui.controls.CustomButton;
 import org.xdat.gui.frames.ChartFrame;
 
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public abstract class SidebarPanel extends JPanel {
 
@@ -38,6 +37,8 @@ public abstract class SidebarPanel extends JPanel {
 	private JPanel contentPanel;
 	private JPanel headerPanel;
     private Chart chart;
+    private boolean maximized = true;
+    private final Runnable onClosed;
 
 	SidebarPanel(Main mainWindow, ChartFrame chartFrame, ChartPanel chartPanel, Chart chart) {
 		this.mainWindow = mainWindow;
@@ -47,11 +48,27 @@ public abstract class SidebarPanel extends JPanel {
 		this.headerPanel = new JPanel();
 		this.contentPanel = new JPanel();
 		initialize();
-		updateView(true);
+		DatasheetListener listener = new DatasheetListener() {
+			@Override
+			public void onClustersChanged() {
+				updateView();
+			}
+
+			@Override
+			public void onDataPanelUpdateRequired() {
+			}
+
+			@Override
+			public void onDataChanged(boolean[] autoFitRequired, boolean[] filterResetRequired, boolean[] applyFiltersRequired) {
+			}
+		};
+		mainWindow.addDataSheetSubListener(listener);
+		onClosed = () -> mainWindow.removeDataSheetSubListener(listener);
+		updateView();
 	}
 
-	private void updateView(boolean maximized) {
-		buildHeaderPanel(maximized);
+	private void updateView() {
+		buildHeaderPanel();
 		this.setLayout(new BorderLayout());
 		this.add(headerPanel, BorderLayout.NORTH);
 		contentPanel.removeAll();
@@ -63,7 +80,7 @@ public abstract class SidebarPanel extends JPanel {
 		this.chartFrame.repaint();
 	}
 
-	private void buildHeaderPanel(final boolean maximized) {
+	private void buildHeaderPanel() {
 		this.headerPanel.removeAll();
 		this.headerPanel.setLayout(new BorderLayout());
 		CustomButton toggleButton;
@@ -74,11 +91,9 @@ public abstract class SidebarPanel extends JPanel {
 			toggleButton = new CustomButton("Expand", "images" + "/maximize.png", "images" + "/maximize_pressed.png", "Expand");
 		}
 		this.headerPanel.add(toggleButton, BorderLayout.WEST);
-		toggleButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				updateView(!maximized);
-			}
+		toggleButton.addActionListener(arg0 -> {
+			maximized = !maximized;
+			updateView();
 		});
 	}
 
@@ -102,4 +117,7 @@ public abstract class SidebarPanel extends JPanel {
 
 	protected abstract void initialize();
 
+	public void onClosed() {
+		onClosed.run();
+	}
 }

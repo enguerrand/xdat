@@ -552,7 +552,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 			this.draggedAxis = null;
 		}
 		if (dragSelecting) {
-			repaintRequired = true;
+			repaintRequired = false;
 			dragSelecting = false;
 
 			Rectangle rec = getSelectionRectangle();
@@ -667,7 +667,6 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 			// try to make the filter follow the drag operation, but always keep
 			// it within axis boundaries and opposite filter
 			this.draggedFilter.setYPos(Math.max(Math.min(e.getY() + this.dragOffsetY, this.draggedFilter.getLowestPos(dataSheet)), this.draggedFilter.getHighestPos(dataSheet)), dataSheet);
-			repaint();
 		} else if (this.draggedAxis != null) {
 			this.dragCurrentX = e.getX();
 			this.repaint();

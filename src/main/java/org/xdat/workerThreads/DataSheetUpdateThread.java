@@ -83,7 +83,6 @@ public class DataSheetUpdateThread extends SwingWorker {
 						c.getAxis(a).getLowerFilter().setValue(lfValues[a], dataSheet);
 					}
 				}
-				f.repaint();
 			}
 
 		} catch (IOException e) {

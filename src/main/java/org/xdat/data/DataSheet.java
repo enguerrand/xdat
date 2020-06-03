@@ -34,6 +34,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -510,6 +511,16 @@ public class DataSheet implements Serializable, ListModel {
 
 	public void fireDataPanelUpdateRequired() {
 		fireListeners(DatasheetListener::onDataPanelUpdateRequired);
+	}
+
+	public void fireOnDataChanged(boolean axisAutofitRequired, boolean axisResetFilterRequired, boolean axisApplyFiltersRequired) {
+		boolean[] autofit = new boolean[parameters.size()];
+		boolean[] resetFilter = new boolean[parameters.size()];
+		boolean[] applyFilters = new boolean[parameters.size()];
+		Arrays.fill(autofit, axisAutofitRequired);
+		Arrays.fill(resetFilter, axisResetFilterRequired);
+		Arrays.fill(applyFilters, axisApplyFiltersRequired);
+		fireOnDataChanged(autofit, resetFilter, applyFilters);
 	}
 
 	public void fireOnDataChanged(boolean[] axisAutofitRequired, boolean[] axisResetFilterRequired, boolean[] axisApplyFiltersRequired) {

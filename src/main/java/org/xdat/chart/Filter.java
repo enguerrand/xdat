@@ -224,6 +224,7 @@ public class Filter implements Serializable {
 					design.setActive(this, true);
 			}
 		}
+		dataSheet.fireOnDataChanged(false, false, false);
 	}
 
 	public void reset(DataSheet dataSheet) {
