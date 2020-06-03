@@ -91,7 +91,7 @@ public abstract class SidebarPanel extends JPanel {
 			toggleButton = new CustomButton("Expand", "images" + "/maximize.png", "images" + "/maximize_pressed.png", "Expand");
 		}
 		this.headerPanel.add(toggleButton, BorderLayout.WEST);
-		toggleButton.addActionListener(arg0 -> {
+		toggleButton.addActionListener(e -> {
 			maximized = !maximized;
 			updateView();
 		});

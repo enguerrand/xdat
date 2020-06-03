@@ -414,7 +414,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 					String ticLabel;
 					g.setFont(new Font("SansSerif", Font.PLAIN, currentAxis.getTicLabelFontSize()));
 					if (currentAxis.getParameter().isNumeric()) {
-						Double ticValue;
+						double ticValue;
 						if (ticCount > 1) {
 							ticValue = currentAxis.getMax() - ticValueDifference * ticID;
 							ticLabel = String.format(currentAxis.getTicLabelFormat(), ticValue);
@@ -463,7 +463,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 
 	public void mouseClicked(MouseEvent e) {
 		if (e.getButton() == 1 && updateHoverList(e.getX(), e.getY())) {
-			List<Integer> newSelection = new ArrayList<Integer>();
+			List<Integer> newSelection = new ArrayList<>();
 			DataSheet dataSheet = this.chart.getDataSheet();
 			for(Integer designId : this.hoverList){
 				Design d = dataSheet.getDesignByID(designId);
@@ -480,9 +480,9 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 			int x = e.getX();
 			int y = e.getY();
 
-			this.getAxisAtLocation(x).ifPresent(axis -> {
-				(new ParallelCoordinatesContextMenu(this.mainWindow, this.chartFrame, axis)).show(this, x, y);
-			});
+			this.getAxisAtLocation(x).ifPresent(axis ->
+					(new ParallelCoordinatesContextMenu(this.mainWindow, this.chartFrame, axis)).show(this, x, y)
+			);
 		}
 
 	}
@@ -684,14 +684,14 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 			this.chart.incrementAxisWidth(-e.getUnitsToScroll());
 		} else if (modifier == 2) {
 			int x = e.getX();
-			this.getAxisAtLocation(x).ifPresent(axis -> {
-				axis.setWidth(Math.max(0, axis.getWidth() - e.getUnitsToScroll()));
-			});
+			this.getAxisAtLocation(x).ifPresent(axis ->
+					axis.setWidth(Math.max(0, axis.getWidth() - e.getUnitsToScroll()))
+			);
 		} else if (modifier == 8) {
 			int x = e.getX();
-			this.getAxisAtLocation(x).ifPresent(axis -> {
-				axis.setTicCount(Math.max(2, axis.getTicCount() - e.getWheelRotation()), mainWindow.getDataSheet());
-			});
+			this.getAxisAtLocation(x).ifPresent(axis ->
+					axis.setTicCount(Math.max(2, axis.getTicCount() - e.getWheelRotation()), mainWindow.getDataSheet())
+			);
 		}
 		this.repaint();
 	}

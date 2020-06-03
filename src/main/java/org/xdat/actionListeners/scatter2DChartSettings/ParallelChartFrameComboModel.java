@@ -29,7 +29,7 @@ import javax.swing.MutableComboBoxModel;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ParallelChartFrameComboModel extends AbstractListModel implements MutableComboBoxModel {
+public class ParallelChartFrameComboModel extends AbstractListModel<String> implements MutableComboBoxModel<String> {
 
 	static final long serialVersionUID = 0L;
 	private Main mainWindow;
@@ -68,7 +68,7 @@ public class ParallelChartFrameComboModel extends AbstractListModel implements M
 	}
 
 	@Override
-	public Object getElementAt(int index) {
+	public String getElementAt(int index) {
 		if (this.chartNames.size() == 0 && index == 0) {
 			return "No chart selected             ";
 		} else {
@@ -82,20 +82,20 @@ public class ParallelChartFrameComboModel extends AbstractListModel implements M
 	}
 
 	@Override
-	public void addElement(Object obj) {
-		this.chartNames.add(obj.toString());
+	public void addElement(String obj) {
+		this.chartNames.add(obj);
 		this.fireIntervalAdded(this, 0, this.chartNames.size());
 	}
 
 	@Override
-	public void insertElementAt(Object obj, int index) {
-		this.chartNames.add(index, obj.toString());
+	public void insertElementAt(String obj, int index) {
+		this.chartNames.add(index, obj);
 		this.fireIntervalAdded(this, 0, this.chartNames.size());
 	}
 
 	@Override
 	public void removeElement(Object obj) {
-		this.chartNames.remove(obj);
+		this.chartNames.remove(obj.toString());
 		this.fireIntervalRemoved(this, 0, this.chartNames.size());
 	}
 

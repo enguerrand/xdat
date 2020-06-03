@@ -106,7 +106,7 @@ public class ScatterChart2DSettingsDialog extends JDialog {
 		displayModeButtonGroup.add(displayAllDesignsButton);
 		displayModeButtonGroup.add(displaySelectedDesignsButton);
 		displayModeButtonGroup.add(displayActiveDesignsButton);
-		JComboBox parallelChartSelectionComboBox = new JComboBox();
+		JComboBox<String> parallelChartSelectionComboBox = new JComboBox<>();
 		ParallelChartFrameComboModel comboModel = new ParallelChartFrameComboModel(mainWindow, this.chartFrame, scatterChart2D.getScatterPlot2D());
 		parallelChartSelectionComboBox.setModel(comboModel);
 		mainWindow.registerComboModel(comboModel);

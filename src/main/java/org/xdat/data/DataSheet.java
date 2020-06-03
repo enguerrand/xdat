@@ -95,8 +95,8 @@ public class DataSheet implements Serializable, ListModel {
 		String[] lineElements = line.split(this.delimiter);
 		if (dataHasHeaders) {
 			// if data has headers read the parameter names from the first line
-			for (int i = 0; i < lineElements.length; i++) {
-				this.parameters.add(new Parameter(this.getUniqueParameterName(lineElements[i]), this));
+			for (String lineElement : lineElements) {
+				this.parameters.add(new Parameter(this.getUniqueParameterName(lineElement), this));
 			}
 		} else {
 			// if data does not have headers read the first Design from the first line and create default Parameter names
@@ -238,8 +238,8 @@ public class DataSheet implements Serializable, ListModel {
 			if (lineElements.length > 0) {
 				newDesign = new Design(idCounter++);
 				boolean newDesignContainsValues = false;
-				for (int i = 0; i < lineElements.length; i++) {
-					if (lineElements[i].length() > 0 && (!lineElements[i].equals("\\s"))) {
+				for (String lineElement : lineElements) {
+					if (lineElement.length() > 0 && (!lineElement.equals("\\s"))) {
 						newDesignContainsValues = true; // found non-empty empty
 						break;
 					}
@@ -381,9 +381,9 @@ public class DataSheet implements Serializable, ListModel {
 	public double getMaxValueOf(Parameter param) {
 		if (param.isNumeric()) {
 			double max = Double.NEGATIVE_INFINITY;
-			for (int i = 0; i < this.data.size(); i++) {
-				if (max < this.data.get(i).getDoubleValue(param)) {
-					max = this.data.get(i).getDoubleValue(param);
+			for (Design datum : this.data) {
+				if (max < datum.getDoubleValue(param)) {
+					max = datum.getDoubleValue(param);
 				}
 			}
 			return max;
@@ -395,9 +395,9 @@ public class DataSheet implements Serializable, ListModel {
 	public double getMinValueOf(Parameter param) {
 		if (param.isNumeric()) {
 			double min = Double.POSITIVE_INFINITY;
-			for (int i = 0; i < this.data.size(); i++) {
-				if (min > this.data.get(i).getDoubleValue(param)) {
-					min = this.data.get(i).getDoubleValue(param);
+			for (Design datum : this.data) {
+				if (min > datum.getDoubleValue(param)) {
+					min = datum.getDoubleValue(param);
 				}
 			}
 			return min;

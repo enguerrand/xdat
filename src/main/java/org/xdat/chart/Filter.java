@@ -170,8 +170,6 @@ public class Filter implements Serializable {
 	 * would become to CPU expensive otherwise because each Filter would have to
 	 * be checked for each design every time the Chart is repainted.
 	 * <p>
-	 *
-     * @param dataSheet
      */
 	public void apply(DataSheet dataSheet) {
 		Parameter param = this.axis.getParameter();
