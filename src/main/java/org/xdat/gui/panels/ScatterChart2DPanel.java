@@ -20,6 +20,7 @@
 
 package org.xdat.gui.panels;
 
+import org.jetbrains.annotations.Nullable;
 import org.xdat.Main;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.chart.ScatterChart2D;
@@ -148,12 +149,12 @@ public class ScatterChart2DPanel extends ChartPanel {
 
 		switch (chart.getScatterPlot2D().getDisplayedDesignSelectionMode()) {
 			case (ScatterPlot2D.SHOW_DESIGNS_ACTIVE_IN_PARALLEL_CHART): {
-				ParallelCoordinatesChart parallelChart = chart.getScatterPlot2D().getParallelCoordinatesChartForFiltering();
-				Color activeDesignColor = parallelChart.getActiveDesignColor();
-				Color activeDesignColorNoAlpha = parallelChart.getActiveDesignColorNoAlpha();
-				Color filteredDesignColor = parallelChart.getFilteredDesignColor();
-				Color filteredDesignColorNoAlpha = parallelChart.getFilteredDesignColorNoAlpha();
-				if (chart.getScatterPlot2D().getParallelCoordinatesChartForFiltering() != null) {
+				@Nullable ParallelCoordinatesChart parallelChart = chart.getScatterPlot2D().getParallelCoordinatesChartForFiltering();
+				if (parallelChart != null) {
+					Color activeDesignColor = parallelChart.getActiveDesignColor();
+					Color activeDesignColorNoAlpha = parallelChart.getActiveDesignColorNoAlpha();
+					Color filteredDesignColor = parallelChart.getFilteredDesignColor();
+					Color filteredDesignColorNoAlpha = parallelChart.getFilteredDesignColorNoAlpha();
 					for (int i = 0; i < dataSheet.getDesignCount(); i++) {
 						Design design = dataSheet.getDesign(i);
 						if (dataSheet.getDesign(i).isActive(parallelChart)) {

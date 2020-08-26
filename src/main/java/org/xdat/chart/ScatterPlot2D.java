@@ -20,6 +20,7 @@
 
 package org.xdat.chart;
 
+import org.jetbrains.annotations.Nullable;
 import org.xdat.UserPreferences;
 import org.xdat.data.AxisType;
 import org.xdat.data.DataSheet;
@@ -39,6 +40,7 @@ public class ScatterPlot2D extends Plot {
 	public static final int TIC_LABEL_PADDING = 5;
 	public static final String TIC_LABEL_FORMAT = "%4.3f";
 	private int displayedDesignSelectionMode = SHOW_ALL_DESIGNS;
+	@Nullable
 	private ParallelCoordinatesChart parallelCoordinatesChartForFiltering;
 	private int dotRadius = 4;
 	private Color activeDesignColor = new Color(0, 150, 0);
@@ -100,11 +102,12 @@ public class ScatterPlot2D extends Plot {
 		this.displayedDesignSelectionMode = displayedDesignSelectionMode;
 	}
 
+	@Nullable
 	public ParallelCoordinatesChart getParallelCoordinatesChartForFiltering() {
 		return parallelCoordinatesChartForFiltering;
 	}
 
-	public void setParallelCoordinatesChartForFiltering(ParallelCoordinatesChart parallelCoordinatesChartForFiltering) {
+	public void setParallelCoordinatesChartForFiltering(@Nullable ParallelCoordinatesChart parallelCoordinatesChartForFiltering) {
 		this.parallelCoordinatesChartForFiltering = parallelCoordinatesChartForFiltering;
 	}
 
