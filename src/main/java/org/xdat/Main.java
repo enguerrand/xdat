@@ -2,7 +2,7 @@ package org.xdat;
 
 /*
  *  Copyright 2014, Enguerrand de Rochefort
- * 
+ *
  * This file is part of xdat.
  *
  * xdat is free software: you can redistribute it and/or modify
@@ -17,9 +17,33 @@ package org.xdat;
  *
  * You should have received a copy of the GNU General Public License
  * along with xdat.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  */
 
+import org.xdat.actionListeners.scatter2DChartSettings.ParallelChartFrameComboModel;
+import org.xdat.chart.Chart;
+import org.xdat.chart.ParallelCoordinatesChart;
+import org.xdat.data.ClusterFactory;
+import org.xdat.data.ClusterSet;
+import org.xdat.data.DataSheet;
+import org.xdat.data.DatasheetListener;
+import org.xdat.exceptions.NoParametersDefinedException;
+import org.xdat.gui.WindowClosingAdapter;
+import org.xdat.gui.frames.ChartFrame;
+import org.xdat.gui.menus.mainWindow.MainMenuBar;
+import org.xdat.gui.panels.DataSheetTablePanel;
+import org.xdat.settings.Setting;
+import org.xdat.settings.SettingsGroup;
+import org.xdat.settings.SettingsGroupFactory;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.ProgressMonitor;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
@@ -27,99 +51,93 @@ import java.io.IOException;
 import java.io.InvalidClassException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.event.ListDataListener;
-
-import org.xdat.actionListeners.scatter2DChartSettings.ParallelChartFrameComboModel;
-import org.xdat.chart.Chart;
-import org.xdat.chart.ParallelCoordinatesChart;
-import org.xdat.data.DataSheet;
-import org.xdat.exceptions.NoParametersDefinedException;
-import org.xdat.gui.WindowClosingAdapter;
-import org.xdat.gui.dialogs.LicenseDisplayDialog;
-import org.xdat.gui.frames.ChartFrame;
-import org.xdat.gui.menus.mainWIndow.MainMenuBar;
-import org.xdat.gui.panels.DataSheetTablePanel;
-
-/**
- * The Main Class from which the program is started.
- * <p>
- * Is also used to store some global references that are needed by other
- * classes, such as for example references to Swing components. Most of the data
- * is stored in the {@link Session} and the {@link UserPreferences} classes
- * though. References to instances of both classes are kept in this class.
- */
 public class Main extends JFrame {
-	/** The version tracking unique identifier for Serialization. */
-	public static final long serialVersionUID = 9;
-
-	/** The release number used in the help -> about dialog. */
-	public static final String XDAT_VERSION = "2.2";
-
-	/**
-	 * Flag to enable debug message printing with the log method for all
-	 * classes.
-	 */
-	public static final boolean loggingEnabled = false;
-
-	/** Flag to enable debug message printing for this class. */
-	public static final boolean printLog = false;
-
-	/** The main menu bar. */
+	public static final long serialVersionUID = 10L;
 	private MainMenuBar mainMenuBar;
-
-	/** The panel that contains the data. */
-	private transient DataSheetTablePanel dataSheetTablePanel;
-
-	/**
-	 * The current session containing all relevant info in the memory. This is
-	 * also the information that gets serialized when saving a session.
-	 */
 	private Session currentSession;
+	private List<ChartFrame> chartFrames = new LinkedList<>();
+	private final BuildProperties buildProperties;
+	private final ClusterFactory clusterFactory = new ClusterFactory();
+	private final DatasheetListener datasheetListener;
+	private final List<DatasheetListener> subListeners = new CopyOnWriteArrayList<>();
+	private DataSheetTablePanel dataSheetTablePanel;
+	private final List<ParallelChartFrameComboModel> comboModels = new LinkedList<>();
+	private final SettingsGroup generalSettingsGroup;
+	private final SettingsGroup parallelCoordinatesAxisSettingsGroup;
 
-	/** A reference to all active chart frames. */
-	private Vector<ChartFrame> chartFrames = new Vector<ChartFrame>(0, 1);
+	private static final List<String> LOOK_AND_FEEL_ORDER_OF_PREF = Arrays.asList(
+			"com.sun.java.swing.plaf.gtk.GTKLookAndFeel",
+			"com.sun.java.swing.plaf.windows.WindowsLookAndFeel",
+			"javax.swing.plaf.nimbus.NimbusLookAndFeel"
+	);
 
-	/**
-	 * List Model Listeners to enable updating the GUI when chart Frames are
-	 * opened or closed.
-	 */
-	private transient Vector<ListDataListener> listDataListener = new Vector<ListDataListener>();
-
-	/** Combobox models that require update when chart frame list changes. */
-	private transient Vector<ParallelChartFrameComboModel> comboModels = new Vector<ParallelChartFrameComboModel>(0);
-
-    private static final List<String> LOOK_AND_FEEL_ORDER_OF_PREF = Arrays.asList(
-            "com.sun.java.swing.plaf.gtk.GTKLookAndFeel",
-            "com.sun.java.swing.plaf.windows.WindowsLookAndFeel",
-            "javax.swing.plaf.nimbus.NimbusLookAndFeel"
-    );
-
-    /**
-	 * Instantiates a new main.
-	 */
 	public Main() {
 		super("xdat   -   Untitled");
-		if (!this.checkLicense()) {
-			this.dispose();
-			return;
+		generalSettingsGroup = SettingsGroupFactory.buildGeneralParallelCoordinatesChartSettingsGroup();
+		for (Setting<?> value : generalSettingsGroup.getSettings().values()) {
+			value.addListener((source, transaction) -> source.setCurrentToDefault());
 		}
+		parallelCoordinatesAxisSettingsGroup = SettingsGroupFactory.buildParallelCoordinatesChartAxisSettingsGroup();
+		for (Setting<?> value : parallelCoordinatesAxisSettingsGroup.getSettings().values()) {
+			value.addListener((source, transaction) -> source.setCurrentToDefault());
+		}
+
+		this.buildProperties = new BuildProperties();
+		this.datasheetListener = new DatasheetListener() {
+			@Override
+			public void onClustersChanged() {
+				repaintAllChartFrames();
+				fireSubListeners(DatasheetListener::onClustersChanged);
+			}
+
+			@Override
+			public void onDataPanelUpdateRequired() {
+				updateDataPanel();
+				fireSubListeners(DatasheetListener::onDataPanelUpdateRequired);
+			}
+
+			@Override
+			public void onDataChanged(boolean[] autoFitRequired, boolean[] filterResetRequired, boolean[] applyFiltersRequired) {
+				final ProgressMonitor progressMonitor = new ProgressMonitor(Main.this, "", "Rebuilding charts", 0, getDataSheet().getParameterCount() - 1);
+				progressMonitor.setMillisToPopup(0);
+
+				for (int i = 0; i < getDataSheet().getParameterCount(); i++) {
+					final int progress = i;
+					if (progressMonitor.isCanceled()) {
+						break;
+					}
+					SwingUtilities.invokeLater(() ->
+							progressMonitor.setProgress(progress));
+					if (autoFitRequired[i]) {
+						autofitAxisAllChartFrames(i);
+					}
+					if (filterResetRequired[i]) {
+						resetFiltersOnAxisAllChartFrames(i);
+					}
+					if (applyFiltersRequired[i]) {
+						refilterAllChartFrames(i);
+					}
+				}
+
+				progressMonitor.close();
+
+				repaintAllChartFrames();
+
+				fireSubListeners(l -> l.onDataChanged(autoFitRequired, filterResetRequired, applyFiltersRequired));
+			}
+		};
 		this.currentSession = new Session();
 		this.addWindowListener(new WindowClosingAdapter(true));
 		this.mainMenuBar = new MainMenuBar(this);
 		this.setJMenuBar(this.mainMenuBar);
 		ImageIcon img = new ImageIcon(Main.class.getClassLoader().getResource("org/xdat/images/icon.png"));
 		this.setIconImage(img.getImage());
-		
+
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		Dimension screenSize;
 		try {
@@ -134,27 +152,19 @@ public class Main extends JFrame {
 		setLocation((int) (0.25 * screenSize.width), (int) (0.25 * screenSize.height));
 		setSize((int) (0.5 * screenSize.width), (int) (0.5 * screenSize.height));
 		setVisible(true);
-
 	}
 
-	/**
-	 * To be called when a new datasheet is loaded into the panel to update the
-	 * GUI.
-	 */
 	public void initialiseDataPanel() {
 		SwingUtilities.invokeLater(new Runnable() {
 
 			@Override
 			public void run() {
-				log("updateDataPanel called");
 				if (dataSheetTablePanel == null) {
-					log("updateDataPanel: dataSheetTablePanel null");
 					dataSheetTablePanel = new DataSheetTablePanel(Main.this);
 					setContentPane(dataSheetTablePanel);
 					// this.repaint();
 					dataSheetTablePanel.revalidate();
 				} else if (currentSession.getCurrentDataSheet() != null) {
-					log("updateDataPanel: DataSheet non-null");
 					dataSheetTablePanel.initialiseDataSheetTableModel();
 					dataSheetTablePanel.revalidate();
 				} else {
@@ -165,41 +175,30 @@ public class Main extends JFrame {
 		});
 	}
 
-	/**
-	 * To be called when the data in the panel has changed to update the GUI.
-	 */
 	public void updateDataPanel() {
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-		log("updateDataPanel called");
-		if (dataSheetTablePanel == null) {
-			log("updateDataPanel: dataSheetTablePanel null");
-			dataSheetTablePanel = new DataSheetTablePanel(Main.this);
-			setContentPane(dataSheetTablePanel);
-			// this.repaint();
-			dataSheetTablePanel.revalidate();
-		} else if (currentSession.getCurrentDataSheet() != null) {
-			log("updateDataPanel: DataSheet non-null");
-			dataSheetTablePanel.updateRunsTableModel();
-			dataSheetTablePanel.revalidate();
-		} else {
-			setContentPane(new JPanel());
-			repaint();
-		}
-	}
+		SwingUtilities.invokeLater(() -> {
+			if (dataSheetTablePanel == null) {
+				dataSheetTablePanel = new DataSheetTablePanel(Main.this);
+				setContentPane(dataSheetTablePanel);
+				dataSheetTablePanel.revalidate();
+			} else if (currentSession.getCurrentDataSheet() != null) {
+				dataSheetTablePanel.updateRunsTableModel();
+				dataSheetTablePanel.revalidate();
+			} else {
+				setContentPane(new JPanel());
+				repaint();
+			}
 		});
 	}
 
 	/**
 	 * The main method.
-	 * 
+	 *
 	 * @param args
 	 *            the command line arguments (not used)
 	 */
 	public static void main(String[] args) {
-	    setLookAndFeel();
+		setLookAndFeel();
 		new Main();
 	}
 
@@ -213,101 +212,61 @@ public class Main extends JFrame {
 		}
 	}
 
-	/**
-	 * Gets the data sheet.
-	 * 
-	 * @return the data sheet
-	 */
 	public DataSheet getDataSheet() {
 		return this.currentSession.getCurrentDataSheet();
 	}
 
-	/**
-	 * Sets the data sheet.
-	 * 
-	 * @param dataSheet
-	 *            the new data sheet
-	 */
 	public void setDataSheet(DataSheet dataSheet) {
+		DataSheet currentDataSheet = this.currentSession.getCurrentDataSheet();
+		if(currentDataSheet != null) {
+			currentDataSheet.removeListener(this.datasheetListener);
+		}
 		this.currentSession.setCurrentDataSheet(dataSheet);
 		if (dataSheet == null) {
 			this.remove(this.dataSheetTablePanel);
+		} else {
+			dataSheet.addListener(this.datasheetListener);
 		}
 		this.initialiseDataPanel();
 		this.repaint();
+		this.rebuildAllChartFrames();
 	}
 
-	/**
-	 * Gets the version string to be shown in the help->about dialog.
-	 * 
-	 * @return the version string
-	 */
-	public static String getVersionString() {
-		return XDAT_VERSION;
-	}
+	public ClusterSet getCurrentClusterSet() {
+        return this.currentSession.getCurrentClusterSet();
+    }
 
-	/**
-	 * Gets the current session.
-	 * 
-	 * @return the current session
-	 */
+    public void setCurrentClusterSet(ClusterSet clusterSet) {
+        this.currentSession.setCurrentClusterSet(clusterSet);
+    }
+
 	public Session getCurrentSession() {
 		return currentSession;
 	}
 
-	/**
-	 * Sets the current session.
-	 * 
-	 * @param currentSession
-	 *            the new current session
-	 */
 	public void setCurrentSession(Session currentSession) {
 		this.currentSession = currentSession;
 	}
 
-	/**
-	 * Adds a chart frame to the Vector with references to all chart frames.
-	 * 
-	 * @param chartFrame
-	 *            the chart frame
-	 */
 	public void addChartFrame(ChartFrame chartFrame) {
 		this.chartFrames.add(chartFrame);
 		this.addChartToComboboxes(chartFrame);
 	}
 
-	/**
-	 * Removes a chart frame from the Vector with references to all chart
-	 * frames.
-	 * 
-	 * @param chartFrame
-	 *            the chart frame
-	 */
 	public void removeChartFrame(ChartFrame chartFrame) {
 		this.chartFrames.remove(chartFrame);
 		this.currentSession.removeChart(chartFrame.getChart());
 		this.removeChartFromComboboxes(chartFrame);
 	}
 
-	/**
-	 * Gets a chart frame to the Vector with references to all chart frames.
-	 * 
-	 * @param index
-	 *            the index
-	 * @return the chart frame
-	 */
+	public void removeParameter(String paramName) {
+		getCurrentSession().removeParameter(paramName);
+	}
+
 	public ChartFrame getChartFrame(int index) {
 		return this.chartFrames.get(index);
 	}
 
-	/**
-	 * Gets a chart frame to the Vector with references to all chart frames by
-	 * chart title.
-	 * 
-	 * @param title
-	 *            the title
-	 * @return the chart frame
-	 */
 	public ChartFrame getChartFrame(String title) {
 		for (int i = 0; i < this.getChartFrameCount(); i++) {
 			if (title.equals(this.getChartFrame(i).getTitle()))
@@ -316,22 +275,10 @@ public class Main extends JFrame {
 		throw new RuntimeException("No chart found with title " + title);
 	}
 
-	/**
-	 * Gets the chart frame count.
-	 * 
-	 * @return the number of active chart frames
-	 */
 	public int getChartFrameCount() {
 		return this.chartFrames.size();
 	}
 
-	/**
-	 * Gets a unique id for the next chart
-	 * @param chartClass 
-	 * 				the chart's class
-	 * 
-	 * @return a unique id for the next chart
-	 */
 	public int getUniqueChartId(Class chartClass) {
 		int id = 0;
 		for (int i = 0; i < this.getChartFrameCount(); i++) {
@@ -343,149 +290,87 @@ public class Main extends JFrame {
 		return ++id;
 	}
 
-	/**
-	 * Dispose all chart frames.
-	 */
 	public void disposeAllChartFrames() {
 		for (int i = this.chartFrames.size() - 1; i >= 0; i--) {
 			this.removeChartFromComboboxes(this.chartFrames.get(i));
 			this.chartFrames.get(i).dispose();
 		}
-		this.chartFrames.removeAllElements();
+		this.chartFrames.clear();
 		this.currentSession.clearAllCharts();
 	}
 
-	/**
-	 * Rebuild all chart frames when the data has changed.
-	 */
-	public void rebuildAllChartFrames() {
-		log("rebuildAllChartFrames:------------------------------------- ");
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-				Chart[] charts = new Chart[currentSession.getChartCount()];
-				log("rebuildAllChartFrames: currently " + charts.length + " charts active. ");
-				for (int i = 0; i < charts.length; i++) {
-					log("rebuildAllChartFrames: reading chart " + i);
-					charts[i] = (currentSession.getChart(i));
+	private void rebuildAllChartFrames() {
+		SwingUtilities.invokeLater(() -> {
+			List<Chart> chartsSnapshot = new ArrayList<>(currentSession.getCharts());
+			disposeAllChartFrames();
+			for (Chart chart : chartsSnapshot) {
+				try {
+					ChartFrame newFrame = new ChartFrame(Main.this, chart);
+					chartFrames.add(newFrame);
+					currentSession.addChart(chart);
+				} catch (NoParametersDefinedException e) {
+					JOptionPane.showMessageDialog(Main.this, "Cannot create chart when no parameters are defined.", "No parameters defined!", JOptionPane.ERROR_MESSAGE);
 				}
-				disposeAllChartFrames();
-				log("rebuildAllChartFrames: still " + charts.length + " charts active. ");
-				for (int i = 0; i < charts.length; i++) {
-					log("rebuildAllChartFrames: creating chart " + i);
-
-					try {
-						ChartFrame newFrame = new ChartFrame(Main.this, charts[i]);
-						chartFrames.add(newFrame);
-						currentSession.addChart(charts[i]);
-					} catch (NoParametersDefinedException e) {
-						JOptionPane.showMessageDialog(Main.this, "Cannot create chart when no parameters are defined.", "No parameters defined!", JOptionPane.ERROR_MESSAGE);
-					}
-				}
-				log("rebuildAllChartFrames: done. Session has now " + currentSession.getChartCount() + " active charts.");
 			}
 		});
 	}
 
-	/**
-	 * Repaint all chart frames when the data has changed.
-	 */
 	public void repaintAllChartFrames() {
-		repaintAllChartFrames(new ArrayList<ChartFrame>());
+		repaintAllChartFrames(new ArrayList<>());
 	}
 
-	/**
-	 * Repaint all chart frames when the data has changed, but exclude some
-	 * @param exclusionList the charts not to be repainted
-	 */
-	public void repaintAllChartFrames(final List<ChartFrame> exclusionList) {
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-				log("repaintAllChartFrames:------------------------------------- ");
-				for (ChartFrame cf : chartFrames) {
-					if (!exclusionList.contains(cf)) {
-						cf.repaint();
-					}
+	private void repaintAllChartFrames(final List<ChartFrame> exclusionList) {
+		SwingUtilities.invokeLater(() -> {
+			for (ChartFrame cf : chartFrames) {
+				if (!exclusionList.contains(cf)) {
+					cf.repaint();
 				}
 			}
 		});
 	}
 
-	/**
-	 * Reapply filters for a given column.
-	 * 
-	 * @param columnIndex
-	 *            the index of the column for which to reapply all filters
-	 */
 	public void refilterAllChartFrames(int columnIndex) {
-		log("refilterAllChartFrames:------------------------------------- ");
 		for (int i = 0; i < this.chartFrames.size(); i++) {
 			Chart c = this.chartFrames.get(i).getChart();
 			if (c.getClass().equals(ParallelCoordinatesChart.class)) {
-				((ParallelCoordinatesChart) c).getAxis(columnIndex).applyFilters();
+				((ParallelCoordinatesChart) c).getAxis(columnIndex).applyFilters(getDataSheet());
 			}
 		}
 	}
 
-	/**
-	 * Autofit a specified axis for all chart frames .
-	 * 
-	 * @param axisIndex
-	 *            the index of the axis to autofit
-	 */
 	public void autofitAxisAllChartFrames(int axisIndex) {
-		log("autofitAxisAllChartFrames:------------------------------------- ");
 		for (int i = 0; i < this.chartFrames.size(); i++) {
 			Chart c = this.chartFrames.get(i).getChart();
 			if (c.getClass().equals(ParallelCoordinatesChart.class)) {
-				((ParallelCoordinatesChart) c).getAxis(axisIndex).autofit();
+				((ParallelCoordinatesChart) c).getAxis(axisIndex).autofit(getDataSheet());
 			}
 		}
 	}
 
-	/**
-	 * Resets filters for a specified axis for all chart frames .
-	 * 
-	 * @param axisIndex
-	 *            the index of the axis to autofit
-	 */
 	public void resetFiltersOnAxisAllChartFrames(int axisIndex) {
-		log("resetFiltersOnAxisAllChartFrames:------------------------------------- ");
 		for (int i = 0; i < this.chartFrames.size(); i++) {
 			Chart c = this.chartFrames.get(i).getChart();
 			if (c.getClass().equals(ParallelCoordinatesChart.class)) {
-				((ParallelCoordinatesChart) c).getAxis(axisIndex).resetFilters();
+				((ParallelCoordinatesChart) c).getAxis(axisIndex).resetFilters(getDataSheet());
 			}
 		}
 	}
 
-	/**
-	 * Load session.
-	 * 
-	 * @param pathToFile
-	 *            the path to the session file
-	 */
 	public void loadSession(String pathToFile) {
 		try {
 			this.disposeAllChartFrames();
-			this.currentSession = Session.readFromFile(this, pathToFile);
+			this.currentSession = Session.readFromFile(pathToFile);
 
 			this.setTitle("xdat   -   " + pathToFile);
 
-			log("loadSession called. " + this.getChartFrameCount() + " chart frames to load.");
-
-			ChartFrame[] chartFrames = new ChartFrame[this.currentSession.getChartCount()];
-			for (int i = 0; i < chartFrames.length; i++) {
+			for (Chart chart : getCurrentSession().getCharts()) {
 				try {
-					new ChartFrame(this, this.currentSession.getChart(i));
-
+					new ChartFrame(this, chart);
 				} catch (NoParametersDefinedException e) {
 					JOptionPane.showMessageDialog(this, "Cannot create chart when no parameters are defined.", "No parameters defined!", JOptionPane.ERROR_MESSAGE);
 				}
 			}
+
 			if (this.currentSession.getCurrentDataSheet() != null) {
 				this.getMainMenuBar().setItemsRequiringDataSheetEnabled(true);
 			} else {
@@ -493,125 +378,89 @@ public class Main extends JFrame {
 				this.getMainMenuBar().setItemsRequiringDataSheetEnabled(false);
 			}
 
-		} catch (InvalidClassException e) {
-			JOptionPane.showMessageDialog(this, "The file " + pathToFile + " is not a proper xdat version " + Main.XDAT_VERSION + " Session file", "Load Session", JOptionPane.OK_OPTION);
-		} catch (ClassNotFoundException e) {
-			JOptionPane.showMessageDialog(this, "The file " + pathToFile + " is not a proper xdat version " + Main.XDAT_VERSION + " Session file", "Load Session", JOptionPane.OK_OPTION);
+		} catch (InvalidClassException | ClassNotFoundException e) {
+			JOptionPane.showMessageDialog(this, "The file " + pathToFile + " is not a proper xdat version " + buildProperties.getVersion() + " Session file", "Load Session", JOptionPane.OK_OPTION);
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(this, "Error on loading session: " + e.getMessage(), "Load Session", JOptionPane.OK_OPTION);
+			JOptionPane.showMessageDialog(this, "Error on loading session: " + e.getMessage(), "Load Session", JOptionPane.ERROR_MESSAGE);
 		}
 
 	}
 
-	/**
-	 * Save session.
-	 * 
-	 * @param pathToFile
-	 *            the path where the session should be saved.
-	 */
 	public void saveSessionAs(String pathToFile) {
-		for (int i = 0; i < this.currentSession.getChartCount(); i++) {
-			log("saving session with chart " + i);
-		}
 		try {
 			this.currentSession.saveToFile(pathToFile);
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(this, "IOException on saving session: " + e.getMessage(), "Save Session", JOptionPane.OK_OPTION);
+			JOptionPane.showMessageDialog(this, "IOException on saving session: " + e.getMessage(), "Save Session", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
-	private boolean checkLicense() {
-		if (!UserPreferences.getInstance().isLicenseAccepted()) {
-			new LicenseDisplayDialog(UserPreferences.getInstance());
-		}
-
-		return UserPreferences.getInstance().isLicenseAccepted();
-	}
-
-	/**
-	 * Checks if is debug message printing is enabled.
-	 * 
-	 * @return true, if debug message printing is enabled
-	 */
-	public static boolean isLoggingEnabled() {
-		return loggingEnabled;
-	}
-
-	/**
-	 * Gets the main menu bar.
-	 * 
-	 * @return the main menu bar
-	 */
 	public MainMenuBar getMainMenuBar() {
 		return mainMenuBar;
 	}
 
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (Main.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
-	}
-
-	/**
-	 * Gets the Data Sheet Table Panel.
-	 * 
-	 * @return the Data Sheet Table Panel
-	 */
 	public DataSheetTablePanel getDataSheetTablePanel() {
 		return dataSheetTablePanel;
 	}
 
-	/**
-	 * Informs all combobox models that a new parallel chart was added.
-	 * 
-	 * @param chartFrame
-	 *            the chart frame to be added
-	 */
 	public void addChartToComboboxes(ChartFrame chartFrame) {
 		for (int i = 0; i < this.comboModels.size(); i++) {
 			if (chartFrame.getChart().getClass().equals(ParallelCoordinatesChart.class)) {
 				comboModels.get(i).addElement(chartFrame.getChart().getTitle());
+			}
 		}
 	}
-	}
 
-	/**
-	 * Informs all combobox models that a parallel chart was closed.
-	 * 
-	 * @param chartFrame
-	 *            the chart frame to be removed
-	 */
 	public void removeChartFromComboboxes(ChartFrame chartFrame) {
 		for (int i = 0; i < this.comboModels.size(); i++) {
 			if (chartFrame.getChart().getClass().equals(ParallelCoordinatesChart.class)) {
 				comboModels.get(i).removeElement(chartFrame.getChart().getTitle());
+			}
 		}
 	}
-	}
 
-	/**
-	 * Registers a comboBoxModel for update notification
-	 * 
-	 * @param comboModel
-	 *            the model to be registered
-	 */
 	public void registerComboModel(ParallelChartFrameComboModel comboModel) {
 		this.comboModels.add(comboModel);
 	}
 
-	/**
-	 * Unregisters a comboBoxModel for update notification
-	 * 
-	 * @param comboModel
-	 *            the model to be unregistered
-	 */
 	public void unRegisterComboModel(ParallelChartFrameComboModel comboModel) {
 		this.comboModels.remove(comboModel);
+	}
+
+	public ClusterFactory getClusterFactory() {
+		return clusterFactory;
+	}
+
+	public SettingsGroup getGeneralSettingsGroup() {
+		return generalSettingsGroup;
+	}
+
+	public SettingsGroup getParallelCoordinatesAxisSettingsGroup() {
+		return parallelCoordinatesAxisSettingsGroup;
+	}
+
+	public void addDataSheetSubListener(DatasheetListener listener) {
+		this.subListeners.add(listener);
+	}
+
+	public void removeDataSheetSubListener(DatasheetListener listener) {
+		this.subListeners.remove(listener);
+	}
+
+	private void fireSubListeners(Consumer<DatasheetListener> action) {
+		for (DatasheetListener l : this.subListeners) {
+			action.accept(l);
+		}
+	}
+
+	public void fireClustersChanged() {
+		this.datasheetListener.onClustersChanged();
+	}
+
+	public void fireDataPanelUpdateRequired() {
+		this.datasheetListener.onDataPanelUpdateRequired();
+	}
+
+	public void fireOnDataChanged(boolean[] axisAutofitRequired, boolean[] axisResetFilterRequired, boolean[] axisApplyFiltersRequired) {
+		this.datasheetListener.onDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired);
 	}
 }

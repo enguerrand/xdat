@@ -19,51 +19,24 @@
  */
 package org.xdat.actionListeners.scatter2DChartSettings;
 
-import java.util.Vector;
-
-import javax.swing.AbstractListModel;
-import javax.swing.MutableComboBoxModel;
-
 import org.xdat.Main;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.chart.ScatterPlot2D;
 import org.xdat.gui.frames.ChartFrame;
 
-/**
- * Combobox Model that is used to choose from all
- * {@link org.xdat.gui.frames.ChartFrame}s that carry a
- * {@link org.xdat.chart.ParallelCoordinatesChart}.
- */
-public class ParallelChartFrameComboModel extends AbstractListModel implements MutableComboBoxModel {
+import javax.swing.AbstractListModel;
+import javax.swing.MutableComboBoxModel;
+import java.util.LinkedList;
+import java.util.List;
 
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0000;
+public class ParallelChartFrameComboModel extends AbstractListModel<String> implements MutableComboBoxModel<String> {
 
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** The main Window */
+	static final long serialVersionUID = 0L;
 	private Main mainWindow;
-
-	/** The chart frame which should be repainted upon changed selection. */
 	private ChartFrame chartFrame;
-
-	/** The 2D scatter plot */
 	private ScatterPlot2D plot;
+	private List<String> chartNames = new LinkedList<>();
 
-	/** the combobox list entries */
-	private Vector<String> chartNames = new Vector<String>();
-
-	/**
-	 * Instantiates parallel chart frame combo box model
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param chartFrame 
-	 * 				the chart frame
-	 * @param plot 
-	 * 				the plot
-	 */
 	public ParallelChartFrameComboModel(Main mainWindow, ChartFrame chartFrame, ScatterPlot2D plot) {
 		this.mainWindow = mainWindow;
 		this.chartFrame = chartFrame;
@@ -82,13 +55,11 @@ public class ParallelChartFrameComboModel extends AbstractListModel implements M
 		} else {
 			this.plot.setParallelCoordinatesChartForFiltering((ParallelCoordinatesChart) this.mainWindow.getChartFrame(anItem.toString()).getChart());
 		}
-		log("setSelectedItem");
 		this.chartFrame.repaint();
 	}
 
 	@Override
 	public Object getSelectedItem() {
-		log("getSelectedItem");
 		if (this.plot.getParallelCoordinatesChartForFiltering() == null) {
 			return "No chart selected             ";
 		} else {
@@ -97,8 +68,7 @@ public class ParallelChartFrameComboModel extends AbstractListModel implements M
 	}
 
 	@Override
-	public Object getElementAt(int index) {
-		log("getElementAt");
+	public String getElementAt(int index) {
 		if (this.chartNames.size() == 0 && index == 0) {
 			return "No chart selected             ";
 		} else {
@@ -108,50 +78,30 @@ public class ParallelChartFrameComboModel extends AbstractListModel implements M
 
 	@Override
 	public int getSize() {
-		log("getSize " + Math.max(this.chartNames.size(), 1));
 		return Math.max(this.chartNames.size(), 1);
 	}
 
 	@Override
-	public void addElement(Object obj) {
-		this.chartNames.add(obj.toString());
+	public void addElement(String obj) {
+		this.chartNames.add(obj);
 		this.fireIntervalAdded(this, 0, this.chartNames.size());
-		log("addElement");
 	}
 
 	@Override
-	public void insertElementAt(Object obj, int index) {
-		this.chartNames.insertElementAt(obj.toString(), index);
+	public void insertElementAt(String obj, int index) {
+		this.chartNames.add(index, obj);
 		this.fireIntervalAdded(this, 0, this.chartNames.size());
-		log("insertElementAt");
-
 	}
 
 	@Override
 	public void removeElement(Object obj) {
-		this.chartNames.remove(obj);
+		this.chartNames.remove(obj.toString());
 		this.fireIntervalRemoved(this, 0, this.chartNames.size());
-		log("removeElement");
-
 	}
 
 	@Override
 	public void removeElementAt(int index) {
 		this.chartNames.remove(index);
 		this.fireIntervalRemoved(this, 0, this.chartNames.size());
-		log("removeElementAt");
 	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (ParallelChartFrameComboModel.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
-	}
-
 }

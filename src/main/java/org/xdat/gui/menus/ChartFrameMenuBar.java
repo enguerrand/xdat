@@ -20,52 +20,24 @@
 
 package org.xdat.gui.menus;
 
-import javax.swing.JMenuBar;
-
 import org.xdat.chart.Chart;
 import org.xdat.gui.frames.ChartFrame;
 
-/**
- * Menubar for a {@link org.xdat.gui.frames.ChartFrame}
- */
+import javax.swing.JMenuBar;
+
 public abstract class ChartFrameMenuBar extends JMenuBar {
 
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0001;
-
-	/** The chart frame. */
 	private ChartFrame chartFrame;
-
-	/** The chart. */
 	private Chart chart;
-
-	/**
-	 * Instantiates a new chart frame menu bar.
-	 * 
-	 * @param chartFrame
-	 *            the chart frame
-	 * @param chart
-	 *            the chart
-	 */
 	public ChartFrameMenuBar(ChartFrame chartFrame, Chart chart) {
 		this.chartFrame = chartFrame;
 		this.chart = chart;
 	}
 
-	/**
-	 * Gets the chart frame.
-	 * 
-	 * @return the chart frame
-	 */
 	public ChartFrame getChartFrame() {
 		return chartFrame;
 	}
 
-	/**
-	 * Gets the chart
-	 * 
-	 * @return the chart
-	 */
 	public Chart getChart() {
 		return chart;
 	}

@@ -20,70 +20,36 @@
 
 package org.xdat.gui.menus.parallelCoordinatesChart;
 
-import java.awt.Event;
-import java.awt.event.KeyEvent;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
-
 import org.xdat.Main;
-import org.xdat.actionListeners.parallelCoordinatesChartFrame.ChartFrameOptionsMenuActionListener;
+import org.xdat.actionListeners.chartFrames.ParallelChartFrameOptionsMenuActionListener;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.gui.frames.ChartFrame;
 
-/**
- * Options Menu for a {@link org.xdat.gui.frames.ChartFrame}
- */
-public class ParallelCoordinatesChartFrameOptionsMenu extends JMenu {
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import java.awt.event.KeyEvent;
 
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0002;
+class ParallelCoordinatesChartFrameOptionsMenu extends JMenu {
 
-	/** The action listener. */
-	private ChartFrameOptionsMenuActionListener cmd;
-
-	/**
-	 * Instantiates a new chart frame options menu.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param chartFrame
-	 *            the chart frame
-	 */
-	public ParallelCoordinatesChartFrameOptionsMenu(Main mainWindow, ChartFrame chartFrame) {
+	ParallelCoordinatesChartFrameOptionsMenu(Main mainWindow, ChartFrame chartFrame) {
 		super("Options");
 		this.setMnemonic(KeyEvent.VK_O);
 		JMenuItem mi;
-		cmd = new ChartFrameOptionsMenuActionListener(mainWindow, (ParallelCoordinatesChart) chartFrame.getChart(), chartFrame);
-		//
+		ParallelChartFrameOptionsMenuActionListener cmd = new ParallelChartFrameOptionsMenuActionListener(mainWindow, (ParallelCoordinatesChart) chartFrame.getChart(), chartFrame);
+
 		mi = new JMenuItem("Display Settings", 'd');
 		mi.setMnemonic(KeyEvent.VK_D);
-		mi.addActionListener(cmd);
+		mi.addActionListener(cmd::displaySettings);
 		this.add(mi);
-		//
+
 		mi = new JMenuItem("Reset to Default", 'r');
 		mi.setMnemonic(KeyEvent.VK_R);
-		mi.addActionListener(cmd);
+		mi.addActionListener(cmd::resetToDefault);
 		this.add(mi);
-		//
+
 		mi = new JMenuItem("Export to png", 'x');
 		mi.setMnemonic(KeyEvent.VK_X);
-		mi.addActionListener(cmd);
+		mi.addActionListener(cmd::exportToPng);
 		this.add(mi);
 	}
-
-	/**
-	 * Sets the ctrl accelerator.
-	 * 
-	 * @param mi
-	 *            the menu item
-	 * @param acc
-	 *            the accelerator
-	 */
-	private void setCtrlAccelerator(JMenuItem mi, char acc) {
-		KeyStroke ks = KeyStroke.getKeyStroke(acc, Event.CTRL_MASK);
-		mi.setAccelerator(ks);
-	}
-
 }

@@ -25,28 +25,11 @@ import org.xdat.chart.ScatterChart2D;
 import org.xdat.gui.frames.ChartFrame;
 import org.xdat.gui.menus.ChartFrameMenuBar;
 
-/**
- * Menubar for a {@link org.xdat.gui.frames.ChartFrame}
- */
 public class ScatterChart2DFrameMenuBar extends ChartFrameMenuBar {
 
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0001;
-
-	/**
-	 * Instantiates a new chart frame menu bar.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param chartFrame
-	 *            the chart frame
-	 * @param chart
-	 *            the chart
-	 */
 	public ScatterChart2DFrameMenuBar(Main mainWindow, ChartFrame chartFrame, ScatterChart2D chart) {
 		super(chartFrame, chart);
 		this.add(new ScatterChart2DFrameOptionsMenu(mainWindow, chartFrame));
-
 	}
 
 }

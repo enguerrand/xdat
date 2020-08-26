@@ -20,17 +20,21 @@
 
 package org.xdat;
 
+import org.xdat.chart.Chart;
+import org.xdat.chart.ParallelCoordinatesChart;
+import org.xdat.data.ClusterSet;
+import org.xdat.data.DataSheet;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Vector;
-
-import org.xdat.chart.Chart;
-import org.xdat.data.DataSheet;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Stores all relevant information of a session.
@@ -46,43 +50,18 @@ import org.xdat.data.DataSheet;
  */
 public class Session implements Serializable {
 
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0004;
-
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** The when storing session files this file extension will be used. */
+	static final long serialVersionUID = 5L;
 	public static final String sessionFileExtension = ".ses";
-
-	/** The session name. */
 	private String sessionName = "Untitled";
-
-	/** The directory where the session was saved. */
 	private String sessionDirectory;
-
-	/** The current data sheet. */
 	private DataSheet currentDataSheet;
+	private ClusterSet currentClusterSet;
+	private List<Chart> charts = new LinkedList<Chart>();
 
-	/** All active charts. */
-	private Vector<Chart> charts = new Vector<Chart>(0, 1);
-
-	/**
-	 * Instantiates a new session.
-	 */
 	public Session() {
-		log("constructor called.");
-
+		this.currentClusterSet = new ClusterSet();
 	}
 
-	/**
-	 * Serializes the session to a file.
-	 * 
-	 * @param pathToFile
-	 *            the path to file
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 */
 	public void saveToFile(String pathToFile) throws IOException {
 		FileOutputStream fs = new FileOutputStream(pathToFile);
 		ObjectOutputStream os = new ObjectOutputStream(fs);
@@ -90,146 +69,75 @@ public class Session implements Serializable {
 		os.close();
 	}
 
-	/**
-	 * Read from file.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param pathToFile
-	 *            the path where the file is saved
-	 * @return the session instance
-	 * @throws InvalidClassException
-	 *             thrown when the selected file is not a valid serialized
-	 *             session
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 * @throws ClassNotFoundException
-	 *             thrown when the class was not found.
-	 */
-	public static Session readFromFile(Main mainWindow, String pathToFile) throws java.io.InvalidClassException, java.io.IOException, ClassNotFoundException {
+	public static Session readFromFile(String pathToFile) throws IOException, ClassNotFoundException {
 		FileInputStream fs = new FileInputStream(pathToFile);
 		ObjectInputStream is = new ObjectInputStream(fs);
 		Session readSession = (Session) is.readObject();
+		readSession.initTransientData();
 		is.close();
 		return readSession;
 
 	}
 
-	/**
-	 * Gets a chart from this session.
-	 * 
-	 * @param index
-	 *            the index of the chart
-	 * @return the chart
-	 */
-	public Chart getChart(int index) {
-		return this.charts.get(index);
+	private void initTransientData() {
+		this.currentDataSheet.initTransientData();
+		this.currentClusterSet.initTransientData();
+		this.charts.forEach(Chart::initTransientData);
 	}
 
-	/**
-	 * Gets the number of charts
-	 * 
-	 * @return the chart count
-	 */
-	public int getChartCount() {
-		return this.charts.size();
+	public Collection<Chart> getCharts() {
+		return Collections.unmodifiableList(this.charts);
 	}
 
-	/**
-	 * Adds a chart to the session.
-	 * 
-	 * @param chart
-	 *            the chart
-	 */
 	public void addChart(Chart chart) {
 		this.charts.add(chart);
 	}
 
-	/**
-	 * Removes a chart from the session.
-	 * 
-	 * @param chart
-	 *            the chart
-	 * @return true, if chart was successfully removed
-	 */
 	public boolean removeChart(Chart chart) {
 		return this.charts.remove(chart);
 	}
 
-	/**
-	 * Clear all charts.
-	 */
 	public void clearAllCharts() {
-		this.charts.removeAllElements();
+		this.charts.clear();
 	}
 
-	/**
-	 * Gets the current data sheet.
-	 * 
-	 * @return the current data sheet
-	 */
+	public void removeParameter(String paramName) {
+		for (Chart chart : charts) {
+			if (chart instanceof ParallelCoordinatesChart) {
+				((ParallelCoordinatesChart) chart).removeAxis(paramName);
+			}
+		}
+	}
+
 	public DataSheet getCurrentDataSheet() {
 		return currentDataSheet;
 	}
 
-	/**
-	 * Sets the current data sheet.
-	 * 
-	 * @param currentDataSheet
-	 *            the new current data sheet
-	 */
 	public void setCurrentDataSheet(DataSheet currentDataSheet) {
 		this.currentDataSheet = currentDataSheet;
 	}
 
-	/**
-	 * Gets the session name.
-	 * 
-	 * @return the session name
-	 */
+	public ClusterSet getCurrentClusterSet() {
+		return currentClusterSet;
+	}
+
+	public void setCurrentClusterSet(ClusterSet currentClusterSet) {
+		this.currentClusterSet = currentClusterSet;
+	}
+
 	public String getSessionName() {
 		return sessionName;
 	}
 
-	/**
-	 * Sets the session name.
-	 * 
-	 * @param sessionName
-	 *            the new session name
-	 */
 	public void setSessionName(String sessionName) {
 		this.sessionName = sessionName;
 	}
 
-	/**
-	 * Gets the directory where the session was saved.
-	 * 
-	 * @return the session directory
-	 */
 	public String getSessionDirectory() {
 		return sessionDirectory;
 	}
 
-	/**
-	 * Sets the directory where the session is saved.
-	 * 
-	 * @param sessionDirectory
-	 *            the new session directory
-	 */
 	public void setSessionDirectory(String sessionDirectory) {
 		this.sessionDirectory = sessionDirectory;
 	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (Session.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
-	}
-
 }

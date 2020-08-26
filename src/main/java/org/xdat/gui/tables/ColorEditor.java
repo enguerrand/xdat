@@ -56,55 +56,27 @@ package org.xdat.gui.tables;
  * TableDialogEditDemo.java.
  */
 
+import javax.swing.AbstractCellEditor;
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
+import javax.swing.JDialog;
+import javax.swing.JTable;
+import javax.swing.table.TableCellEditor;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.AbstractCellEditor;
-import javax.swing.JButton;
-import javax.swing.JColorChooser;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JTable;
-import javax.swing.table.TableCellEditor;
-
-import org.xdat.Main;
-
-/**
- * Cell Editor to choose a color for a {@link org.xdat.data.Cluster}.
- */
 public class ColorEditor extends AbstractCellEditor
 
 implements TableCellEditor, ActionListener {
 
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0000;
-
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-	
-	/** The dialog **/
 	private JDialog parent;
-
-	/** The current color. */
 	private Color currentColor;
-
-	/** The button. */
 	private JButton button;
+	private static final String EDIT = "edit";
 
-	/** The Constant EDIT. */
-	protected static final String EDIT = "edit";
-
-	/**
-	 * Instantiates a new color editor.
-	 * @param parent the parent component for opening dialogs upon button press
-	 */
 	public ColorEditor(JDialog parent) {
-		// Set up the editor (from the table's point of view),
-		// which is a button.
-		// This button brings up the color chooser dialog,
-		// which is the editor from the user's point of view.
 		button = new JButton();
 		button.setActionCommand(EDIT);
 		button.addActionListener(this);
@@ -113,67 +85,22 @@ implements TableCellEditor, ActionListener {
 
 	}
 
-	/**
-	 * Handles events from the editor button and from the dialog's OK button.
-	 * 
-	 * @param e
-	 *            the event
-	 */
 	public void actionPerformed(ActionEvent e) {
-
 		if (EDIT.equals(e.getActionCommand())) {
-			// The user has clicked the cell, so
-			// bring up the dialog.
-			// Set up the dialog that the button brings up.
 			Color newColor = JColorChooser.showDialog(parent, "Pick a Color", currentColor);
 			if (newColor != null)
 				this.currentColor = newColor;
 			button.setBackground(currentColor);
-
-			// Make the renderer reappear.
 			fireEditingStopped();
-
-		} else { // User pressed dialog's "OK" button.
-
-			log("actionPerformed: currentColor = " + currentColor.toString());
 		}
 	}
 
-	// Implement the one CellEditor method that AbstractCellEditor doesn't.
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.swing.CellEditor#getCellEditorValue()
-	 */
 	public Object getCellEditorValue() {
-		log("getCellEditorValue: currentColor = " + currentColor.toString());
 		return currentColor;
 	}
 
-	// Implement the one method defined by TableCellEditor.
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * javax.swing.table.TableCellEditor#getTableCellEditorComponent(javax.swing
-	 * .JTable, java.lang.Object, boolean, int, int)
-	 */
 	public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
 		currentColor = (Color) value;
-
-		log("getTableCellEditorComponent: currentColor = " + currentColor.toString());
 		return button;
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (ColorEditor.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
 	}
 }

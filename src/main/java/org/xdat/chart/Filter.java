@@ -20,11 +20,11 @@
 
 package org.xdat.chart;
 
-import java.io.Serializable;
-
-import org.xdat.Main;
 import org.xdat.data.DataSheet;
+import org.xdat.data.Design;
 import org.xdat.data.Parameter;
+
+import java.io.Serializable;
 
 /**
  * Provides the possibility to filter the Designs on a
@@ -47,135 +47,54 @@ import org.xdat.data.Parameter;
  * <li>the Filter is inverted. In this case all designs with values between the
  * two Filters become inactive.
  * </ul>
- * 
- * @see ParallelCoordinatesChart
- * @see Axis
- * @see org.xdat.data.Parameter
- * @see org.xdat.data.Design
  */
 public class Filter implements Serializable {
-
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0002;
-
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** Constant that describes an upper filter. */
+	static final long serialVersionUID = 2L;
 	public static final int UPPER_FILTER = 0;
-
-	/** Constant that described a lower filter. */
 	public static final int LOWER_FILTER = 1;
-
-	/**
-	 * Filter tolerance to compensate round off errors and prevent filtering
-	 * designs that are not supposed to be filtered.
-	 */
 	public static final double FILTER_TOLERANCE = 0.00001;
-
-	/** The data sheet. */
-	private DataSheet dataSheet;
-
-	/** The filter type. Upper or Lower */
 	private int filterType;
-
-	/** The axis to which the Filter belongs. */
 	private Axis axis;
-
-	/** The x position of the Filter on the Chart. */
 	private int xPos;
-
-	/** The filter's value. */
 	private double value;
-
-	/**
-	 * Instantiates a new filter.
-	 * 
-	 * @param dataSheet
-	 *            the data sheet
-	 * @param axis
-	 *            the axis to which the Filter belongs
-	 * @param filterType
-	 *            the filter type: UPPER_FILTER, LOWER_FILTER
-	 */
 	public Filter(DataSheet dataSheet, Axis axis, int filterType) {
-		log("constructor called");
-		this.dataSheet = dataSheet;
 		this.axis = axis;
 		this.filterType = filterType;
-
-		this.reset();
+		this.reset(dataSheet);
 	}
 
-	/**
-	 * Gets the current value of this Filter.
-	 * 
-	 * @return the current value of this Filter.
-	 */
 	public double getValue() {
 		return this.value;
 	}
 
-	/**
-	 * Sets the current value of this Filter.
-	 * <p>
-	 * Also calls applyToDesigns in order to make sure that the modified Filter
-	 * positions is accounted for in the Filter states of all Designs.
-	 * 
-	 * @param value
-	 *            the new current value of this Filter.
-	 */
-	public void setValue(double value) {
+	public void setValue(double value, DataSheet dataSheet) {
 		this.value = value;
-		apply();
+		apply(dataSheet);
 	}
 
-	/**
-	 * Gets the x position of this Filter on the Chart.
-	 * 
-	 * @return the x position of this Filter on the Chart.
-	 */
 	public int getXPos() {
 		return xPos;
 	}
 
-	/**
-	 * Sets the x position of this Filter on the Chart.
-	 * 
-	 * @param pos
-	 *            the new x position of this Filter on the Chart.
-	 */
 	public void setXPos(int pos) {
 		this.xPos = pos;
 	}
 
-	/**
-	 * Gets the y position of this Filter on the Chart.
-	 * 
-	 * @return the y position of this Filter on the Chart.
-	 */
-	public int getYPos() {
+	public int getYPos(DataSheet dataSheet) {
 		if (this.axis.getTicCount() == 1)
 			return this.getAxis().getChart().getAxisTopPos() + (int) (this.getAxis().getChart().getAxisHeight() * 0.5);
 		else {
-			// log("****");
-			// log("getYPos: setting value of filter "+filterType+" to: "+value);
 			double upperLimit = this.axis.getMax();
-			// log("getYPos: upperLimit of filter "+filterType+": "+upperLimit);
 			double lowerLimit = this.axis.getMin();
-			// log("getYPos: lowerLimit of filter "+filterType+": "+lowerLimit);
 			if (value > upperLimit)
 				value = upperLimit;
 			else if (value < lowerLimit)
 				value = lowerLimit;
 			double valueRange = upperLimit - lowerLimit;
 
-			// log("getYPos: valueRange of filter "+filterType+": "+valueRange
-			// );
 			int topPos = this.axis.getChart().getAxisTopPos() - 1;
 			int bottomPos = topPos + this.getAxis().getChart().getAxisHeight() + 1;
 			double posRange = bottomPos - topPos;
-			// log("getYPos: posRange of filter "+filterType+": "+posRange );
 			double ratio;
 			int yPos;
 			if (axis.isAxisInverted()) {
@@ -185,22 +104,11 @@ public class Filter implements Serializable {
 				ratio = (value - lowerLimit) / valueRange;
 				yPos = bottomPos - (int) (posRange * ratio);
 			}
-			// log("getYPos: ratio of filter "+filterType+": "+ratio );
-			// log("getYPos: setting value of filter "+filterType+" to ypos: "+yPos);
 			return yPos;
 		}
 	}
 
-	/**
-	 * Sets the y position of this Filter on the Chart.
-	 * <p>
-	 * Also calls applyToDesigns in order to make sure that the modified Filter
-	 * positions is accounted for in the Filter states of all Designs.
-	 * 
-	 * @param pos
-	 *            the new y position of this Filter on the Chart.
-	 */
-	public void setYPos(int pos) {
+	public void setYPos(int pos, DataSheet dataSheet) {
 		double upperLimit = this.axis.getMax();
 		// log("getValue: upperLimit of filter "+filterType+": "+upperLimit);
 		double lowerLimit = this.axis.getMin();
@@ -215,41 +123,25 @@ public class Filter implements Serializable {
 		else
 			ratio = (bottomPos - pos) / posRange;
 		this.value = lowerLimit + valueRange * ratio;
-		apply();
+		apply(dataSheet);
 	}
 
-	/**
-	 * Gets the highest position that this Filter may reach.
-	 * <p>
-	 * Used to make sure that a lower Filter is not dragged to a position above
-	 * the upper Filter or outside the Axis range.
-	 * 
-	 * @return the highest reachable position
-	 */
-	public int getHighestPos() {
+	public int getHighestPos(DataSheet dataSheet) {
 		int pos;
 		if (this.getFilterType() == Filter.UPPER_FILTER) {
 			pos = this.getAxis().getChart().getAxisTopPos();
 		} else if (this.getFilterType() == Filter.LOWER_FILTER) {
-			pos = this.getAxis().getUpperFilter().getYPos();
+			pos = this.getAxis().getUpperFilter().getYPos(dataSheet);
 		} else {
 			pos = this.getAxis().getChart().getAxisTopPos();
 		}
 		return pos - 1;
 	}
 
-	/**
-	 * Gets the lowest position that this Filter may reach.
-	 * <p>
-	 * Used to make sure that a upper Filter is not dragged to a position below
-	 * the lower Filter or outside the Axis range.
-	 * 
-	 * @return the lowest reachable position
-	 */
-	public int getLowestPos() {
+	public int getLowestPos(DataSheet dataSheet) {
 		int pos;
 		if (this.getFilterType() == Filter.UPPER_FILTER) {
-			pos = this.getAxis().getLowerFilter().getYPos();
+			pos = this.getAxis().getLowerFilter().getYPos(dataSheet);
 		} else if (this.getFilterType() == Filter.LOWER_FILTER) {
 			pos = this.getAxis().getChart().getAxisTopPos() + this.getAxis().getChart().getAxisHeight();
 		} else {
@@ -258,20 +150,10 @@ public class Filter implements Serializable {
 		return pos + 1;
 	}
 
-	/**
-	 * Gets the filter type. Upper or lower.
-	 * 
-	 * @return the filter type
-	 */
 	public int getFilterType() {
 		return filterType;
 	}
 
-	/**
-	 * Gets the axis to which the Filter belongs.
-	 * 
-	 * @return the axis to which the Filter belongs.
-	 */
 	public Axis getAxis() {
 		return axis;
 	}
@@ -288,104 +170,71 @@ public class Filter implements Serializable {
 	 * would become to CPU expensive otherwise because each Filter would have to
 	 * be checked for each design every time the Chart is repainted.
 	 * <p>
-	 * 
-	 */
-	public void apply() {
+     */
+	public void apply(DataSheet dataSheet) {
 		Parameter param = this.axis.getParameter();
 		double tolerance = this.getAxis().getRange() * FILTER_TOLERANCE;
 		if (tolerance <= 0) {
 			tolerance = FILTER_TOLERANCE;
 		}
 		double value = this.getValue();
-		if (this.filterType == UPPER_FILTER && axis.isFilterInverted() && axis.isAxisInverted()) {
-			for (int i = 0; i < this.dataSheet.getDesignCount(); i++) {
-				if (this.dataSheet.getDesign(i).getDoubleValue(param) - tolerance > value)
-					this.dataSheet.getDesign(i).setActive(this, false);
-				else
-					this.dataSheet.getDesign(i).setActive(this, true);
-			}
-		} else if (this.filterType == LOWER_FILTER && axis.isFilterInverted() && axis.isAxisInverted()) {
-			for (int i = 0; i < this.dataSheet.getDesignCount(); i++) {
-				if (this.dataSheet.getDesign(i).getDoubleValue(param) + tolerance < value)
-					this.dataSheet.getDesign(i).setActive(this, false);
-				else
-					this.dataSheet.getDesign(i).setActive(this, true);
-			}
-		}
 
-		else if (this.filterType == UPPER_FILTER && axis.isAxisInverted()) {
-			for (int i = 0; i < this.dataSheet.getDesignCount(); i++) {
-				if (this.dataSheet.getDesign(i).getDoubleValue(param) + tolerance < value)
-					this.dataSheet.getDesign(i).setActive(this, false);
+		for (Design design : dataSheet.getDesigns()) {
+			if (this.filterType == UPPER_FILTER && axis.isFilterInverted() && axis.isAxisInverted()) {
+				if (design.getDoubleValue(param) - tolerance > value)
+					design.setActive(this, false);
 				else
-					this.dataSheet.getDesign(i).setActive(this, true);
-			}
-		} else if (this.filterType == LOWER_FILTER && axis.isAxisInverted()) {
-			for (int i = 0; i < this.dataSheet.getDesignCount(); i++) {
-				if (this.dataSheet.getDesign(i).getDoubleValue(param) - tolerance > value)
-					this.dataSheet.getDesign(i).setActive(this, false);
+					design.setActive(this, true);
+			} else if (this.filterType == LOWER_FILTER && axis.isFilterInverted() && axis.isAxisInverted()) {
+				if (design.getDoubleValue(param) + tolerance < value)
+					design.setActive(this, false);
 				else
-					this.dataSheet.getDesign(i).setActive(this, true);
-			}
-		}
-
-		else if (this.filterType == UPPER_FILTER && axis.isFilterInverted()) {
-			for (int i = 0; i < this.dataSheet.getDesignCount(); i++) {
-				if (this.dataSheet.getDesign(i).getDoubleValue(param) + tolerance < value)
-					this.dataSheet.getDesign(i).setActive(this, false);
+					design.setActive(this, true);
+			} else if (this.filterType == UPPER_FILTER && axis.isAxisInverted()) {
+				if (design.getDoubleValue(param) + tolerance < value)
+					design.setActive(this, false);
 				else
-					this.dataSheet.getDesign(i).setActive(this, true);
-			}
-		} else if (this.filterType == LOWER_FILTER && axis.isFilterInverted()) {
-			for (int i = 0; i < this.dataSheet.getDesignCount(); i++) {
-				if (this.dataSheet.getDesign(i).getDoubleValue(param) - tolerance > value)
-					this.dataSheet.getDesign(i).setActive(this, false);
+					design.setActive(this, true);
+			} else if (this.filterType == LOWER_FILTER && axis.isAxisInverted()) {
+				if (design.getDoubleValue(param) - tolerance > value)
+					design.setActive(this, false);
 				else
-					this.dataSheet.getDesign(i).setActive(this, true);
-			}
-		} else if (this.filterType == UPPER_FILTER) {
-			for (int i = 0; i < this.dataSheet.getDesignCount(); i++) {
-				if (this.dataSheet.getDesign(i).getDoubleValue(param) - tolerance > value)
-					this.dataSheet.getDesign(i).setActive(this, false);
+					design.setActive(this, true);
+			} else if (this.filterType == UPPER_FILTER && axis.isFilterInverted()) {
+				if (design.getDoubleValue(param) + tolerance < value)
+					design.setActive(this, false);
 				else
-					this.dataSheet.getDesign(i).setActive(this, true);
-			}
-		} else if (this.filterType == LOWER_FILTER) {
-			for (int i = 0; i < this.dataSheet.getDesignCount(); i++) {
-				if (this.dataSheet.getDesign(i).getDoubleValue(param) + tolerance < value)
-					this.dataSheet.getDesign(i).setActive(this, false);
+					design.setActive(this, true);
+			} else if (this.filterType == LOWER_FILTER && axis.isFilterInverted()) {
+				if (design.getDoubleValue(param) - tolerance > value)
+					design.setActive(this, false);
 				else
-					this.dataSheet.getDesign(i).setActive(this, true);
+					design.setActive(this, true);
+			} else if (this.filterType == UPPER_FILTER) {
+				if (design.getDoubleValue(param) - tolerance > value)
+					design.setActive(this, false);
+				else
+					design.setActive(this, true);
+			} else if (this.filterType == LOWER_FILTER) {
+				if (design.getDoubleValue(param) + tolerance < value)
+					design.setActive(this, false);
+				else
+					design.setActive(this, true);
 			}
 		}
+		dataSheet.fireOnDataChanged(false, false, false);
 	}
 
-	/**
-	 * Resets the filter.
-	 */
-	public void reset() {
+	public void reset(DataSheet dataSheet) {
 		if (this.filterType == UPPER_FILTER && this.axis.isAxisInverted()) {
-			this.setValue(this.axis.getMax());
+			this.setValue(this.axis.getMax(), dataSheet);
 		} else if (this.filterType == UPPER_FILTER) {
 			double value = this.axis.getMax();
-			log("reset: maxValue = " + value);
-			this.setValue(value);
+			this.setValue(value, dataSheet);
 		} else if (this.filterType == LOWER_FILTER && this.axis.isAxisInverted()) {
-			this.setValue(this.axis.getMax());
+			this.setValue(this.axis.getMax(), dataSheet);
 		} else {
-			this.setValue(this.axis.getMin());
-		}
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (Filter.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
+			this.setValue(this.axis.getMin(), dataSheet);
 		}
 	}
 

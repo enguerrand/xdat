@@ -20,13 +20,13 @@
 
 package org.xdat.data;
 
+import org.xdat.UserPreferences;
+
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.xdat.Main;
-import org.xdat.UserPreferences;
+import java.util.Objects;
 
 /**
  * A group of {@link org.xdat.data.Design}s that can be displayed in a
@@ -42,218 +42,118 @@ import org.xdat.UserPreferences;
  */
 public class Cluster implements Serializable {
 
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0001;
-
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** The Cluster name. */
+	static final long serialVersionUID = 1L;
 	private String name;
-
-	/** The color in which Designs belonging to this Cluster are displayed. */
 	private Color activeDesignColor;
-	
-	/** The color in which Designs belonging to this Cluster are displayed (without alpha). */
 	private Color activeDesignColorNoAlpha;
-
-	/** Specifies whether Designs belonging to this Cluster should be displayed. */
 	private boolean active = true;
-
-	/** Specifies the line thickness for designs belonging to the cluster. */
 	private int lineThickness = 1;
-
-	/**
-	 * The unique identification number for tracking purposes in the
-	 * {@link ClusterSet}.
-	 */
-	private int uniqueIdentificationNumber;
-
-	/**
-	 * The listeners to be notified upon changes on the cluster
-	 */
+	private int uniqueId;
 	private transient List<ClusterListener> clusterListeners;
-	/**
-	 * Instantiates a new cluster.
-	 * 
-	 * @param name
-	 *            the Cluster name
-	 * @param uniqueIdentificationNumber
-	 *            the unique identification number
-	 */
-	public Cluster(String name, int uniqueIdentificationNumber) {
-		log("constructor called.");
+	public Cluster(String name, int uniqueId) {
 		this.name = name;
-		this.uniqueIdentificationNumber = uniqueIdentificationNumber;
+		this.uniqueId = uniqueId;
 		this.activeDesignColor = UserPreferences.getInstance().getParallelCoordinatesActiveDesignDefaultColor();
 		this.activeDesignColorNoAlpha = new Color(this.activeDesignColor.getRed(), this.activeDesignColor.getGreen(), this.activeDesignColor.getBlue());
-		this.clusterListeners = new ArrayList<ClusterListener>();
+		initTransientData();
 	}
 
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (Cluster.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
-	}
-
-	/**
-	 * Gets the color in which Designs belonging to this Cluster are displayed.
-	 * 
-	 * @param useAlpha
-	 * 			specifies whether to use transparency effects
-	 * @return the color in which Designs belonging to this Cluster are
-	 *         displayed.
-	 */
 	public Color getActiveDesignColor(boolean useAlpha) {
 		return useAlpha ? activeDesignColor : activeDesignColorNoAlpha;
 	}
 
-	/**
-	 * Sets the color in which Designs belonging to this Cluster are displayed.
-	 * 
-	 * @param activeDesignColor
-	 *            the new color in which Designs belonging to this Cluster are
-	 *            displayed.
-	 */
 	public void setActiveDesignColor(Color activeDesignColor) {
 		this.activeDesignColor = activeDesignColor;
 		this.activeDesignColorNoAlpha = new Color(this.activeDesignColor.getRed(), this.activeDesignColor.getGreen(), this.activeDesignColor.getBlue());
+		this.fireColorChanged();
 	}
 
-	/**
-	 * Gets the line thickness.
-	 * 
-	 * @return the line thickness
-	 */
 	public int getLineThickness() {
 		return lineThickness;
 	}
 
-	/**
-	 * Sets the line thickness.
-	 * 
-	 * @param lineThickness
-	 *            the new line thickness
-	 */
 	public void setLineThickness(int lineThickness) {
 		this.lineThickness = lineThickness;
 	}
 
-	/**
-	 * Gets the Cluster name.
-	 * 
-	 * @return the Cluster name
-	 */
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * Sets the Cluster name.
-	 * 
-	 * @param name
-	 *            the new Cluster name
-	 */
 	public void setName(String name) {
 		this.name = name;
-		this.notifyClusterListenersOfNewName(name);
+		this.fireNameChanged();
 	}
 
-	/**
-	 * Checks whether Designs belonging to this Cluster should be displayed
-	 * 
-	 * @return true, if Designs belonging to this Cluster should be displayed
-	 */
 	public boolean isActive() {
 		return active;
 	}
 
-	/**
-	 * Specifies whether Designs belonging to this Cluster should be displayed
-	 * 
-	 * @param active
-	 *            Specifies whether Designs belonging to this Cluster should be
-	 *            displayed
-	 */
 	public void setActive(boolean active) {
 		this.active = active;
 	}
 
-	/**
-	 * Returns a duplicated instance of this Cluster for use in an editing
-	 * Buffer.
-	 * 
-	 * @return the cluster
-	 * @see ClusterSet
-	 */
 	public Cluster duplicate() {
-		Cluster duplication = new Cluster(this.name, this.uniqueIdentificationNumber);
+		Cluster duplication = new Cluster(this.name, this.uniqueId);
 		duplication.setActive(this.active);
 		duplication.setActiveDesignColor(this.activeDesignColor);
 		duplication.setLineThickness(this.lineThickness);
 		return duplication;
 	}
 
-	/**
-	 * Copies settings of this Cluster to a given Cluster.
-	 * 
-	 * @param cluster
-	 *            the Cluster to which the settings of this Cluster should be
-	 *            copied.
-	 */
-	public void copySettingsTo(Cluster cluster) {
+	public boolean copySettingsTo(Cluster cluster) {
+		boolean changed = !Objects.equals(cluster.name, this.name) ||
+				cluster.active != this.active ||
+				!Objects.equals(cluster.activeDesignColor, this.activeDesignColor) ||
+				cluster.lineThickness != this.lineThickness;
+		if (!changed) {
+			return false;
+		}
 		cluster.setName(this.name);
 		cluster.setActive(this.active);
 		cluster.setActiveDesignColor(this.activeDesignColor);
 		cluster.setLineThickness(this.lineThickness);
+		return true;
 	}
 
-	/**
-	 * Gets the unique identification number.
-	 * 
-	 * @return the unique identification number
-	 */
-	public int getUniqueIdentificationNumber() {
-		return uniqueIdentificationNumber;
+	public int getUniqueId() {
+		return uniqueId;
 	}
 	
-	/**
-	 * Adds a cluster listener
-	 * @param l The listener to add
-	 */
 	public void addClusterListener(ClusterListener l){
-		if(this.clusterListeners==null){
-			this.clusterListeners = new ArrayList<ClusterListener>();
-		}
 		this.clusterListeners.add(l);
 	}
 	
-	/**
-	 * Removes a cluster listener
-	 * @param l The listener to remove
-	 */
 	public void removeClusterListener(ClusterListener l){
-		if(this.clusterListeners==null){
-			return;
-		}
-		if(this.clusterListeners.contains(l)){
-			this.clusterListeners.remove(l);
-		}
+		this.clusterListeners.remove(l);
 	}
 	
-	/**
-	 * Notifies all listeners of an updated name
-	 * @param newName The new name
-	 */
-	public void notifyClusterListenersOfNewName(String newName){
+	private void fireNameChanged(){
 		for(ClusterListener l : this.clusterListeners){
-			l.onNameChanged(this, newName);
+			l.onNameChanged(this);
 		}
+	}
+
+	private void fireColorChanged(){
+		for(ClusterListener l : this.clusterListeners){
+			l.onColorChanged(this);
+		}
+	}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Cluster cluster = (Cluster) o;
+        return uniqueId == cluster.uniqueId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uniqueId);
+    }
+
+	void initTransientData() {
+		this.clusterListeners = new ArrayList<>();
 	}
 }

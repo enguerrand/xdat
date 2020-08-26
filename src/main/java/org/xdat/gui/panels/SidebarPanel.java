@@ -20,94 +20,27 @@
 
 package org.xdat.gui.panels;
 
-import org.xdat.gui.panels.ParallelCoordinatesChartPanel;
-
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-
 import org.xdat.Main;
-import org.xdat.UserPreferences;
-import org.xdat.actionListeners.parallelCoordinatesChartFrame.ParallelChartSidebarActionListener;
 import org.xdat.chart.Chart;
-import org.xdat.chart.ParallelCoordinatesChart;
-import org.xdat.data.Cluster;
-import org.xdat.data.ClusterSet;
-import org.xdat.gui.buttons.ColorChoiceButton;
-import org.xdat.gui.buttons.CustomButton;
+import org.xdat.data.DatasheetListener;
+import org.xdat.gui.controls.CustomButton;
 import org.xdat.gui.frames.ChartFrame;
 
-/**
- * Panel to modify display settings for a
- * {@link org.xdat.chart.Chart}.
- */
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+
 public abstract class SidebarPanel extends JPanel {
-	/**
-	 * The version tracking unique identifier for Serialization.
-	 */
-	static final long serialVersionUID = 0000;
 
-	/**
-	 * Flag to enable debug message printing for this class.
-	 */
-	static final boolean printLog = false;
-	
-	
-	/**
-	 * The main Window
-	 */
 	private Main mainWindow;
-
-	/**
-	 * The chart frame
-	 */
 	private ChartFrame chartFrame;
-	
-	
-	/**
-	 * The chart panel
-	 */
 	private ChartPanel chartPanel;
-	
-
-	/**
-	 * the panel with chart specific content
-	 */
 	private JPanel contentPanel;
-	
-	/**
-	 * the header panel
-	 */
 	private JPanel headerPanel;
-	
-	/**
-	 * The chart frame to which the settings apply.
-	 */
-	private Chart chart;
-	
-	/**
-	 * Instantiates a new side panel 
-	 * @param mainWindow
-	 * 			     the main window
-	 * @param chartFrame
-	 *       		the chart frame
-	 * @param chartPanel
-	 *       		the chart panel
-	 * @param chart
-	 *            the chart
-	 */
-	public SidebarPanel(Main mainWindow, ChartFrame chartFrame, ChartPanel chartPanel, Chart chart) {
+    private Chart chart;
+    private boolean maximized = true;
+    private final Runnable onClosed;
+
+	SidebarPanel(Main mainWindow, ChartFrame chartFrame, ChartPanel chartPanel, Chart chart) {
 		this.mainWindow = mainWindow;
 		this.chartFrame = chartFrame;
 		this.chartPanel = chartPanel;
@@ -115,11 +48,27 @@ public abstract class SidebarPanel extends JPanel {
 		this.headerPanel = new JPanel();
 		this.contentPanel = new JPanel();
 		initialize();
-		updateView(true);
+		DatasheetListener listener = new DatasheetListener() {
+			@Override
+			public void onClustersChanged() {
+				updateView();
+			}
+
+			@Override
+			public void onDataPanelUpdateRequired() {
+			}
+
+			@Override
+			public void onDataChanged(boolean[] autoFitRequired, boolean[] filterResetRequired, boolean[] applyFiltersRequired) {
+			}
+		};
+		mainWindow.addDataSheetSubListener(listener);
+		onClosed = () -> mainWindow.removeDataSheetSubListener(listener);
+		updateView();
 	}
 
-	private void updateView(boolean maximized) {
-		buildHeaderPanel(maximized);
+	private void updateView() {
+		buildHeaderPanel();
 		this.setLayout(new BorderLayout());
 		this.add(headerPanel, BorderLayout.NORTH);
 		contentPanel.removeAll();
@@ -131,10 +80,7 @@ public abstract class SidebarPanel extends JPanel {
 		this.chartFrame.repaint();
 	}
 
-	/**
-	 * Builds the header panel
-	 */
-	private void buildHeaderPanel(final boolean maximized) {
+	private void buildHeaderPanel() {
 		this.headerPanel.removeAll();
 		this.headerPanel.setLayout(new BorderLayout());
 		CustomButton toggleButton;
@@ -145,67 +91,33 @@ public abstract class SidebarPanel extends JPanel {
 			toggleButton = new CustomButton("Expand", "images" + "/maximize.png", "images" + "/maximize_pressed.png", "Expand");
 		}
 		this.headerPanel.add(toggleButton, BorderLayout.WEST);
-		toggleButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				updateView(!maximized);
-			}
+		toggleButton.addActionListener(e -> {
+			maximized = !maximized;
+			updateView();
 		});
 	}
 
-	/**
-	 * Gets the main window
-	 * @return the main window
-	 */
 	public Main getMainWindow() {
 		return mainWindow;
 	}
 
-	/**
-	 * Gets the chart
-	 * @return the chart
-	 */
 	public Chart getChart() {
 		return chart;
 	}
 	
-	/**
-	 * gets the chart panel
-	 * @return the chart panel
-	 */
 	public ChartPanel getChartPanel() {
 		return chartPanel;
 	}
 	
-	/**
-	 * Gets the chart frame
-	 * @return the chart frame
-	 */
 	public ChartFrame getChartFrame() {
 		return chartFrame;
 	}
 	
-	/**
-	 * Builds the panel
-	 */
 	protected abstract void buildPanel(JPanel contentPanel);
 
-	/**
-	 * Initializes members needed before building the panel
-	 */
 	protected abstract void initialize();
 
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (SidebarPanel.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
+	public void onClosed() {
+		onClosed.run();
 	}
-	
-
 }

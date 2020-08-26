@@ -20,6 +20,17 @@
 
 package org.xdat.gui.panels;
 
+import org.xdat.Main;
+import org.xdat.chart.Axis;
+import org.xdat.chart.Filter;
+import org.xdat.chart.ParallelCoordinatesChart;
+import org.xdat.data.DataSheet;
+import org.xdat.data.Design;
+import org.xdat.data.Parameter;
+import org.xdat.gui.frames.ChartFrame;
+import org.xdat.gui.menus.parallelCoordinatesChart.ParallelCoordinatesContextMenu;
+import org.xdat.gui.tables.DataSheetTableColumnModel;
+
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
@@ -40,49 +51,26 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.xdat.Main;
-import org.xdat.chart.Axis;
-import org.xdat.chart.Filter;
-import org.xdat.chart.ParallelCoordinatesChart;
-import org.xdat.data.DataSheet;
-import org.xdat.data.Design;
-import org.xdat.data.Parameter;
-import org.xdat.exceptions.NoAxisFoundException;
-import org.xdat.gui.frames.ChartFrame;
-import org.xdat.gui.menus.parallelCoordinatesChart.ParallelCoordinatesContextMenu;
-import org.xdat.gui.tables.DataSheetTableColumnModel;
+import java.util.Optional;
 
 public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMotionListener, MouseListener, MouseWheelListener {
-	static final long serialVersionUID = 0005;
-
-	static final boolean printLog = false;
-
-	private Main mainWindow;
-
-	private ChartFrame chartFrame;
-
-	private ParallelCoordinatesChart chart;
-
+	static final long serialVersionUID = 5L;
+	private final Main mainWindow;
+	private final ChartFrame chartFrame;
+	private final ParallelCoordinatesChart chart;
 	private BufferedImage bufferedImage;
-
 	private Filter draggedFilter;
 	private Axis draggedAxis;
-
 	private int dragStartX;
 	private int dragStartY;
 	private int dragCurrentX;
 	private int dragOffsetY;
 	private boolean dragSelecting = false;
-
-	/** Stores all designs under the cursor to display them in their selection color */
-	private HashSet<Integer> hoverList;
-
-	/** Stores all lines in a map with references to their respective ids */
-	private Map<int[], HashSet<Integer>> lineMap;
+	private final HashSet<Integer> hoverList;
+	private final Map<int[], HashSet<Integer>> lineMap;
 
 	public ParallelCoordinatesChartPanel(Main mainWindow, ChartFrame chartFrame, ParallelCoordinatesChart chart) {
-		super(mainWindow.getDataSheet(), chart);
+		super(chart);
 		this.mainWindow = mainWindow;
 		this.chartFrame = chartFrame;
 		this.chart = chart;
@@ -90,12 +78,12 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		this.addMouseMotionListener(this);
 		this.addMouseWheelListener(this);
 
-		this.lineMap = new LinkedHashMap<int[], HashSet<Integer>>();
-		this.hoverList = new HashSet<Integer>();
+		this.lineMap = new LinkedHashMap<>();
+		this.hoverList = new HashSet<>();
+		this.chart.addListener(source -> repaint());
 	}
 
 	public void paintComponent(Graphics g) {
-		long begin = System.currentTimeMillis();
 		Graphics cg;
 		BufferedImage canvas;
 		if(this.chart.isAntiAliasing() || this.chart.isUseAlpha() ){
@@ -128,7 +116,6 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 			this.drawDesigns(cg);
 			this.drawAxes(cg);
 		}
-		log("Painting took "+(System.currentTimeMillis()-begin)+" ms");
 
 		if(canvas != null){
 			g.drawImage(canvas, 0, 0, null);
@@ -210,12 +197,22 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 			axisActiveFlags[i] = chart.getAxis(i).isActive();
 			axisInversionFlags[i] = chart.getAxis(i).isAxisInverted();
 		}
+		Color activeDesignColor = chart.getActiveDesignColor();
+		Color activeDesignColorNoAlpha = chart.getActiveDesignColorNoAlpha();
+		Color filteredDesignColor = chart.getFilteredDesignColor();
+		Color filteredDesignColorNoAlpha = chart.getFilteredDesignColorNoAlpha();
+		Color selectedDesignColor = chart.getSelectedDesignColor();
+		boolean showFilteredDesigns = chart.isShowFilteredDesigns();
+		int chartLineThickness = chart.getLineThickness();
+		boolean showOnlySelectedDesigns = chart.isShowOnlySelectedDesigns();
+		int selectedDesignsLineThickness = chart.getSelectedDesignsLineThickness();
 
 		this.lineMap.clear();
 		boolean useAlpha = chart.isUseAlpha();
 		List<Design> highlightedDesigns = new ArrayList<>();
-		for (int designIndex = 0; designIndex < getDataSheet().getDesignCount(); designIndex++) {
-			Design currentDesign = getDataSheet().getDesign(designIndex);
+		DataSheet dataSheet = mainWindow.getDataSheet();
+		for (int designIndex = 0; designIndex < dataSheet.getDesignCount(); designIndex++) {
+			Design currentDesign = dataSheet.getDesign(designIndex);
 			if (!currentDesign.isInsideBounds(chart)){
 				continue;
 			}
@@ -228,17 +225,22 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 
 			boolean displayDesign;
 
-			if (chart.isShowOnlySelectedDesigns()) {
-				displayDesign = currentDesign.isSelected() && (currentDesignActive || chart.isShowFilteredDesigns()) && (currentDesignClusterActive);
+			if (showOnlySelectedDesigns) {
+				displayDesign = currentDesign.isSelected() && (currentDesignActive || showFilteredDesigns) && (currentDesignClusterActive);
 			} else {
-				displayDesign = (currentDesignActive || chart.isShowFilteredDesigns()) && (currentDesignClusterActive);
+				displayDesign = (currentDesignActive || showFilteredDesigns) && (currentDesignClusterActive);
 			}
 
 			if (displayDesign) {
-				if ((chart.isShowOnlySelectedDesigns() || !currentDesign.isSelected())&&(!hoverList.contains(currentDesign.getId()))) {
-					g.setColor(chart.getDesignColor(currentDesign, currentDesignActive, useAlpha));
-				    int lineThickness = chart.getDesignLineThickness(currentDesign);
-                    drawDesign(g, chart, axisTopPos, designLabelFontSize, axisCount, axisRanges, axisHeights, axisWidths, axisMaxValues, axisMinValues, axisActiveFlags,
+				if ((showOnlySelectedDesigns || !currentDesign.isSelected())&&(!hoverList.contains(currentDesign.getId()))) {
+					g.setColor(chart.getDesignColor(currentDesign, currentDesignActive, useAlpha, activeDesignColor, activeDesignColorNoAlpha, filteredDesignColor, filteredDesignColorNoAlpha));
+					int lineThickness;
+					if (currentDesign.getCluster() != null) {
+						lineThickness = currentDesign.getCluster().getLineThickness();
+					} else {
+						lineThickness = chartLineThickness;
+					}
+					drawDesign(g, chart, axisTopPos, designLabelFontSize, axisCount, axisRanges, axisHeights, axisWidths, axisMaxValues, axisMinValues, axisActiveFlags,
                             axisInversionFlags, currentDesign, lineThickness);
 				} else {
                     highlightedDesigns.add(currentDesign);
@@ -246,10 +248,9 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 			}
 		}
         for (Design highlightedDesign : highlightedDesigns) {
-					g.setColor(chart.getSelectedDesignColor());
-            int lineThickness = chart.getSelectedDesignsLineThickness();
-                    drawDesign(g, chart, axisTopPos, designLabelFontSize, axisCount, axisRanges, axisHeights, axisWidths, axisMaxValues, axisMinValues, axisActiveFlags,
-                            axisInversionFlags, highlightedDesign, lineThickness);
+			g.setColor(selectedDesignColor);
+			drawDesign(g, chart, axisTopPos, designLabelFontSize, axisCount, axisRanges, axisHeights, axisWidths, axisMaxValues, axisMinValues, axisActiveFlags,
+                            axisInversionFlags, highlightedDesign, selectedDesignsLineThickness);
 
         }
 	}
@@ -265,7 +266,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
         for (int i = 0; i < axisCount; i++) {
             int yPosition = axisTopPos;
             if (axisActiveFlags[i]) {
-                Parameter parameter = getDataSheet().getParameter(i);
+                Parameter parameter = this.mainWindow.getDataSheet().getParameter(i);
                 double value = currentDesign.getDoubleValue(parameter);
 
                 int yPositionRelToBottom;
@@ -324,7 +325,9 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		Axis lastAxis = null;
 		Axis currentAxis;
 		int drawnAxisCount = 0;
-		for (int i = 0; i < chart.getAxisCount(); i++) {
+		Color filterColor = chart.getFilterColor();
+        DataSheet dataSheet = mainWindow.getDataSheet();
+        for (int i = 0; i < chart.getAxisCount(); i++) {
 			if (chart.getAxis(i).isActive()) {
 				// axes
 				currentAxis = chart.getAxis(i);
@@ -358,29 +361,28 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 				lf.setXPos(xPosition);
 
 				// lower Filter triangle Drawing
-
-				g.setColor(chart.getFilterColor());
-				g.drawLine(uf.getXPos(), uf.getYPos(), uf.getXPos() - chart.getFilterWidth(), uf.getYPos() - chart.getFilterHeight());
-				g.drawLine(uf.getXPos(), uf.getYPos(), uf.getXPos() + chart.getFilterWidth(), uf.getYPos() - chart.getFilterHeight());
-				g.drawLine(uf.getXPos() - chart.getFilterWidth(), uf.getYPos() - chart.getFilterHeight(), uf.getXPos() + chart.getFilterWidth(), uf.getYPos() - chart.getFilterHeight());
+				g.setColor(filterColor);
+				g.drawLine(uf.getXPos(), uf.getYPos(dataSheet), uf.getXPos() - chart.getFilterWidth(), uf.getYPos(dataSheet) - chart.getFilterHeight());
+				g.drawLine(uf.getXPos(), uf.getYPos(dataSheet), uf.getXPos() + chart.getFilterWidth(), uf.getYPos(dataSheet) - chart.getFilterHeight());
+				g.drawLine(uf.getXPos() - chart.getFilterWidth(), uf.getYPos(dataSheet) - chart.getFilterHeight(), uf.getXPos() + chart.getFilterWidth(), uf.getYPos(dataSheet) - chart.getFilterHeight());
 
 				// upper Filter triangle Drawing
 
-				g.drawLine(lf.getXPos(), lf.getYPos(), lf.getXPos() - chart.getFilterWidth(), lf.getYPos() + chart.getFilterHeight());
-				g.drawLine(lf.getXPos(), lf.getYPos(), lf.getXPos() + chart.getFilterWidth(), lf.getYPos() + chart.getFilterHeight());
-				g.drawLine(lf.getXPos() - chart.getFilterWidth(), lf.getYPos() + chart.getFilterHeight(), lf.getXPos() + chart.getFilterWidth(), lf.getYPos() + chart.getFilterHeight());
+				g.drawLine(lf.getXPos(), lf.getYPos(dataSheet), lf.getXPos() - chart.getFilterWidth(), lf.getYPos(dataSheet) + chart.getFilterHeight());
+				g.drawLine(lf.getXPos(), lf.getYPos(dataSheet), lf.getXPos() + chart.getFilterWidth(), lf.getYPos(dataSheet) + chart.getFilterHeight());
+				g.drawLine(lf.getXPos() - chart.getFilterWidth(), lf.getYPos(dataSheet) + chart.getFilterHeight(), lf.getXPos() + chart.getFilterWidth(), lf.getYPos(dataSheet) + chart.getFilterHeight());
 
 				g.setFont(new Font("SansSerif", Font.PLAIN, currentAxis.getTicLabelFontSize()));
 				// log("Font size: "+currentAxis.getTicLabelFontSize());
 				if ((uf == this.draggedFilter || lf == this.draggedFilter) && currentAxis.getParameter().isNumeric()) {
-					g.drawString(String.format(currentAxis.getTicLabelFormat(), this.draggedFilter.getValue()), this.draggedFilter.getXPos() + chart.getFilterWidth() + 4, this.draggedFilter.getYPos() - chart.getFilterHeight());
+					g.drawString(String.format(currentAxis.getTicLabelFormat(), this.draggedFilter.getValue()), this.draggedFilter.getXPos() + chart.getFilterWidth() + 4, this.draggedFilter.getYPos(dataSheet) - chart.getFilterHeight());
 				}
 
 				// Filteraxis Drawing
 
 				if (null != lastAxis) {
-					g.drawLine(lastAxis.getUpperFilter().getXPos(), lastAxis.getUpperFilter().getYPos(), uf.getXPos(), uf.getYPos());
-					g.drawLine(lastAxis.getLowerFilter().getXPos(), lastAxis.getLowerFilter().getYPos(), lf.getXPos(), lf.getYPos());
+					g.drawLine(lastAxis.getUpperFilter().getXPos(), lastAxis.getUpperFilter().getYPos(dataSheet), uf.getXPos(), uf.getYPos(dataSheet));
+					g.drawLine(lastAxis.getLowerFilter().getXPos(), lastAxis.getLowerFilter().getYPos(dataSheet), lf.getXPos(), lf.getYPos(dataSheet));
 				}
 
 				// tics
@@ -405,14 +407,14 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 					if (ticCount > 1)
 						g.drawLine(xPosition, currentTicYPos, xPosition + ticSize, currentTicYPos);
 					else
-						g.drawLine(xPosition, yPosition + (int) (chart.getAxisHeight() / 2), xPosition + ticSize, yPosition + (int) (chart.getAxisHeight() / 2));
+						g.drawLine(xPosition, yPosition + (chart.getAxisHeight() / 2), xPosition + ticSize, yPosition + (chart.getAxisHeight() / 2));
 
 					g.setColor(currentAxis.getAxisTicLabelFontColor());
 
 					String ticLabel;
 					g.setFont(new Font("SansSerif", Font.PLAIN, currentAxis.getTicLabelFontSize()));
 					if (currentAxis.getParameter().isNumeric()) {
-						Double ticValue;
+						double ticValue;
 						if (ticCount > 1) {
 							ticValue = currentAxis.getMax() - ticValueDifference * ticID;
 							ticLabel = String.format(currentAxis.getTicLabelFormat(), ticValue);
@@ -420,7 +422,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 						} else {
 							ticValue = currentAxis.getMax();
 							ticLabel = String.format(currentAxis.getTicLabelFormat(), ticValue);
-							g.drawString(ticLabel, xPosition + 2 * ticSize, yPosition + ((int) (chart.getAxisHeight() / 2)) + (int) (0.5 * currentAxis.getTicLabelFontSize()));
+							g.drawString(ticLabel, xPosition + 2 * ticSize, yPosition + chart.getAxisHeight() / 2 + (int) (0.5 * currentAxis.getTicLabelFontSize()));
 						}
 
 					} else {
@@ -429,7 +431,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 							g.drawString(ticLabel, xPosition + 2 * ticSize, currentTicYPos + (int) (0.5 * currentAxis.getTicLabelFontSize()));
 						} else {
 							ticLabel = currentAxis.getParameter().getStringValueOf(currentAxis.getMax());
-							g.drawString(ticLabel, xPosition + 2 * ticSize, yPosition + ((int) (chart.getAxisHeight() / 2)) + (int) (0.5 * currentAxis.getTicLabelFontSize()));
+							g.drawString(ticLabel, xPosition + 2 * ticSize, yPosition + chart.getAxisHeight() / 2 + (int) (0.5 * currentAxis.getTicLabelFontSize()));
 						}
 					}
 				}
@@ -439,29 +441,20 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		}
 	}
 
-	private Axis getAxisAtLocation(int x) throws NoAxisFoundException {
+	private Optional<Axis> getAxisAtLocation(int x)  {
 		for (int i = 0; i < this.chart.getAxisCount(); i++) {
 			Filter uf = this.chart.getAxis(i).getUpperFilter();
-			if // check if this axis was meant by the click
-			(this.chart.getAxis(i).isActive() && x >= uf.getXPos() - 0.5 * this.chart.getAxis(i).getWidth() && x < uf.getXPos() + 0.5 * this.chart.getAxis(i).getWidth()) {
-				return this.chart.getAxis(i);
+			if (this.chart.getAxis(i).isActive() && x >= uf.getXPos() - 0.5 * this.chart.getAxis(i).getWidth() && x < uf.getXPos() + 0.5 * this.chart.getAxis(i).getWidth()) {
+				return Optional.of(this.chart.getAxis(i));
 			}
 		}
-		throw new NoAxisFoundException(x);
+		return Optional.empty();
 	}
 
-	/**
-	 * Finds the new index when dragging an axis to a given x location.
-	 * 
-	 * @param x
-	 *            the location
-	 * @return the found index
-	 */
-	private int getNewAxisIndexAtLocation(int x) throws NoAxisFoundException {
+	private int getNewAxisIndexAtLocation(int x) {
 		for (int i = 0; i < this.chart.getAxisCount(); i++) {
 			Filter uf = this.chart.getAxis(i).getUpperFilter();
-			if // check if this axis was meant by the click
-			(this.chart.getAxis(i).isActive() && x < uf.getXPos()) {
+			if (this.chart.getAxis(i).isActive() && x < uf.getXPos()) {
 				return i;
 			}
 		}
@@ -470,7 +463,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 
 	public void mouseClicked(MouseEvent e) {
 		if (e.getButton() == 1 && updateHoverList(e.getX(), e.getY())) {
-			List<Integer> newSelection = new ArrayList<Integer>();
+			List<Integer> newSelection = new ArrayList<>();
 			DataSheet dataSheet = this.chart.getDataSheet();
 			for(Integer designId : this.hoverList){
 				Design d = dataSheet.getDesignByID(designId);
@@ -483,17 +476,13 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 			}
 			
 			this.mainWindow.getDataSheetTablePanel().setSelectedRows(newSelection);
-		}
-		else if (e.getButton() == 3) {
+		} else if (e.getButton() == 3) {
 			int x = e.getX();
 			int y = e.getY();
 
-			try {
-				Axis axis = this.getAxisAtLocation(x);
-				(new ParallelCoordinatesContextMenu(this.mainWindow, this.chartFrame, axis)).show(this, x, y);
-			} catch (NoAxisFoundException e1) {
-				e1.printStackTrace();
-			}
+			this.getAxisAtLocation(x).ifPresent(axis ->
+					(new ParallelCoordinatesContextMenu(this.mainWindow, this.chartFrame, axis)).show(this, x, y)
+			);
 		}
 
 	}
@@ -510,33 +499,30 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		ParallelCoordinatesChart chart = ((ParallelCoordinatesChart) this.getChart());
 		dragStartX = e.getX();
 		dragStartY = e.getY();
-		for (int i = 0; i < chart.getAxisCount(); i++) {
+        DataSheet dataSheet = mainWindow.getDataSheet();
+        for (int i = 0; i < chart.getAxisCount(); i++) {
 			Filter uf = chart.getAxis(i).getUpperFilter();
 			Filter lf = chart.getAxis(i).getLowerFilter();
 			if // check whether the drag operation started on the upper filter
-			(chart.getAxis(i).isActive() && dragStartY >= uf.getYPos() - chart.getFilterHeight() && dragStartY <= uf.getYPos() && dragStartX >= uf.getXPos() - chart.getFilterWidth() && dragStartX <= uf.getXPos() + chart.getFilterWidth()) {
+			(chart.getAxis(i).isActive() && dragStartY >= uf.getYPos(dataSheet) - chart.getFilterHeight() && dragStartY <= uf.getYPos(dataSheet) && dragStartX >= uf.getXPos() - chart.getFilterWidth() && dragStartX <= uf.getXPos() + chart.getFilterWidth()) {
 				this.draggedFilter = uf;
-				this.dragOffsetY = uf.getYPos() - dragStartY;
+				this.dragOffsetY = uf.getYPos(dataSheet) - dragStartY;
 				setCursor(new Cursor(Cursor.MOVE_CURSOR));
 			} else if // check whether the drag operation started on the lower
 						// filter
-			(chart.getAxis(i).isActive() && dragStartY >= lf.getYPos() && dragStartY <= lf.getYPos() + chart.getFilterHeight() && dragStartX >= lf.getXPos() - chart.getFilterWidth() && dragStartX <= lf.getXPos() + chart.getFilterWidth()) {
+			(chart.getAxis(i).isActive() && dragStartY >= lf.getYPos(dataSheet) && dragStartY <= lf.getYPos(dataSheet) + chart.getFilterHeight() && dragStartX >= lf.getXPos() - chart.getFilterWidth() && dragStartX <= lf.getXPos() + chart.getFilterWidth()) {
 				this.draggedFilter = lf;
-				this.dragOffsetY = lf.getYPos() - dragStartY;
+				this.dragOffsetY = lf.getYPos(dataSheet) - dragStartY;
 				setCursor(new Cursor(Cursor.MOVE_CURSOR));
 			}
 		}
 		if (this.draggedFilter == null){
 			this.storeBufferedImage();
 			if ( e.getButton() == 1 && withinAxisDragZone(e.getX()) > -1) {
-				try {
-					this.draggedAxis = this.getAxisAtLocation(dragStartX);
+				this.getAxisAtLocation(dragStartX).ifPresent(axis -> {
+					this.draggedAxis = axis;
 					setCursor(new Cursor(Cursor.MOVE_CURSOR));
-				} catch (NoAxisFoundException e1) {
-					if (this.printLog) {
-						e1.printStackTrace();
-					}
-				}
+				});
 			} else if (e.getButton() == 1) {
 				this.hoverList.clear();
 				this.dragSelecting = true;
@@ -546,6 +532,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 
 	public void mouseReleased(MouseEvent e) {
 		setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        DataSheet dataSheet = this.mainWindow.getDataSheet();
 
 		boolean repaintRequired = false;
 		if (this.draggedFilter != null) {
@@ -554,22 +541,18 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		}
 		if (this.draggedAxis != null) {
 			repaintRequired = true;
-			try {
-				int newIndex = this.getNewAxisIndexAtLocation(e.getX() - 1); // column index starts at  one, param index at 0
-				DataSheetTableColumnModel cm = (DataSheetTableColumnModel) this.mainWindow.getDataSheetTablePanel().getDataTable().getColumnModel();
-				int currentIndex = this.mainWindow.getDataSheet().getParameterIndex(this.draggedAxis.getName()) + 1;
-				if (newIndex > currentIndex) {
-					cm.moveColumn(currentIndex, newIndex);
-				} else if (newIndex < currentIndex) {
-					cm.moveColumn(currentIndex, newIndex + 1);
-				}
-			} catch (NoAxisFoundException e1) {
-				e1.printStackTrace();
+			int newIndex = this.getNewAxisIndexAtLocation(e.getX() - 1); // column index starts at  one, param index at 0
+			DataSheetTableColumnModel cm = (DataSheetTableColumnModel) this.mainWindow.getDataSheetTablePanel().getDataTable().getColumnModel();
+			int currentIndex = dataSheet.getParameterIndex(this.draggedAxis.getName()) + 1;
+			if (newIndex > currentIndex) {
+				cm.moveColumn(currentIndex, newIndex);
+			} else if (newIndex < currentIndex) {
+				cm.moveColumn(currentIndex, newIndex + 1);
 			}
 			this.draggedAxis = null;
 		}
 		if (dragSelecting) {
-			repaintRequired = true;
+			repaintRequired = false;
 			dragSelecting = false;
 
 			Rectangle rec = getSelectionRectangle();
@@ -585,8 +568,8 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 					Filter lf = chart.getAxis(i).getLowerFilter();
 
 					if (rec.contains(uf.getXPos(), rec.y + 1)) {
-						uf.setYPos(rec.y);
-						lf.setYPos(rec.y + rec.height);
+						uf.setYPos(rec.y, dataSheet);
+						lf.setYPos(rec.y + rec.height, dataSheet);
 					}
 				}
 			}
@@ -679,11 +662,11 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 	}
 
 	public void mouseDragged(MouseEvent e) {
+        DataSheet dataSheet = this.mainWindow.getDataSheet();
 		if (this.draggedFilter != null) {
 			// try to make the filter follow the drag operation, but always keep
 			// it within axis boundaries and opposite filter
-			this.draggedFilter.setYPos(Math.max(Math.min(e.getY() + this.dragOffsetY, this.draggedFilter.getLowestPos()), this.draggedFilter.getHighestPos()));
-			repaint();
+			this.draggedFilter.setYPos(Math.max(Math.min(e.getY() + this.dragOffsetY, this.draggedFilter.getLowestPos(dataSheet)), this.draggedFilter.getHighestPos(dataSheet)), dataSheet);
 		} else if (this.draggedAxis != null) {
 			this.dragCurrentX = e.getX();
 			this.repaint();
@@ -701,23 +684,16 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 			this.chart.incrementAxisWidth(-e.getUnitsToScroll());
 		} else if (modifier == 2) {
 			int x = e.getX();
-			try {
-				Axis axis = this.getAxisAtLocation(x);
-				axis.setWidth(Math.max(0, axis.getWidth() - e.getUnitsToScroll()));
-			} catch (NoAxisFoundException e1) {
-			}
-		}
-
-		else if (modifier == 8) {
+			this.getAxisAtLocation(x).ifPresent(axis ->
+					axis.setWidth(Math.max(0, axis.getWidth() - e.getUnitsToScroll()))
+			);
+		} else if (modifier == 8) {
 			int x = e.getX();
-			try {
-				Axis axis = this.getAxisAtLocation(x);
-				axis.setTicCount(Math.max(2, axis.getTicCount() - e.getWheelRotation()));
-			} catch (NoAxisFoundException e1) {
-			}
+			this.getAxisAtLocation(x).ifPresent(axis ->
+					axis.setTicCount(Math.max(2, axis.getTicCount() - e.getWheelRotation()), mainWindow.getDataSheet())
+			);
 		}
 		this.repaint();
-
 	}
 
 	private void storeBufferedImage() {
@@ -725,12 +701,6 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		Graphics g = this.bufferedImage.createGraphics();
 		this.paintComponent(g);
 		g.dispose();
-	}
-
-	private void log(String message) {
-		if (ParallelCoordinatesChartPanel.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
 	}
 
 }

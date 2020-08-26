@@ -20,86 +20,59 @@
 
 package org.xdat.actionListeners.clusterDialog;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import org.xdat.Main;
+import org.xdat.data.Cluster;
+import org.xdat.data.DataSheet;
 import org.xdat.gui.dialogs.ClusterDialog;
+import org.xdat.gui.tables.ClusterTableModel;
 
-/**
- * ActionListener for a {@link ClusterDialog}.
- * 
- */
-public class ClusterDialogActionListener implements ActionListener {
+import java.awt.event.ActionEvent;
+import java.util.List;
 
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
+public class ClusterDialogActionListener {
+	private final Main mainWindow;
+	private final ClusterDialog dialog;
+	private final ClusterTableModel tableModel;
 
-	/** The main window. */
-	private Main mainWindow;
-
-	/** The dialog. */
-	private ClusterDialog dialog;
-
-	/**
-	 * Instantiates a new cluster dialog action listener.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param dialog
-	 *            the dialog
-	 */
-	public ClusterDialogActionListener(Main mainWindow, ClusterDialog dialog) {
+	public ClusterDialogActionListener(Main mainWindow, ClusterDialog dialog, ClusterTableModel tableModel) {
 		this.mainWindow = mainWindow;
 		this.dialog = dialog;
-
+		this.tableModel = tableModel;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
-	public void actionPerformed(ActionEvent e) {
-		String actionCommand = e.getActionCommand();
-		log("Action Command = " + actionCommand);
-		if (actionCommand.equals("Add")) {
-			log(" adding cluster to buffer.");
-			this.dialog.getDataSheet().getClusterSet().addClusterToBuffer();
-		} else if (actionCommand.equals("Remove")) {
-			int[] selectedRows = this.dialog.getClusterTable().getSelectedRows();
-			for (int i = selectedRows.length - 1; i >= 0; i--) {
-				this.dialog.getDataSheet().getClusterSet().removeClusterFromBuffer(selectedRows[i]);
-			}
-		} else if (actionCommand.equals("Cancel")) {
-			dialog.setVisible(false);
-			dialog.dispose();
-		} else if (actionCommand.equals("Ok")) {
-			// make sure the cell is not in editing mode anymore
-			if (this.dialog.getClusterTable().isEditing() && this.dialog.getClusterTable().getCellEditor() != null) {
-				this.dialog.getClusterTable().getCellEditor().stopCellEditing();
-			}
+	public void onOk(ActionEvent e) {
+		// make sure the cell is not in editing mode anymore
+		if (this.dialog.getClusterTable().isEditing() && this.dialog.getClusterTable().getCellEditor() != null) {
+			this.dialog.getClusterTable().getCellEditor().stopCellEditing();
+		}
 
-			this.dialog.getDataSheet().getClusterSet().applyChanges();
-			for (int i = 0; i < this.mainWindow.getChartFrameCount(); i++) {
-				this.mainWindow.getChartFrame(i).validate();
-				this.mainWindow.getChartFrame(i).repaint();
-			}
-			dialog.setVisible(false);
-			dialog.dispose();
+		List<Cluster> clustersBuffer = this.tableModel.getClustersBuffer();
+		DataSheet dataSheet = this.mainWindow.getDataSheet();
+
+		mainWindow.getCurrentClusterSet().applyClustersBuffer(clustersBuffer);
+
+		this.tableModel.applyBuffer(this.mainWindow.getCurrentClusterSet().getClusters(), dataSheet);
+		for (int i = 0; i < this.mainWindow.getChartFrameCount(); i++) {
+			this.mainWindow.getChartFrame(i).validate();
+			this.mainWindow.getChartFrame(i).repaint();
+		}
+		dialog.setVisible(false);
+		dialog.dispose();
+	}
+
+	public void onCancel(ActionEvent e) {
+		dialog.setVisible(false);
+		dialog.dispose();
+	}
+
+	public void onRemove(ActionEvent e) {
+		int[] selectedRows = this.dialog.getClusterTable().getSelectedRows();
+		for (int i = selectedRows.length - 1; i >= 0; i--) {
+			this.tableModel.removeCluster(selectedRows[i]);
 		}
 	}
 
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (ClusterDialogActionListener.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
+	public void onAdd(ActionEvent e) {
+		this.tableModel.addCluster();
 	}
 }

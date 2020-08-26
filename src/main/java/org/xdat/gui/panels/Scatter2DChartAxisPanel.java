@@ -20,8 +20,14 @@
 
 package org.xdat.gui.panels;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
+import org.xdat.Main;
+import org.xdat.actionListeners.scatter2DChartSettings.Scatter2DChartAxisPanelActionListener;
+import org.xdat.chart.ScatterChart2D;
+import org.xdat.data.AxisType;
+import org.xdat.data.Parameter;
+import org.xdat.gui.controls.MinMaxSpinnerModel;
+import org.xdat.gui.controls.RightAlignedSpinner;
+import org.xdat.gui.frames.ChartFrame;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -31,98 +37,55 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.util.Vector;
 
-import org.xdat.Main;
-import org.xdat.actionListeners.scatter2DChartSettings.Scatter2DChartAxisPanelActionListener;
-import org.xdat.actionListeners.scatter2DChartSettings.Scatter2DChartAxisSelectionListener;
-import org.xdat.chart.ScatterChart2D;
-import org.xdat.gui.buttons.MinMaxSpinnerModel;
-import org.xdat.gui.frames.ChartFrame;
-
-/**
- * Panel to modify display settings for axes on the
- * {@link org.xdat.chart.ScatterChart2D}.
- */
 public class Scatter2DChartAxisPanel extends JPanel {
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0000;
-
-	/** Settings for X-Axis. */
-	public static final int X_AXIS = 1;
-
-	/** Settings for Y-Axis. */
-	public static final int Y_AXIS = 2;
-
-	/** Settings for which this panel is used. */
-	private int axis;
-
-	/** The chart. */
+	private AxisType axisType;
 	private ScatterChart2D chart;
-
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** The text field to set the axis min value */
 	private JTextField axisMinTextField = new JTextField();
-
-	/** The text field to set the axis max value */
 	private JTextField axisMaxTextField = new JTextField();
-
-	/** The autofit checkbox */
 	private JCheckBox autoFitAxisCheckbox = new JCheckBox();
-
-	/** The tic count spinner */
-	private JSpinner ticCountSpinner = new JSpinner(new MinMaxSpinnerModel(1, 500));
+	private JSpinner ticCountSpinner = new RightAlignedSpinner(new MinMaxSpinnerModel(1, 500));
+	private final JSpinner ticLabelDigitCountSpinner;
+	private final JSpinner axisLabelFontSizeSpinner;
+	private final JSpinner ticLabelFontSizeSpinner;
+	private boolean updating = false;
 
 	/**
 	 * Instantiates a new axis display settings panel that is used to modify the
 	 * settings of a particular chart. These changes are not stored in the
 	 * preferences and are lost when the chart is closed.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param chartFrame
-	 *            the chart frame to which the settings apply.
-	 * @param chart
-	 *            the chart to which the settings apply.
-	 * @param axis
-	 *            the axis type (x or y)
 	 */
-	public Scatter2DChartAxisPanel(Main mainWindow, ChartFrame chartFrame, ScatterChart2D chart, int axis) {
-		// main panel
-		Scatter2DChartAxisPanelActionListener cmd = new Scatter2DChartAxisPanelActionListener(mainWindow, chartFrame, chart, this, axis);
-		String title;
-		String selectedParam = "";
+	public Scatter2DChartAxisPanel(Main mainWindow, ChartFrame chartFrame, ScatterChart2D chart, AxisType axisType) {
 		this.chart = chart;
-		this.axis = axis;
-		if (axis == X_AXIS) {
-			title = "X-Axis";
-			selectedParam = chart.getScatterPlot2D().getParameterForXAxis().getName();
-		} else if (axis == Y_AXIS) {
-			title = "Y-Axis";
-			selectedParam = chart.getScatterPlot2D().getParameterForYAxis().getName();
-		} else {
-			throw new RuntimeException("Invalid axis type " + axis);
-		}
+		this.axisType = axisType;
+		// main panel
+		Scatter2DChartAxisPanelActionListener cmd = new Scatter2DChartAxisPanelActionListener(mainWindow, chartFrame, chart, axisType);
+		String title = axisType.getLabel();
+		String selectedParam = chart.getScatterPlot2D().getParameterForAxis(axisType).getName();
 		TitledSubPanel mainPanel = new TitledSubPanel(title);
-
 		this.setLayout(new GridLayout(1, 1));
 		this.add(mainPanel);
 		mainPanel.setLayout(new BorderLayout());
 
 		// Parameter Selection
-		JList parameterSelectionList = new JList(mainWindow.getDataSheet());
+		Vector<Parameter> parametersList = new Vector<>(mainWindow.getDataSheet().getParameters());
+		JList<Parameter> parameterSelectionList = new JList<>(parametersList);
 		parameterSelectionList.setVisibleRowCount(6);
 		parameterSelectionList.setAutoscrolls(true);
 		parameterSelectionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		parameterSelectionList.setSelectedValue(selectedParam, true);
 
-		for (int i = 0; i < parameterSelectionList.getModel().getSize(); i++) {
-			if (parameterSelectionList.getModel().getElementAt(i).equals(selectedParam)) {
-				parameterSelectionList.setSelectedIndex(i);
-				break;
+		parameterSelectionList.addListSelectionListener(listSelectionEvent -> {
+			Parameter selectedValue = parameterSelectionList.getSelectedValue();
+			if (selectedValue != null) {
+				chart.getScatterPlot2D().setParameterForAxis(axisType, selectedValue);
+				currentParameterChanged();
+				chartFrame.repaint();
 			}
-		}
-		parameterSelectionList.addListSelectionListener(new Scatter2DChartAxisSelectionListener(chartFrame, chart, this, axis));
+		});
 		JScrollPane scrollPane = new JScrollPane(parameterSelectionList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		mainPanel.add(scrollPane, BorderLayout.NORTH);
 
@@ -140,7 +103,8 @@ public class Scatter2DChartAxisPanel extends JPanel {
 		JLabel axisMaxLabel = new JLabel("Axis maximum   ");
 		JLabel axisLabelFontSizeLabel = new JLabel("Axis Title Fontsize  ");
 		JLabel nrOfTicsLabel = new JLabel("Number of Tics  ");
-		JLabel ticLabelFontSizeLabel = new JLabel("Tic Label Font Size  ");
+		JLabel ticLabelFontSizeLabel =   new JLabel("Tic Label Font Size  ");
+		JLabel ticLabelDigitCountLabel = new JLabel("Tic Label Digit Count  ");
 
 		labelPanel.add(autoFitAxisLabel);
 		labelPanel.add(axisMinLabel);
@@ -148,24 +112,30 @@ public class Scatter2DChartAxisPanel extends JPanel {
 		labelPanel.add(axisLabelFontSizeLabel);
 		labelPanel.add(nrOfTicsLabel);
 		labelPanel.add(ticLabelFontSizeLabel);
+		labelPanel.add(ticLabelDigitCountLabel);
 
-		JSpinner axisLabelFontSizeSpinner = new JSpinner(new MinMaxSpinnerModel(0, 100));
-		axisLabelFontSizeSpinner.setName("axisLabelFontSizeSpinner");
-		axisLabelFontSizeSpinner.addChangeListener(cmd);
-		ticCountSpinner.setName("ticCountSpinner");
-		ticCountSpinner.addChangeListener(cmd);
-		JSpinner ticLabelFontSizeSpinner = new JSpinner(new MinMaxSpinnerModel(0, 100));
-		ticLabelFontSizeSpinner.setName("ticLabelFontSizeSpinner");
-		ticLabelFontSizeSpinner.addChangeListener(cmd);
-		if (axis == X_AXIS) {
-			axisLabelFontSizeSpinner.setValue(chart.getScatterPlot2D().getAxisLabelFontSizeX());
-			ticCountSpinner.setValue(chart.getScatterPlot2D().getTicCountX());
-			ticLabelFontSizeSpinner.setValue(chart.getScatterPlot2D().getTicLabelFontSizeX());
-		} else {
-			axisLabelFontSizeSpinner.setValue(chart.getScatterPlot2D().getAxisLabelFontSizeY());
-			ticCountSpinner.setValue(chart.getScatterPlot2D().getTicCountY());
-			ticLabelFontSizeSpinner.setValue(chart.getScatterPlot2D().getTicLabelFontSizeY());
-		}
+		axisLabelFontSizeSpinner = new RightAlignedSpinner(new MinMaxSpinnerModel(0, 100));
+		axisLabelFontSizeSpinner.addChangeListener(changeEvent -> {
+			if (updating) {
+				return;
+			}
+			cmd.axisLabelFontsizeUpdated((Integer) axisLabelFontSizeSpinner.getValue());
+		});
+		ticCountSpinner.addChangeListener(changeEvent -> {
+			if (updating) {
+				return;
+			}
+			cmd.ticCountUpdated((Integer) ticCountSpinner.getValue());
+		});
+		ticLabelFontSizeSpinner = new RightAlignedSpinner(new MinMaxSpinnerModel(0, 100));
+		ticLabelFontSizeSpinner.addChangeListener(changeEvent -> {
+			if (updating) {
+				return;
+			}
+			cmd.ticLabelFontsizeUpdated((Integer) ticLabelFontSizeSpinner.getValue());
+		});
+
+		ticLabelDigitCountSpinner = new RightAlignedSpinner(new MinMaxSpinnerModel(0, 20));
 
 		controlsPanel.add(autoFitAxisCheckbox);
 		controlsPanel.add(this.axisMinTextField);
@@ -173,110 +143,69 @@ public class Scatter2DChartAxisPanel extends JPanel {
 		controlsPanel.add(axisLabelFontSizeSpinner);
 		controlsPanel.add(ticCountSpinner);
 		controlsPanel.add(ticLabelFontSizeSpinner);
+		controlsPanel.add(ticLabelDigitCountSpinner);
 
-		autoFitAxisCheckbox.addActionListener(cmd);
-		autoFitAxisCheckbox.setActionCommand("autofitAxis");
-		this.axisMinTextField.addActionListener(cmd);
-		this.axisMinTextField.setName("minTextField");
-		this.axisMaxTextField.addActionListener(cmd);
-		this.axisMaxTextField.setName("maxTextField");
-
-		if (axis == X_AXIS) {
-			if (chart.getScatterPlot2D().isAutofitX()) {
-				autoFitAxisCheckbox.setSelected(true);
-				this.setTextFieldsEnabled(false);
-			} else {
-				autoFitAxisCheckbox.setSelected(false);
-				this.setTextFieldsEnabled(true);
+		autoFitAxisCheckbox.addActionListener(actionEvent -> {
+			if (updating) {
+				return;
 			}
+			boolean newState = autoFitAxisCheckbox.isSelected();
+			this.updating = true;
+			updateMinMaxFields();
+			this.updating = false;
+			cmd.updateAutofitAxis(newState);
+		});
+		this.axisMinTextField.addActionListener(e -> {
+			if (updating) {
+				return;
+			}
+			cmd.minTextFieldUpdated(e);
+		});
+		this.axisMaxTextField.addActionListener(e -> {
+			if (updating) {
+				return;
+			}
+			cmd.maxTextFieldUpdated(e);
+		});
+
+		ticLabelDigitCountSpinner.addChangeListener(changeEvent -> {
+			if (updating) {
+				return;
+			}
+			cmd.ticLabelDigitCountUpdated((Integer) ticLabelDigitCountSpinner.getValue());
+		});
+
+		currentParameterChanged();
+
+	}
+
+	private void updateMinMaxFields() {
+		boolean autofit = autoFitAxisCheckbox.isSelected();
+		boolean numeric = this.chart.getScatterPlot2D().getParameterForAxis(this.axisType).isNumeric();
+		this.axisMaxTextField.setEnabled(!autofit && numeric);
+		this.axisMinTextField.setEnabled(!autofit && numeric);
+		this.axisMaxTextField.setText(Double.toString(this.chart.getScatterPlot2D().getMax(this.axisType)));
+		this.axisMinTextField.setText(Double.toString(this.chart.getScatterPlot2D().getMin(this.axisType)));
+	}
+
+	private void currentParameterChanged() {
+		this.updating = true;
+		Parameter parameter = chart.getScatterPlot2D().getParameterForAxis(this.axisType);
+		boolean numeric = parameter.isNumeric();
+		if (parameter.isNumeric()) {
+			ticLabelDigitCountSpinner.setValue(parameter.getTicLabelDigitCount());
+			ticLabelDigitCountSpinner.setEnabled(true);
 		} else {
-			if (chart.getScatterPlot2D().isAutofitY()) {
-				autoFitAxisCheckbox.setSelected(true);
-				this.setTextFieldsEnabled(false);
-			} else {
-				autoFitAxisCheckbox.setSelected(false);
-				this.setTextFieldsEnabled(true);
-			}
+			ticLabelDigitCountSpinner.setValue(0);
+			ticLabelDigitCountSpinner.setEnabled(false);
 		}
-
+		ticCountSpinner.setEnabled(numeric);
+		ticCountSpinner.setValue(numeric ? chart.getScatterPlot2D().getTicCount(axisType) : 0);
+		axisLabelFontSizeSpinner.setValue(chart.getScatterPlot2D().getAxisLabelFontSize(axisType));
+		ticLabelFontSizeSpinner.setValue(chart.getScatterPlot2D().getTicLabelFontSize(axisType));
+		updateMinMaxFields();
+		autoFitAxisCheckbox.setSelected(chart.getScatterPlot2D().isAutofit(this.axisType));
+		autoFitAxisCheckbox.setEnabled(numeric);
+		this.updating = false;
 	}
-
-	/**
-	 * Sets the state of the text boxes for the min and max of the axis
-	 * 
-	 * @param enabled
-	 *            the new state
-	 */
-	public void setTextFieldsEnabled(boolean enabled) {
-		this.axisMaxTextField.setEnabled(enabled);
-		this.axisMinTextField.setEnabled(enabled);
-		if (this.axis == X_AXIS) {
-			this.axisMaxTextField.setText(Double.toString(this.chart.getScatterPlot2D().getMaxX()));
-			this.axisMinTextField.setText(Double.toString(this.chart.getScatterPlot2D().getMinX()));
-		} else {
-			this.axisMaxTextField.setText(Double.toString(this.chart.getScatterPlot2D().getMaxY()));
-			this.axisMinTextField.setText(Double.toString(this.chart.getScatterPlot2D().getMinY()));
-		}
-	}
-
-	/**
-	 * Sets the state of the tic count spinner according to whether or not the
-	 * parameter is numeric
-	 */
-	public void updateTicCountSpinnerEnabled() {
-		if (this.axis == X_AXIS) {
-			if (this.chart.getScatterPlot2D().getParameterForXAxis().isNumeric()) {
-				this.ticCountSpinner.setEnabled(true);
-			} else {
-				this.ticCountSpinner.setEnabled(false);
-			}
-		} else if (this.axis == Y_AXIS) {
-			if (this.chart.getScatterPlot2D().getParameterForYAxis().isNumeric()) {
-				this.ticCountSpinner.setEnabled(true);
-			} else {
-				this.ticCountSpinner.setEnabled(false);
-			}
-		}
-	}
-
-	/**
-	 * Gets the axis min text field
-	 * 
-	 * @return the min text field
-	 */
-	public JTextField getAxisMinTextField() {
-		return axisMinTextField;
-	}
-
-	/**
-	 * Gets the axis max text field
-	 * 
-	 * @return the max text field
-	 */
-	public JTextField getAxisMaxTextField() {
-		return axisMaxTextField;
-	}
-
-	/**
-	 * Gets the axis autofit checkbox
-	 * 
-	 * @return the axis autofit checkbox
-	 */
-	public JCheckBox getAutoFitAxisCheckbox() {
-		return autoFitAxisCheckbox;
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-
-	private void log(String message) {
-		if (AxisDisplaySettingsPanel.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
-	}
-
 }

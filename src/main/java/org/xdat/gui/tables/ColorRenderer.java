@@ -56,88 +56,22 @@ package org.xdat.gui.tables;
  * TableDialogEditDemo.java.
  */
 
+import javax.swing.JLabel;
+import javax.swing.JTable;
+import javax.swing.table.TableCellRenderer;
 import java.awt.Color;
 import java.awt.Component;
 
-import javax.swing.JLabel;
-import javax.swing.JTable;
-import javax.swing.border.Border;
-import javax.swing.table.TableCellRenderer;
-
-import org.xdat.Main;
-
-/**
- * Color Renderer for a cell that displays the color of a
- * {@link org.xdat.data.Cluster}.
- */
 public class ColorRenderer extends JLabel implements TableCellRenderer {
 
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0000;
-
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/** The unselected border. */
-	Border unselectedBorder = null;
-
-	/** The selected border. */
-	Border selectedBorder = null;
-
-	/** Specifies whether cell is bordered. */
-	boolean isBordered = true;
-
-	/**
-	 * Instantiates a new color renderer.
-	 * 
-	 * @param isBordered
-	 *            switches borders on and off
-	 */
-	public ColorRenderer(boolean isBordered) {
-		this.isBordered = isBordered;
-		setOpaque(true); // MUST do this for background to show up.
+	public ColorRenderer() {
+		setOpaque(true);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax
-	 * .swing.JTable, java.lang.Object, boolean, boolean, int, int)
-	 */
 	public Component getTableCellRendererComponent(JTable table, Object color, boolean isSelected, boolean hasFocus, int row, int column) {
-		log("getTableCellRendererComponent: object = " + color.toString());
 		Color newColor = (Color) color;
 		setBackground(newColor);
-		// if (isBordered) {
-		// if (isSelected) {
-		// if (selectedBorder == null) {
-		// selectedBorder = BorderFactory.createMatteBorder(2,5,2,5,
-		// table.getSelectionBackground());
-		// }
-		// setBorder(selectedBorder);
-		// } else {
-		// if (unselectedBorder == null) {
-		// unselectedBorder = BorderFactory.createMatteBorder(2,5,2,5,
-		// table.getBackground());
-		// }
-		// setBorder(unselectedBorder);
-		// }
-		// }
-
 		setToolTipText("RGB value: " + newColor.getRed() + ", " + newColor.getGreen() + ", " + newColor.getBlue());
 		return this;
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (ColorRenderer.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
 	}
 }

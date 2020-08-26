@@ -22,23 +22,8 @@ package org.xdat.exceptions;
 
 import org.xdat.data.Parameter;
 
-/**
- * This exception is thrown when the data of a discrete parameter is corrupt.
- * <p>
- * 
- * @see org.xdat.data.Parameter
- */
 public class CorruptDataException extends RuntimeException {
 
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0000;
-
-	/**
-	 * Instantiates a new corrupt data exception.
-	 * 
-	 * @param corruptParameter
-	 *            the corrupt parameter
-	 */
 	public CorruptDataException(Parameter corruptParameter) {
 		super("The data of parameter \"" + corruptParameter.getName() + "\" seems to be corrupt!");
 	}

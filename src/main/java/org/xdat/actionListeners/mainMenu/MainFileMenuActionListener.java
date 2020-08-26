@@ -20,98 +20,51 @@
 
 package org.xdat.actionListeners.mainMenu;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
 import org.xdat.Main;
 import org.xdat.Session;
 import org.xdat.UserPreferences;
-import org.xdat.gui.menus.mainWIndow.MainFileMenu;
 
-/**
- * ActionListener for a {@link MainFileMenu}.
- */
-public class MainFileMenuActionListener implements ActionListener {
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.event.ActionEvent;
+import java.io.File;
 
-	/** The main window. */
+public class MainFileMenuActionListener {
+
 	private Main mainWindow;
-
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/**
-	 * Instantiates a new main file menu action listener.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 */
 	public MainFileMenuActionListener(Main mainWindow) {
 		this.mainWindow = mainWindow;
-
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
-	public void actionPerformed(ActionEvent e) {
-		log("constructor called");
-		if (e.getActionCommand().equals("Load Session")) {
-			String filepath;
-			JFileChooser chooser = new JFileChooser();
-			FileNameExtensionFilter filter = new FileNameExtensionFilter("*.ses files", "ses");
-			chooser.setFileFilter(filter);
-			chooser.addChoosableFileFilter(filter);
-			if (UserPreferences.getInstance().getCurrentDir() != null) {
-				chooser.setCurrentDirectory(new File(UserPreferences.getInstance().getCurrentDir()));
-			}
-			int returnVal = chooser.showOpenDialog(mainWindow);
+	public void loadSession(ActionEvent e) {
+		JFileChooser chooser = buildFileChooser();
+		if (UserPreferences.getInstance().getCurrentDir() != null) {
+			chooser.setCurrentDirectory(new File(UserPreferences.getInstance().getCurrentDir()));
+		}
+		int returnVal = chooser.showOpenDialog(mainWindow);
 
-			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				filepath = chooser.getSelectedFile().getAbsolutePath();
-				UserPreferences.getInstance().setLastFile(chooser.getSelectedFile().getAbsolutePath());
-				this.mainWindow.loadSession(filepath);
-				this.mainWindow.initialiseDataPanel();
-			}
-
-		} else if (e.getActionCommand().equals("Save Session As...")) {
-			saveSessionAs();
-
-		} else if (e.getActionCommand().equals("Save Session")) {
-			log("save session called");
-			Session session = mainWindow.getCurrentSession();
-			if (session.getSessionDirectory() == null || session.getSessionName() == null) {
-				saveSessionAs();
-			} else {
-				String filepath = session.getSessionDirectory() + System.getProperty("file.separator") + session.getSessionName() + Session.sessionFileExtension;
-				this.mainWindow.saveSessionAs(filepath);
-				// this.mainWindow.updateDataPanel();
-			}
-		} else if (e.getActionCommand().equals("Exit")) {
-			mainWindow.setVisible(false);
-			mainWindow.dispose();
-			System.exit(0);
-		} else {
-			System.out.println(e.getActionCommand());
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			String filepath = chooser.getSelectedFile().getAbsolutePath();
+			UserPreferences.getInstance().setLastFile(chooser.getSelectedFile().getAbsolutePath());
+			this.mainWindow.loadSession(filepath);
+			this.mainWindow.initialiseDataPanel();
 		}
 	}
 
-	/**
-	 * Save session as.
-	 */
-	private void saveSessionAs() {
+	public void saveSession(ActionEvent e) {
+		Session session = mainWindow.getCurrentSession();
+		if (session.getSessionDirectory() == null || session.getSessionName() == null) {
+			saveSessionAs(e);
+		} else {
+			String filepath = session.getSessionDirectory() + System.getProperty("file.separator") + session.getSessionName() + Session.sessionFileExtension;
+			this.mainWindow.saveSessionAs(filepath);
+		}
+	}
+
+	public void saveSessionAs(ActionEvent e) {
 		Session session = mainWindow.getCurrentSession();
 		String filepath;
-		JFileChooser chooser = new JFileChooser();
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("*.ses files", "ses");
-		chooser.setFileFilter(filter);
-		chooser.addChoosableFileFilter(filter);
+		JFileChooser chooser = buildFileChooser();
 		if (UserPreferences.getInstance().getCurrentDir() != null) {
 			chooser.setCurrentDirectory(new File(UserPreferences.getInstance().getCurrentDir()));
 		}
@@ -130,19 +83,20 @@ public class MainFileMenuActionListener implements ActionListener {
 			}
 			UserPreferences.getInstance().setLastFile(filepath);
 			this.mainWindow.setTitle("xdat   -   " + filepath + Session.sessionFileExtension);
-			// this.mainWindow.updateDataPanel();
 		}
 	}
 
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (MainFileMenuActionListener.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
+	public void exit(ActionEvent e) {
+		mainWindow.setVisible(false);
+		mainWindow.dispose();
+		System.exit(0);
+	}
+
+	private JFileChooser buildFileChooser() {
+		JFileChooser chooser = new JFileChooser();
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("*.ses files", "ses");
+		chooser.setFileFilter(filter);
+		chooser.addChoosableFileFilter(filter);
+		return chooser;
 	}
 }

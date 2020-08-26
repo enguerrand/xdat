@@ -20,79 +20,27 @@
 
 package org.xdat.gui.menus.parallelCoordinatesChart;
 
-import java.awt.Event;
-import java.awt.event.KeyEvent;
+import org.xdat.Main;
+import org.xdat.gui.dialogs.ClusterDialog;
+import org.xdat.gui.frames.ChartFrame;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
+import java.awt.event.KeyEvent;
 
-import org.xdat.Main;
-import org.xdat.actionListeners.parallelCoordinatesChartFrame.ChartFrameClusteringMenuActionListener;
-import org.xdat.gui.frames.ChartFrame;
+class ParallelCoordinatesChartFrameClusteringMenu extends JMenu {
 
-/**
- * Menu for a {@link org.xdat.gui.frames.ChartFrame} to edit
- * {@link org.xdat.data.Cluster}s.
- */
-public class ParallelCoordinatesChartFrameClusteringMenu extends JMenu {
-
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0001;
-
-	/** Flag to enable debug message printing for this class. */
-	static final boolean printLog = false;
-
-	/**
-	 * Instantiates a new chart frame clustering menu.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param chartFrame
-	 *            the chart frame
-	 */
-	public ParallelCoordinatesChartFrameClusteringMenu(Main mainWindow, ChartFrame chartFrame) {
+	ParallelCoordinatesChartFrameClusteringMenu(Main mainWindow, ChartFrame chartFrame) {
 		super("Clustering");
-		log("constructor called.");
 		this.setMnemonic(KeyEvent.VK_C);
-
-		// Edit clusters
-		ChartFrameClusteringMenuActionListener cmd = new ChartFrameClusteringMenuActionListener(mainWindow, chartFrame);
 
 		JMenuItem mi;
 		mi = new JMenuItem("Edit Clusters");
-		mi.addActionListener(cmd);
+		mi.addActionListener(actionEvent -> new ClusterDialog(chartFrame, mainWindow));
 		this.add(mi);
 
-		// Add to Cluster
 		ParallelCoordinatesChartFrameAddDesignToClusterMenu clustersMenu;
 		clustersMenu = new ParallelCoordinatesChartFrameAddDesignToClusterMenu(mainWindow, chartFrame);
 		this.add(clustersMenu);
-
-	}
-
-	/**
-	 * Sets the ctrl accelerator.
-	 * 
-	 * @param mi
-	 *            the menuitem
-	 * @param acc
-	 *            the accelerator
-	 */
-	private void setCtrlAccelerator(JMenuItem mi, char acc) {
-		KeyStroke ks = KeyStroke.getKeyStroke(acc, Event.CTRL_MASK);
-		mi.setAccelerator(ks);
-	}
-
-	/**
-	 * Prints debug information to stdout when printLog is set to true.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	private void log(String message) {
-		if (ParallelCoordinatesChartFrameClusteringMenu.printLog && Main.isLoggingEnabled()) {
-			System.out.println(this.getClass().getName() + "." + message);
-		}
 	}
 }

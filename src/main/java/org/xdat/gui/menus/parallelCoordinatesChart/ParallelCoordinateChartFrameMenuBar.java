@@ -25,30 +25,13 @@ import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.gui.frames.ChartFrame;
 import org.xdat.gui.menus.ChartFrameMenuBar;
 
-/**
- * Menubar for a {@link org.xdat.gui.frames.ChartFrame}
- */
 public class ParallelCoordinateChartFrameMenuBar extends ChartFrameMenuBar {
 
-	/** The version tracking unique identifier for Serialization. */
-	static final long serialVersionUID = 0001;
-
-	/**
-	 * Instantiates a new chart frame menu bar.
-	 * 
-	 * @param mainWindow
-	 *            the main window
-	 * @param chartFrame
-	 *            the chart frame
-	 * @param chart
-	 *            the chart
-	 */
 	public ParallelCoordinateChartFrameMenuBar(Main mainWindow, ChartFrame chartFrame, ParallelCoordinatesChart chart) {
 		super(chartFrame, chart);
 		this.add(new ParallelCoordinatesChartFrameSelectParametersMenu(mainWindow, chartFrame, chart));
 		this.add(new ParallelCoordinatesChartFrameClusteringMenu(mainWindow, chartFrame));
 		this.add(new ParallelCoordinatesChartFrameOptionsMenu(mainWindow, chartFrame));
-
 	}
 
 }

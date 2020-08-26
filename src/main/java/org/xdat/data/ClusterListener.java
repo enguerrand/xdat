@@ -1,6 +1,6 @@
 /*
  *  Copyright 2014, Enguerrand de Rochefort
- * 
+ *
  * This file is part of xdat.
  *
  * xdat is free software: you can redistribute it and/or modify
@@ -15,21 +15,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with xdat.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  */
 
 package org.xdat.data;
 
-/**
- * Listener for changes in a {@link org.xdat.data.Cluster}
- */
 public interface ClusterListener {
-	
-	/**
-	 * Is called when a cluster's name changes 
-	 * 
-	 * @param source The cluster that changed
-	 * @param newName The cluster's new name
-	 */
-	public void onNameChanged(Cluster source, String newName);
+	void onNameChanged(Cluster source);
+	void onColorChanged(Cluster source);
 }
