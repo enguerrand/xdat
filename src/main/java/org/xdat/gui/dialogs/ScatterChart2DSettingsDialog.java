@@ -22,7 +22,6 @@ package org.xdat.gui.dialogs;
 
 import org.xdat.Main;
 import org.xdat.actionListeners.scatter2DChartSettings.ParallelChartFrameComboModel;
-import org.xdat.actionListeners.scatter2DChartSettings.Scatter2DChartDisplaySettingsActionListener;
 import org.xdat.chart.ScatterChart2D;
 import org.xdat.chart.ScatterPlot2D;
 import org.xdat.data.AxisType;
@@ -36,6 +35,7 @@ import org.xdat.gui.panels.TitledSubPanel;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -43,15 +43,14 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class ScatterChart2DSettingsDialog extends JDialog {
 
-	private ColorChoiceButton fgColorButton;
-	private ColorChoiceButton bgColorButton;
-	private ColorChoiceButton standardDesignColorButton;
-	private ColorChoiceButton selectedDesignColorButton;
 	private ChartFrame chartFrame;
 	private final Runnable onClosed;
 
@@ -87,8 +86,6 @@ public class ScatterChart2DSettingsDialog extends JDialog {
 	}
 
 	public void buildPanel(Main mainWindow, ChartFrame chartFrame, ScatterChart2D scatterChart2D) {
-		Scatter2DChartDisplaySettingsActionListener cmd = new Scatter2DChartDisplaySettingsActionListener(mainWindow, chartFrame, scatterChart2D, this);
-
 		// create components
 		this.getContentPane().removeAll();
 		this.getContentPane().setLayout(new BorderLayout());
@@ -99,15 +96,16 @@ public class ScatterChart2DSettingsDialog extends JDialog {
 		TitledSubPanel displayModeSelectionPanel = new TitledSubPanel("Display Mode");
 		displayModeSelectionPanel.setLayout(new GridLayout(3, 1));
 		ButtonGroup displayModeButtonGroup = new ButtonGroup();
-		int displayMode = scatterChart2D.getScatterPlot2D().getDisplayedDesignSelectionMode();
-		JRadioButton displayAllDesignsButton = new JRadioButton("Display all designs", displayMode == ScatterPlot2D.SHOW_ALL_DESIGNS);
-		JRadioButton displaySelectedDesignsButton = new JRadioButton("Display selected designs", displayMode == ScatterPlot2D.SHOW_SELECTED_DESIGNS);
-		JRadioButton displayActiveDesignsButton = new JRadioButton("Display designs visible in parallel chart: ", displayMode == ScatterPlot2D.SHOW_DESIGNS_ACTIVE_IN_PARALLEL_CHART);
+		ScatterPlot2D scatterPlot2D = scatterChart2D.getScatterPlot2D();
+		int displayMode = scatterPlot2D.getDisplayedDesignSelectionMode();
+		JRadioButton displayAllDesignsButton = buildDisplayModeButton("Display all designs", displayMode, ScatterPlot2D.SHOW_ALL_DESIGNS, scatterPlot2D, chartFrame);
+		JRadioButton displaySelectedDesignsButton = buildDisplayModeButton("Display selected designs", displayMode, ScatterPlot2D.SHOW_SELECTED_DESIGNS, scatterPlot2D, chartFrame);
+		JRadioButton displayActiveDesignsButton = buildDisplayModeButton("Display designs visible in parallel chart: ", displayMode, ScatterPlot2D.SHOW_DESIGNS_ACTIVE_IN_PARALLEL_CHART, scatterPlot2D, chartFrame);
 		displayModeButtonGroup.add(displayAllDesignsButton);
 		displayModeButtonGroup.add(displaySelectedDesignsButton);
 		displayModeButtonGroup.add(displayActiveDesignsButton);
 		JComboBox<String> parallelChartSelectionComboBox = new JComboBox<>();
-		ParallelChartFrameComboModel comboModel = new ParallelChartFrameComboModel(mainWindow, this.chartFrame, scatterChart2D.getScatterPlot2D());
+		ParallelChartFrameComboModel comboModel = new ParallelChartFrameComboModel(mainWindow, this.chartFrame, scatterPlot2D);
 		parallelChartSelectionComboBox.setModel(comboModel);
 		mainWindow.registerComboModel(comboModel);
 		JPanel visibleDesignsPanel = new JPanel(new GridLayout(1, 2));
@@ -117,10 +115,6 @@ public class ScatterChart2DSettingsDialog extends JDialog {
 		displayModeSelectionPanel.add(displaySelectedDesignsButton);
 		displayModeSelectionPanel.add(visibleDesignsPanel);
 		mainPanel.add(displayModeSelectionPanel, BorderLayout.NORTH);
-
-		displayAllDesignsButton.addActionListener(cmd);
-		displaySelectedDesignsButton.addActionListener(cmd);
-		displayActiveDesignsButton.addActionListener(cmd);
 
 		// Panel to select parameters for x- and y-axis
 
@@ -149,14 +143,41 @@ public class ScatterChart2DSettingsDialog extends JDialog {
 		JLabel selectedDesignColorLabel = new JLabel("Selected designs Color   ");
 		JLabel dataPointSizeLabel = new JLabel("Data Point Size   ");
 
-		this.fgColorButton = new ColorChoiceButton(scatterChart2D.getScatterPlot2D().getDecorationsColor(), "Foreground Color");
-		this.bgColorButton = new ColorChoiceButton(scatterChart2D.getScatterPlot2D().getBackGroundColor(), "Background Color");
-		this.standardDesignColorButton = new ColorChoiceButton(scatterChart2D.getScatterPlot2D().getActiveDesignColor(), "Active Design Color");
-		this.selectedDesignColorButton = new ColorChoiceButton(scatterChart2D.getScatterPlot2D().getSelectedDesignColor(), "Selected Design Color");
+		ColorChoiceButton fgColorButton = buildColorChoiceButton(
+				"Foreground Color",
+				scatterPlot2D::getDecorationsColor,
+				scatterPlot2D::setDecorationsColor,
+				chartFrame
+		);
+
+		ColorChoiceButton bgColorButton = buildColorChoiceButton(
+				"Background Color",
+				scatterPlot2D::getBackGroundColor,
+				scatterPlot2D::setBackGroundColor,
+				chartFrame
+		);
+
+		ColorChoiceButton standardDesignColorButton = buildColorChoiceButton(
+				"Active Design Color",
+				scatterPlot2D::getActiveDesignColor,
+				scatterPlot2D::setActiveDesignColor,
+				chartFrame
+		);
+
+		ColorChoiceButton selectedDesignColorButton = buildColorChoiceButton(
+				"Selected Design Color",
+				scatterPlot2D::getSelectedDesignColor,
+				scatterPlot2D::setSelectedDesignColor,
+				chartFrame
+		);
+
 		JSpinner dataPointSizeSpinner = new RightAlignedSpinner(new MinMaxSpinnerModel(1, 20));
-		dataPointSizeSpinner.setName("dataPointSizeSpinner");
-		dataPointSizeSpinner.addChangeListener(cmd);
-		dataPointSizeSpinner.setValue(scatterChart2D.getScatterPlot2D().getDotRadius());
+		dataPointSizeSpinner.addChangeListener(changeEvent -> {
+			int value = Integer.parseInt(dataPointSizeSpinner.getValue().toString());
+			scatterPlot2D.setDotRadius(value);
+			chartFrame.repaint();
+		});
+		dataPointSizeSpinner.setValue(scatterPlot2D.getDotRadius());
 
 		designDisplaySettingsLabelPanel.add(fgColorLabel);
 		designDisplaySettingsLabelPanel.add(bgColorLabel);
@@ -166,11 +187,6 @@ public class ScatterChart2DSettingsDialog extends JDialog {
 		designDisplaySettingsControlsPanel.add(bgColorButton);
 		designDisplaySettingsControlsPanel.add(standardDesignColorButton);
 		designDisplaySettingsControlsPanel.add(selectedDesignColorButton);
-
-		fgColorButton.addActionListener(cmd);
-		bgColorButton.addActionListener(cmd);
-		standardDesignColorButton.addActionListener(cmd);
-		selectedDesignColorButton.addActionListener(cmd);
 
 		JPanel dataPointPanel = new JPanel(new GridLayout(1, 2));
 		dataPointPanel.add(dataPointSizeLabel);
@@ -183,9 +199,12 @@ public class ScatterChart2DSettingsDialog extends JDialog {
 		TitledSubPanel lowerButtonsPanel = new TitledSubPanel("Save / restore Settings");
 		lowerButtonsPanel.setLayout(new GridLayout(1, 2));
 		JButton setAsDefaultButton = new JButton("Set current settings as default");
-		setAsDefaultButton.addActionListener(cmd);
+		setAsDefaultButton.addActionListener(e -> scatterChart2D.setCurrentSettingsAsDefault());
 		JButton loadFromDefaultButton = new JButton("Load default settings");
-		loadFromDefaultButton.addActionListener(cmd);
+		loadFromDefaultButton.addActionListener(e -> {
+			scatterChart2D.resetDisplaySettingsToDefault(mainWindow.getDataSheet());
+			buildPanel(mainWindow, chartFrame, scatterChart2D);
+		});
 		lowerButtonsPanel.add(setAsDefaultButton);
 		lowerButtonsPanel.add(loadFromDefaultButton);
 		panelForMainPanelAndLowerButtonsPanel.add(lowerButtonsPanel, BorderLayout.SOUTH);
@@ -196,25 +215,31 @@ public class ScatterChart2DSettingsDialog extends JDialog {
 		this.repaint();
 	}
 
+	private JRadioButton buildDisplayModeButton(String label, int currentDisplayMode, int buttonDisplayMode, ScatterPlot2D plot, ChartFrame chartFrame) {
+		JRadioButton displayAllDesignsButton = new JRadioButton(label, currentDisplayMode == buttonDisplayMode);
+		displayAllDesignsButton.addActionListener(actionEvent -> {
+			plot.setDisplayedDesignSelectionMode(buttonDisplayMode);
+			chartFrame.repaint();
+		});
+		return displayAllDesignsButton;
+	}
+
+	private ColorChoiceButton buildColorChoiceButton(String label, Supplier<Color> getter, Consumer<Color> setter, ChartFrame chartFrame) {
+		ColorChoiceButton colorChoiceButton = new ColorChoiceButton(getter.get(), label);
+		colorChoiceButton.addActionListener(actionEvent -> {
+			Color newColor = JColorChooser.showDialog(this, label, getter.get());
+			if (newColor != null) {
+				setter.accept(newColor);
+				colorChoiceButton.setCurrentColor(newColor);
+				chartFrame.repaint();
+			}
+		});
+		return colorChoiceButton;
+	}
+
 	@Override
 	public void dispose() {
 		super.dispose();
 		onClosed.run();
-	}
-
-	public ColorChoiceButton getFgColorButton() {
-		return fgColorButton;
-	}
-
-	public ColorChoiceButton getBgColorButton() {
-		return bgColorButton;
-	}
-
-	public ColorChoiceButton getStandardDesignColorButton() {
-		return standardDesignColorButton;
-	}
-
-	public ColorChoiceButton getSelectedDesignColorButton() {
-		return selectedDesignColorButton;
 	}
 }
