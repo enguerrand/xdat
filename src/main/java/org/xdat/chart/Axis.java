@@ -54,9 +54,9 @@ public class Axis implements Serializable {
 	private final SettingsGroup settings;
 
 	public Axis(DataSheet dataSheet, ParallelCoordinatesChart chart, Parameter parameter) {
-		this.settings = SettingsGroupFactory.buildParallelCoordinatesChartAxisSettingsGroup();
 		this.chart = chart;
 		this.parameter = parameter;
+		this.settings = SettingsGroupFactory.buildParallelCoordinatesChartAxisSettingsGroup(() -> getMinPossibleValue(dataSheet), () -> getMaxPossibleValue(dataSheet));
 		initialiseSettings(dataSheet);
 		if (this.settings.getBoolean(Key.PARALLEL_COORDINATES_AUTO_FIT_AXIS)) {
 			autofit(dataSheet);
@@ -98,9 +98,17 @@ public class Axis implements Serializable {
 	}
 
 	public void autofit(DataSheet dataSheet) {
-		this.setMax(dataSheet.getMaxValueOf(this.parameter));
-		this.setMin(dataSheet.getMinValueOf(this.parameter));
+		this.setMax(getMaxPossibleValue(dataSheet));
+		this.setMin(getMinPossibleValue(dataSheet));
 		dataSheet.evaluateBoundsForAllDesigns(this.chart);
+	}
+
+	public double getMinPossibleValue(DataSheet dataSheet) {
+		return dataSheet.getMinValueOf(this.parameter);
+	}
+
+	public double getMaxPossibleValue(DataSheet dataSheet) {
+		return dataSheet.getMaxValueOf(this.parameter);
 	}
 
 	public Color getAxisLabelFontColor() {

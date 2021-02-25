@@ -82,7 +82,7 @@ public class Main extends JFrame {
 		for (Setting<?> value : generalSettingsGroup.getSettings().values()) {
 			value.addListener((source, transaction) -> source.setCurrentToDefault());
 		}
-		parallelCoordinatesAxisSettingsGroup = SettingsGroupFactory.buildParallelCoordinatesChartAxisSettingsGroup();
+		parallelCoordinatesAxisSettingsGroup = SettingsGroupFactory.buildParallelCoordinatesChartAxisSettingsGroup(() -> 0.0, () -> 1.0);
 		for (Setting<?> value : parallelCoordinatesAxisSettingsGroup.getSettings().values()) {
 			value.addListener((source, transaction) -> source.setCurrentToDefault());
 		}

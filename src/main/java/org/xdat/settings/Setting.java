@@ -20,7 +20,7 @@ public abstract class Setting<T> implements Serializable {
     private final SettingsType type;
     private transient List<SettingsListener<T>> listeners;
     @Nullable
-    private EnabledCondition<?> enabledCondition;
+    private EnabledCondition<?, T> enabledCondition;
 
     Setting(String title, T hardCodedDefault, SettingsType type, Key key) {
         this.title = title;
@@ -101,11 +101,11 @@ public abstract class Setting<T> implements Serializable {
         return set(getDefault(), t);
     }
 
-    public void setEnabledCondition(@Nullable EnabledCondition<?> enabledCondition) {
+    public void setEnabledCondition(@Nullable EnabledCondition<?, T> enabledCondition) {
         this.enabledCondition = enabledCondition;
     }
 
-    public Optional<EnabledCondition<?>> getEnabledCondition() {
+    public Optional<EnabledCondition<?, T>> getEnabledCondition() {
         return Optional.ofNullable(enabledCondition);
     }
 }

@@ -28,6 +28,7 @@ import java.awt.Color;
 import java.awt.GraphicsEnvironment;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class SettingsGroupFactory {
     public static SettingsGroup buildGeneralParallelCoordinatesChartSettingsGroup() {
@@ -64,13 +65,14 @@ public class SettingsGroupFactory {
         return new MultipleChoiceSetting("Font Family", defaultFontFamily, Key.FONT_FAMILY, availableFontFamilies);
     }
 
-    public static SettingsGroup buildParallelCoordinatesChartAxisSettingsGroup() {
+    public static SettingsGroup buildParallelCoordinatesChartAxisSettingsGroup(Supplier<Double> minPossibleValueSupplier, Supplier<Double> maxPossibleValueSupplier) {
         IntegerSetting digitCountSetting = new IntegerSetting("Tic Label Digit Count", 3, Key.PARALLEL_COORDINATES_AXIS_TIC_LABEL_DIGIT_COUNT, 0, 20);
         BooleanSetting autoFit = new BooleanSetting("Autofit Axis", true, Key.PARALLEL_COORDINATES_AUTO_FIT_AXIS);
         DoubleSetting min = new DoubleSetting("Min", 0, Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MIN, digitCountSetting);
         DoubleSetting max = new DoubleSetting("Max", 1, Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MAX, digitCountSetting);
-        min.setEnabledCondition(new EnabledCondition<>(autoFit, false));
-        max.setEnabledCondition(new EnabledCondition<>(autoFit, false));
+        min.setEnabledCondition(new EnabledCondition<>(autoFit, false, minPossibleValueSupplier));
+        max.setEnabledCondition(new EnabledCondition<>(autoFit, false, maxPossibleValueSupplier));
+
         return SettingsGroup.newBuilder()
                 .addSetting(new BooleanSetting("Active", true, Key.PARALLEL_COORDINATES_AXIS_ACTIVE))
                 .addSetting(new ColorSetting("Axis Color", Color.BLACK, Key.PARALLEL_COORDINATES_AXIS_COLOR))

@@ -8,9 +8,9 @@ import javax.swing.JPanel;
 import java.awt.LayoutManager;
 import java.util.Objects;
 
-public abstract class SettingControlPanel extends JPanel {
+public abstract class SettingControlPanel<K> extends JPanel {
     @Nullable
-    private EnabledCondition<?> enabledCondition = null;
+    private EnabledCondition<?, K> enabledCondition = null;
 
     public SettingControlPanel(LayoutManager layoutManager, boolean b) {
         super(layoutManager, b);
@@ -43,11 +43,18 @@ public abstract class SettingControlPanel extends JPanel {
             return;
         }
         if (Objects.equals(sourceSetting.getUniqueId(), this.enabledCondition.getEnablingSetting().getUniqueId())) {
-            setEnabled(Objects.equals(this.enabledCondition.getEnablingValue(), currentValue));
+            boolean enabled = Objects.equals(this.enabledCondition.getEnablingValue(), currentValue);
+            setEnabled(enabled);
+            if (!enabled) {
+                setCurrentValue(this.enabledCondition.getDisabledValue());
+            }
+
         }
     }
 
-    public <T> void setEnabledWhen(EnabledCondition<T> enabledCondition) {
+    protected abstract void setCurrentValue(K value);
+
+    public <T> void setEnabledWhen(EnabledCondition<T, K> enabledCondition) {
         this.enabledCondition = enabledCondition;
         enabledCondition.getEnablingSetting().addListener((source, transaction) -> checkEnabled(source, source.get()));
         checkEnabled(enabledCondition.getEnablingSetting(), enabledCondition.getEnablingSetting().get());

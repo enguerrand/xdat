@@ -57,9 +57,9 @@ public class SettingsPanelFactory {
         }
     }
 
-    private static SettingControlPanel buildBooleanControl(BooleanSetting setting, @Nullable SettingsControlListener settingsControlListener) {
+    private static SettingControlPanel<Boolean> buildBooleanControl(BooleanSetting setting, @Nullable SettingsControlListener settingsControlListener) {
         JCheckBox checkBox = new JCheckBox();
-        SettingControlPanel outer = new SettingControlPanel(new FlowLayout(FlowLayout.CENTER)) {
+        SettingControlPanel<Boolean> outer = new SettingControlPanel<Boolean>(new FlowLayout(FlowLayout.CENTER)) {
             @Override
             public boolean applyValue(@Nullable SettingsTransaction transaction) {
                 return setting.set(checkBox.isSelected(), transaction);
@@ -68,6 +68,11 @@ public class SettingsPanelFactory {
             @Override
             public void setEnabled(boolean enabled) {
                 checkBox.setEnabled(enabled);
+            }
+
+            @Override
+            protected void setCurrentValue(Boolean value) {
+                checkBox.setSelected(value);
             }
         };
         checkBox.setSelected(setting.get());
@@ -82,10 +87,10 @@ public class SettingsPanelFactory {
         return outer;
     }
 
-    private static SettingControlPanel buildIntegerControl(IntegerSetting setting, @Nullable SettingsControlListener settingsControlListener) {
+    private static SettingControlPanel<Integer> buildIntegerControl(IntegerSetting setting, @Nullable SettingsControlListener settingsControlListener) {
         JSpinner spinner = new RightAlignedSpinner(new MinMaxSpinnerModel(setting.getMin(), setting.getMax()));
         ((JSpinner.DefaultEditor)spinner.getEditor()).getTextField().setHorizontalAlignment(JTextField.RIGHT);
-        SettingControlPanel outer = new SettingControlPanel(new GridLayout(1,1)) {
+        SettingControlPanel<Integer> outer = new SettingControlPanel<Integer>(new GridLayout(1,1)) {
             @Override
             public boolean applyValue(SettingsTransaction transaction) {
                 return setting.set((Integer)spinner.getValue(), transaction);
@@ -94,6 +99,11 @@ public class SettingsPanelFactory {
             @Override
             public void setEnabled(boolean enabled) {
                 spinner.setEnabled(enabled);
+            }
+
+            @Override
+            protected void setCurrentValue(Integer value) {
+                spinner.setValue(value);
             }
         };
         spinner.setValue(setting.get());
@@ -108,10 +118,10 @@ public class SettingsPanelFactory {
         return outer;
     }
 
-    private static SettingControlPanel buildDoubleControl(DoubleSetting setting, @Nullable SettingsControlListener settingsControlListener) {
+    private static SettingControlPanel<Double> buildDoubleControl(DoubleSetting setting, @Nullable SettingsControlListener settingsControlListener) {
         JTextField textField = new JTextField();
 
-        SettingControlPanel outer = new SettingControlPanel(new GridLayout(1,1)) {
+        SettingControlPanel<Double> outer = new SettingControlPanel<Double>(new GridLayout(1,1)) {
             @Override
             public boolean applyValue(SettingsTransaction transaction) {
                 String text = textField.getText();
@@ -130,6 +140,11 @@ public class SettingsPanelFactory {
             public void setEnabled(boolean enabled) {
                 textField.setEnabled(enabled);
             }
+
+            @Override
+            protected void setCurrentValue(Double value) {
+                textField.setText(Formatting.formatDouble(value, setting.getDigitCountSetting().get()));
+            }
         };
         textField.setText(String.valueOf(Formatting.formatDouble(setting.get(), setting.getDigitCountSetting().get())));
         outer.add(textField);
@@ -147,9 +162,9 @@ public class SettingsPanelFactory {
         return outer;
     }
 
-    private static SettingControlPanel buildColorControl(ColorSetting setting, @Nullable SettingsControlListener settingsControlListener) {
+    private static SettingControlPanel<Color> buildColorControl(ColorSetting setting, @Nullable SettingsControlListener settingsControlListener) {
         ColorChoiceButton colorChoiceButton = new ColorChoiceButton(setting.get());
-        SettingControlPanel outer = new SettingControlPanel(new FlowLayout(FlowLayout.CENTER)) {
+        SettingControlPanel<Color> outer = new SettingControlPanel<Color>(new FlowLayout(FlowLayout.CENTER)) {
             @Override
             public boolean applyValue(SettingsTransaction transaction) {
                 return setting.set(colorChoiceButton.getCurrentColor(), transaction);
@@ -158,6 +173,11 @@ public class SettingsPanelFactory {
             @Override
             public void setEnabled(boolean enabled) {
                 colorChoiceButton.setEnabled(enabled);
+            }
+
+            @Override
+            protected void setCurrentValue(Color value) {
+                colorChoiceButton.setCurrentColor(value);
             }
         };
         colorChoiceButton.addActionListener(actionCommand -> {
@@ -175,12 +195,12 @@ public class SettingsPanelFactory {
         return outer;
     }
 
-    private static SettingControlPanel buildMultipleChoiceControl(MultipleChoiceSetting setting, @Nullable SettingsControlListener settingsControlListener) {
+    private static SettingControlPanel<String> buildMultipleChoiceControl(MultipleChoiceSetting setting, @Nullable SettingsControlListener settingsControlListener) {
         List<String> options = setting.getOptions();
         JComboBox<String> comboBox = new JComboBox<>(options.toArray(new String[0]));
         comboBox.setSelectedItem(setting.get());
 
-        SettingControlPanel outer = new SettingControlPanel(new FlowLayout(FlowLayout.CENTER)) {
+        SettingControlPanel<String> outer = new SettingControlPanel<String>(new FlowLayout(FlowLayout.CENTER)) {
             @Override
             public boolean applyValue(SettingsTransaction transaction) {
                 @Nullable String selectedItem = (String) comboBox.getSelectedItem();
@@ -194,6 +214,11 @@ public class SettingsPanelFactory {
             @Override
             public void setEnabled(boolean enabled) {
                 comboBox.setEnabled(enabled);
+            }
+
+            @Override
+            protected void setCurrentValue(String value) {
+                comboBox.setSelectedItem(value);
             }
         };
         outer.add(comboBox);

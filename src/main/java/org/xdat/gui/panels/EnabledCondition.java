@@ -22,13 +22,17 @@ package org.xdat.gui.panels;
 
 import org.xdat.settings.Setting;
 
-public class EnabledCondition<T> {
+import java.util.function.Supplier;
+
+public class EnabledCondition<T, K> {
     private final Setting<T> enablingSetting;
     private final T enablingValue;
+    private final Supplier<K> disabledValueSupplier;
 
-    public EnabledCondition(Setting<T> enablingSetting, T enablingValue) {
+    public EnabledCondition(Setting<T> enablingSetting, T enablingValue, Supplier<K> disabledValueSupplier) {
         this.enablingSetting = enablingSetting;
         this.enablingValue = enablingValue;
+        this.disabledValueSupplier = disabledValueSupplier;
     }
 
     public Setting<T> getEnablingSetting() {
@@ -37,5 +41,9 @@ public class EnabledCondition<T> {
 
     public T getEnablingValue() {
         return enablingValue;
+    }
+
+    public K getDisabledValue() {
+        return disabledValueSupplier.get();
     }
 }
