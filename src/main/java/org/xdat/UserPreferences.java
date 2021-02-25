@@ -83,7 +83,7 @@ public class UserPreferences {
 		int g = PREFS.getInt(key.getId() + "Green", defaultValue.getGreen());
 		int b = PREFS.getInt(key.getId() + "Blue", defaultValue.getBlue());
 		int a = PREFS.getInt(key.getId() + "Alpha", defaultValue.getAlpha());
-		return new Color(r, g, b);
+		return new Color(r, g, b, a);
 	}
 
 	public static void putColor(Key key, Color value) {
