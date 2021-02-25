@@ -21,6 +21,7 @@
 package org.xdat.settings;
 
 import org.xdat.data.AxisType;
+import org.xdat.gui.panels.EnabledCondition;
 
 import javax.swing.JLabel;
 import java.awt.Color;
@@ -65,6 +66,11 @@ public class SettingsGroupFactory {
 
     public static SettingsGroup buildParallelCoordinatesChartAxisSettingsGroup() {
         IntegerSetting digitCountSetting = new IntegerSetting("Tic Label Digit Count", 3, Key.PARALLEL_COORDINATES_AXIS_TIC_LABEL_DIGIT_COUNT, 0, 20);
+        BooleanSetting autoFit = new BooleanSetting("Autofit Axis", true, Key.PARALLEL_COORDINATES_AUTO_FIT_AXIS);
+        DoubleSetting min = new DoubleSetting("Min", 0, Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MIN, digitCountSetting);
+        DoubleSetting max = new DoubleSetting("Max", 1, Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MAX, digitCountSetting);
+        min.setEnabledCondition(new EnabledCondition<>(autoFit, false));
+        max.setEnabledCondition(new EnabledCondition<>(autoFit, false));
         return SettingsGroup.newBuilder()
                 .addSetting(new BooleanSetting("Active", true, Key.PARALLEL_COORDINATES_AXIS_ACTIVE))
                 .addSetting(new ColorSetting("Axis Color", Color.BLACK, Key.PARALLEL_COORDINATES_AXIS_COLOR))
@@ -78,9 +84,9 @@ public class SettingsGroupFactory {
                 .addSetting(digitCountSetting)
                 .addSetting(new BooleanSetting("Invert Filter", false, Key.PARALLEL_COORDINATES_FILTER_INVERTED))
                 .addSetting(new BooleanSetting("Invert Axis", false, Key.PARALLEL_COORDINATES_AXIS_INVERTED))
-                .addSetting(new BooleanSetting("Autofit Axis", true, Key.PARALLEL_COORDINATES_AUTO_FIT_AXIS))
-                .addSetting(new DoubleSetting("Min", 0, Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MIN, digitCountSetting))
-                .addSetting(new DoubleSetting("Max", 1, Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MAX, digitCountSetting))
+                .addSetting(autoFit)
+                .addSetting(min)
+                .addSetting(max)
                 .build();
     }
 

@@ -51,8 +51,21 @@ public class SettingsGroupPanel extends PaddedPanel {
         controlsPanel.setLayout(new GridLayout(0, 1));
         add(labelPanel, BorderLayout.CENTER);
         add(controlsPanel, BorderLayout.EAST);
+
+        List<SettingComponents> allComponents = new ArrayList<>();
+
+        SettingsControlListener listener = new SettingsControlListener() {
+            @Override
+            public <T> void onLinkedSettingsControlUpdated(Setting<T> sourceSetting, T currentControlValue) {
+                for (SettingComponents settingComponents : allComponents) {
+                    settingComponents.onLinkedSettingsControlUpdated(sourceSetting, currentControlValue);
+                }
+            }
+        };
         for (Setting<?> setting : settingsGroup.getSettings().values()) {
-            SettingComponents settingComponents = SettingsPanelFactory.from(setting);
+            SettingComponents settingComponents = SettingsPanelFactory.from(setting, listener);
+            setting.getEnabledCondition().ifPresent(settingComponents::setEnabledWhen);
+            allComponents.add(settingComponents);
             this.map.put(setting.getKey(), settingComponents);
             labelPanel.add(settingComponents.getLabel());
             controlsPanel.add(settingComponents.getControl());

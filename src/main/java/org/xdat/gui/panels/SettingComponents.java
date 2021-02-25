@@ -1,5 +1,7 @@
 package org.xdat.gui.panels;
 
+import org.xdat.settings.Setting;
+
 import javax.swing.JComponent;
 
 public class SettingComponents {
@@ -18,4 +20,13 @@ public class SettingComponents {
     public SettingControlPanel getControl() {
         return control;
     }
+
+    public <T> void onLinkedSettingsControlUpdated(Setting<T> sourceSetting, T currentControlValue) {
+        control.onLinkedSettingsControlUpdated(sourceSetting, currentControlValue);
+    }
+
+    public <T> void setEnabledWhen(EnabledCondition<T> enabledCondition) {
+        control.setEnabledWhen(enabledCondition);
+    }
+
 }
