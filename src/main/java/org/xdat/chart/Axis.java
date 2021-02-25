@@ -67,11 +67,20 @@ public class Axis implements Serializable {
 		this.settings.getBooleanSetting(Key.PARALLEL_COORDINATES_AXIS_INVERTED).addListener((source, transaction) ->
 				onAxisInverted(dataSheet)
 		);
-
 		this.settings.getBooleanSetting(Key.PARALLEL_COORDINATES_FILTER_INVERTED).addListener((source, transaction) ->
 				applyFilters(dataSheet)
 		);
-
+		this.settings.getDoubleSetting(Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MIN).addListener((source, transaction) ->
+				dataSheet.evaluateBoundsForAllDesigns(chart)
+		);
+		this.settings.getDoubleSetting(Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MAX).addListener((source, transaction) ->
+				dataSheet.evaluateBoundsForAllDesigns(chart)
+		);
+		this.settings.getIntegerSetting(Key.PARALLEL_COORDINATES_AXIS_TIC_COUNT).addListener((source, transaction) -> {
+			if (source.get() < 2) {
+				this.applyFilters(dataSheet);
+			}
+		});
 	}
 
 	private void initialiseSettings(DataSheet dataSheet) {
@@ -89,8 +98,8 @@ public class Axis implements Serializable {
 	}
 
 	public void autofit(DataSheet dataSheet) {
-		this.setMax(dataSheet.getMaxValueOf(this.parameter), dataSheet);
-		this.setMin(dataSheet.getMinValueOf(this.parameter), dataSheet);
+		this.setMax(dataSheet.getMaxValueOf(this.parameter));
+		this.setMin(dataSheet.getMinValueOf(this.parameter));
 		dataSheet.evaluateBoundsForAllDesigns(this.chart);
 	}
 
@@ -109,9 +118,8 @@ public class Axis implements Serializable {
 			return this.settings.getDouble(Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MAX);
 	}
 
-	public void setMax(double max, DataSheet dataSheet) {
+	public void setMax(double max) {
 		this.settings.getDoubleSetting(Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MAX).set(max);
-		dataSheet.evaluateBoundsForAllDesigns(this.chart);
 	}
 
 	public double getMin() {
@@ -121,9 +129,8 @@ public class Axis implements Serializable {
 			return this.settings.getDouble(Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MIN);
 	}
 
-	public void setMin(double min, DataSheet dataSheet) {
+	public void setMin(double min) {
 		this.settings.getDoubleSetting(Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MIN).set(min);
-		dataSheet.evaluateBoundsForAllDesigns(this.chart);
 	}
 
 	public double getRange() {
@@ -144,9 +151,6 @@ public class Axis implements Serializable {
 
 	public void setTicCount(int ticCount, DataSheet dataSheet) {
 		this.settings.getIntegerSetting(Key.PARALLEL_COORDINATES_AXIS_TIC_COUNT).set(ticCount);
-		if (ticCount < 2) {
-			this.applyFilters(dataSheet);
-		}
 	}
 
 	public int getTicLabelFontSize() {
@@ -256,14 +260,11 @@ public class Axis implements Serializable {
 	}
 
 	public void setFilterAsNewRange(DataSheet dataSheet) {
-		// log("setFilterAsNewRange: current range: "+this.getMin()+" and "+this.getMax()+" for axis "+this.getName());
-		// log("setFilterAsNewRange:filterPositions: "+this.lowerFilter.getValue()+" and "+this.upperFilter.getValue()+" for axis "+this.getName());
 		this.setAutoFit(false);
 		double minFilterValue = this.getMinimumFilter().getValue();
 		double maxFilterValue = this.getMaximumFilter().getValue();
-		this.setMin(minFilterValue, dataSheet);
-		this.setMax(maxFilterValue, dataSheet);
-		// log("setFilterAsNewRange: new range set to "+this.getMin()+" and "+this.getMax()+" for axis "+this.getName());
+		this.setMin(minFilterValue);
+		this.setMax(maxFilterValue);
 		this.resetFilters(dataSheet);
 	}
 
