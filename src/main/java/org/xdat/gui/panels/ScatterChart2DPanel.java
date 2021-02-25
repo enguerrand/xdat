@@ -81,8 +81,8 @@ public class ScatterChart2DPanel extends ChartPanel {
 			return;
 		}
 		DataSheet dataSheet = chart.getDataSheet();
-		double xValues[] = new double[dataSheet.getDesignCount()];
-		double yValues[] = new double[dataSheet.getDesignCount()];
+		double[] xValues = new double[dataSheet.getDesignCount()];
+		double[] yValues = new double[dataSheet.getDesignCount()];
 		double minX = chart.getScatterPlot2D().getMin(AxisType.X);
 		double maxX = chart.getScatterPlot2D().getMax(AxisType.X);
 		double minY = chart.getScatterPlot2D().getMin(AxisType.Y);

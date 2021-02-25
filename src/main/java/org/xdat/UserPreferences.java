@@ -328,14 +328,10 @@ public class UserPreferences {
 
 	public Locale getLocale() {
 		int locale = PREFS.getInt(Key.LOCALE.getId(), LOCALE_US);
-		switch (locale) {
-			case (LOCALE_DE): {
-				return Locale.GERMANY;
-			}
-			default: {
-				return Locale.US;
-			}
+		if (locale == LOCALE_DE) {
+			return Locale.GERMANY;
 		}
+		return Locale.US;
 	}
 
 	public void setLocale(int locale) {

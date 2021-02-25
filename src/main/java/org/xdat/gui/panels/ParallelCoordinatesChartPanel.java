@@ -265,7 +265,8 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
         int yPositionLast;
         boolean firstAxisDrawn = false;
         for (int i = 0; i < axisCount; i++) {
-            int yPosition = axisTopPos;
+			//noinspection UnnecessaryLocalVariable
+			int yPosition = axisTopPos;
             if (axisActiveFlags[i]) {
                 Parameter parameter = this.mainWindow.getDataSheet().getParameter(i);
                 double value = currentDesign.getDoubleValue(parameter);
