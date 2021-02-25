@@ -52,6 +52,7 @@ public enum Key {
     PARALLEL_COORDINATES_FILTER_COLOR("ParallelCoordinatesFilterColor"),
     PARALLEL_COORDINATES_FILTER_HEIGHT("ParallelCoordinatesFilterHeight"),
     PARALLEL_COORDINATES_FILTER_WIDTH("ParallelCoordinatesFilterWidth"),
+    FONT_FAMILY("fontFamily"),
     TIC_LABEL_FONT_SIZE("ticLabelFontSize"),
     DESIGN_LABEL_FONT_SIZE("designLabelFontSize"),
     LINE_THICKNESS("lineThickness"),

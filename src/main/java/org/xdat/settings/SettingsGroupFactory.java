@@ -20,15 +20,23 @@
 
 package org.xdat.settings;
 
+import org.jetbrains.annotations.NotNull;
+
+import javax.swing.JLabel;
 import java.awt.Color;
+import java.awt.GraphicsEnvironment;
+import java.util.Arrays;
+import java.util.List;
 
 public class SettingsGroupFactory {
     public static SettingsGroup buildGeneralParallelCoordinatesChartSettingsGroup() {
+
         return SettingsGroup.newBuilder()
                 .addSetting(new BooleanSetting("Offset Axis Labels", true, Key.PARALLEL_COORDINATES_VERTICALLY_OFFSET_AXIS_LABELS))
                 .addSetting(new IntegerSetting("Axis Label vertical Distance", 10, Key.PARALLEL_COORDINATES_LABELS_VERTICAL_DISTANCE, 0, 100))
                 .addSetting(new BooleanSetting("Use Anti Aliasing", true, Key.ANTI_ALIASING))
                 .addSetting(new BooleanSetting("Use Transparency", true, Key.USE_ALPHA))
+                .addSetting(buildFontSetting())
                 .addSetting(new ColorSetting("Background Color", Color.WHITE, Key.PARALLEL_CHART_BACKGROUND_COLOR))
                 .addSetting(new ColorSetting("Active Design Color", new Color(0, 150, 0, 128), Key.ACTIVE_DESIGN_DEFAULT_COLOR))
                 .addSetting(new ColorSetting("Selected Design Color", Color.BLUE, Key.SELECTED_DESIGN_DEFAULT_COLOR))
@@ -44,6 +52,16 @@ public class SettingsGroupFactory {
                 .addSetting(new IntegerSetting("Filter Symbol Width", 7, Key.PARALLEL_COORDINATES_FILTER_WIDTH, 1, 30))
                 .addSetting(new IntegerSetting("Filter Symbol Height", 10, Key.PARALLEL_COORDINATES_FILTER_HEIGHT, 1, 60))
                 .build();
+    }
+
+    @NotNull
+    private static MultipleChoiceSetting buildFontSetting() {
+        List<String> availableFontFamilies = Arrays.asList(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
+        String defaultFontFamily = new JLabel().getFont().getFamily();
+        if (!availableFontFamilies.contains(defaultFontFamily)) { // can this happen?
+            availableFontFamilies.add(defaultFontFamily);
+        }
+        return new MultipleChoiceSetting("Font Family", defaultFontFamily, Key.FONT_FAMILY, availableFontFamilies);
     }
 
     public static SettingsGroup buildParallelCoordinatesChartAxisSettingsGroup() {

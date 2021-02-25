@@ -30,7 +30,7 @@ import java.awt.Dimension;
 public class ScatterChart2D extends Chart {
 
 	static final long serialVersionUID = 1;
-	private ScatterPlot2D scatterPlot2D;
+	private final ScatterPlot2D scatterPlot2D;
 
 	public ScatterChart2D(DataSheet dataSheet, boolean showDecorations, Dimension frameSize, int id) {
 		super(dataSheet, id);

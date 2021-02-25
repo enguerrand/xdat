@@ -294,6 +294,10 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 		return chartSettings.getColor(Key.PARALLEL_COORDINATES_FILTER_COLOR);
 	}
 
+	public String getFontFamily() {
+		return chartSettings.getMultipleChoiceSetting(Key.FONT_FAMILY).get();
+	}
+
 	public int getTopMargin() {
 		return topMargin;
 	}

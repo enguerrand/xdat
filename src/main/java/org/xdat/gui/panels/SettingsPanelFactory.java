@@ -8,18 +8,21 @@ import org.xdat.settings.ColorSetting;
 import org.xdat.settings.DoubleSetting;
 import org.xdat.settings.Formatting;
 import org.xdat.settings.IntegerSetting;
+import org.xdat.settings.MultipleChoiceSetting;
 import org.xdat.settings.Setting;
 import org.xdat.settings.SettingsTransaction;
 import org.xdat.settings.SettingsType;
 
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.util.List;
 
 public class SettingsPanelFactory {
 
@@ -42,6 +45,8 @@ public class SettingsPanelFactory {
                 throw new IllegalStateException("Setting type " + type + " not yet implemented!");
             case COLOR:
                 return new SettingComponents(label, buildColorControl((ColorSetting) setting));
+            case MULTIPLE_CHOICE:
+                return new SettingComponents(label, buildMultipleChoiceControl((MultipleChoiceSetting) setting));
             default:
                 throw new IllegalStateException("Unknown setting type "+ type);
         }
@@ -132,6 +137,26 @@ public class SettingsPanelFactory {
             }
         });
         outer.add(colorChoiceButton);
+        return outer;
+    }
+
+    private static SettingControlPanel buildMultipleChoiceControl(MultipleChoiceSetting setting) {
+        List<String> options = setting.getOptions();
+        JComboBox<String> comboBox = new JComboBox<>(options.toArray(new String[0]));
+        comboBox.setSelectedItem(setting.get());
+
+        SettingControlPanel outer = new SettingControlPanel(new FlowLayout(FlowLayout.CENTER)) {
+            @Override
+            public boolean applyValue(SettingsTransaction transaction) {
+                return setting.set((String)comboBox.getSelectedItem(), transaction);
+            }
+
+            @Override
+            public void setEnabled(boolean enabled) {
+                comboBox.setEnabled(enabled);
+            }
+        };
+        outer.add(comboBox);
         return outer;
     }
 }

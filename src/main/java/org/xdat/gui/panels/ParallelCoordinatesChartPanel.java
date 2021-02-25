@@ -211,6 +211,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		boolean useAlpha = chart.isUseAlpha();
 		List<Design> highlightedDesigns = new ArrayList<>();
 		DataSheet dataSheet = mainWindow.getDataSheet();
+		String fontFamily = chart.getFontFamily();
 		for (int designIndex = 0; designIndex < dataSheet.getDesignCount(); designIndex++) {
 			Design currentDesign = dataSheet.getDesign(designIndex);
 			if (!currentDesign.isInsideBounds(chart)){
@@ -241,7 +242,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 						lineThickness = chartLineThickness;
 					}
 					drawDesign(g, chart, axisTopPos, designLabelFontSize, axisCount, axisRanges, axisHeights, axisWidths, axisMaxValues, axisMinValues, axisActiveFlags,
-                            axisInversionFlags, currentDesign, lineThickness);
+                            axisInversionFlags, currentDesign, lineThickness, fontFamily);
 				} else {
                     highlightedDesigns.add(currentDesign);
 				}
@@ -250,14 +251,14 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
         for (Design highlightedDesign : highlightedDesigns) {
 			g.setColor(selectedDesignColor);
 			drawDesign(g, chart, axisTopPos, designLabelFontSize, axisCount, axisRanges, axisHeights, axisWidths, axisMaxValues, axisMinValues, axisActiveFlags,
-                            axisInversionFlags, highlightedDesign, selectedDesignsLineThickness);
+                            axisInversionFlags, highlightedDesign, selectedDesignsLineThickness, fontFamily);
 
         }
 	}
 
     private void drawDesign(Graphics g, ParallelCoordinatesChart chart, int axisTopPos, int designLabelFontSize, int axisCount, double[] axisRanges, int[] axisHeights,
 							int[] axisWidths, double[] axisMaxValues, double[] axisMinValues, boolean[] axisActiveFlags, boolean[] axisInversionFlags, Design currentDesign,
-							int lineThickness) {
+							int lineThickness, String fontFamily) {
         int xPositionCurrent = getMarginLeft();
         int yPositionCurrent = axisTopPos;
         int xPositionLast = xPositionCurrent;
@@ -286,7 +287,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
                 yPositionCurrent = yPosition + (axisHeights[i]) - yPositionRelToBottom;
 
                 FontMetrics fm = g.getFontMetrics();
-                g.setFont(new Font("SansSerif", Font.PLAIN, designLabelFontSize));
+                g.setFont(new Font(fontFamily, Font.PLAIN, designLabelFontSize));
                 if (firstAxisDrawn) {
                     xPositionCurrent = xPositionCurrent + (int) (axisWidths[i] * 0.5);
 
@@ -326,6 +327,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 		Axis currentAxis;
 		int drawnAxisCount = 0;
 		Color filterColor = chart.getFilterColor();
+		String fontFamily = chart.getFontFamily();
         DataSheet dataSheet = mainWindow.getDataSheet();
         for (int i = 0; i < chart.getAxisCount(); i++) {
 			if (chart.getAxis(i).isActive()) {
@@ -337,7 +339,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 
 				String axisLabel = currentAxis.getName();
 				int slenX = fm.stringWidth(axisLabel);
-				g.setFont(new Font("SansSerif", Font.PLAIN, currentAxis.getAxisLabelFontSize()));
+				g.setFont(new Font(fontFamily, Font.PLAIN, currentAxis.getAxisLabelFontSize()));
 
 				int yLabelOffset = 0;
 				if (chart.isVerticallyOffsetAxisLabels()) {
@@ -372,7 +374,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 				g.drawLine(lf.getXPos(), lf.getYPos(dataSheet), lf.getXPos() + chart.getFilterWidth(), lf.getYPos(dataSheet) + chart.getFilterHeight());
 				g.drawLine(lf.getXPos() - chart.getFilterWidth(), lf.getYPos(dataSheet) + chart.getFilterHeight(), lf.getXPos() + chart.getFilterWidth(), lf.getYPos(dataSheet) + chart.getFilterHeight());
 
-				g.setFont(new Font("SansSerif", Font.PLAIN, currentAxis.getTicLabelFontSize()));
+				g.setFont(new Font(fontFamily, Font.PLAIN, currentAxis.getTicLabelFontSize()));
 				// log("Font size: "+currentAxis.getTicLabelFontSize());
 				if ((uf == this.draggedFilter || lf == this.draggedFilter) && currentAxis.getParameter().isNumeric()) {
 					g.drawString(String.format(currentAxis.getTicLabelFormat(), this.draggedFilter.getValue()), this.draggedFilter.getXPos() + chart.getFilterWidth() + 4, this.draggedFilter.getYPos(dataSheet) - chart.getFilterHeight());
@@ -412,7 +414,7 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 					g.setColor(currentAxis.getAxisTicLabelFontColor());
 
 					String ticLabel;
-					g.setFont(new Font("SansSerif", Font.PLAIN, currentAxis.getTicLabelFontSize()));
+					g.setFont(new Font(fontFamily, Font.PLAIN, currentAxis.getTicLabelFontSize()));
 					if (currentAxis.getParameter().isNumeric()) {
 						double ticValue;
 						if (ticCount > 1) {
