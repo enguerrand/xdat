@@ -102,22 +102,6 @@ public class Axis implements Serializable {
 		return this.settings.getInteger(Key.PARALLEL_COORDINATES_AXIS_LABEL_FONT_SIZE);
 	}
 
-	public void setAxisLabelFontSize(int axisLabelFontSize, DataSheet dataSheet) {
-		double[] upperFilterValues = new double[this.chart.getAxisCount()];
-		double[] lowerFilterValues = new double[this.chart.getAxisCount()];
-		for (int i = 0; i < this.chart.getAxisCount(); i++) {
-			Axis axis = this.chart.getAxis(i);
-			lowerFilterValues[i] = axis.getLowerFilter().getValue();
-			upperFilterValues[i] = axis.getUpperFilter().getValue();
-		}
-		this.settings.getIntegerSetting(Key.PARALLEL_COORDINATES_AXIS_LABEL_FONT_SIZE).set(axisLabelFontSize);
-		for (int i = 0; i < this.chart.getAxisCount(); i++) {
-			Axis axis = this.chart.getAxis(i);
-			axis.getLowerFilter().setValue(lowerFilterValues[i], dataSheet);
-			axis.getUpperFilter().setValue(upperFilterValues[i], dataSheet);
-		}
-	}
-
 	public double getMax() {
 		if (!this.parameter.isNumeric())
 			return this.parameter.getDiscreteLevelCount() - 1;
