@@ -65,9 +65,7 @@ public class SettingsGroupPanel extends PaddedPanel {
     }
 
     public void applyAllAsDefault() {
-        for (Setting setting : this.settingsGroup.getSettings().values()) {
-            setting.setCurrentToDefault();
-        }
+        this.settingsGroup.applyAllAsDefault();
     }
 
     public SettingComponents getComponents(Key key) {

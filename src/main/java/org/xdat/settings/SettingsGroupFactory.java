@@ -20,7 +20,7 @@
 
 package org.xdat.settings;
 
-import org.jetbrains.annotations.NotNull;
+import org.xdat.data.AxisType;
 
 import javax.swing.JLabel;
 import java.awt.Color;
@@ -54,7 +54,6 @@ public class SettingsGroupFactory {
                 .build();
     }
 
-    @NotNull
     private static MultipleChoiceSetting buildFontSetting() {
         List<String> availableFontFamilies = Arrays.asList(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
         String defaultFontFamily = new JLabel().getFont().getFamily();
@@ -82,6 +81,12 @@ public class SettingsGroupFactory {
                 .addSetting(new BooleanSetting("Autofit Axis", true, Key.PARALLEL_COORDINATES_AUTO_FIT_AXIS))
                 .addSetting(new DoubleSetting("Min", 0, Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MIN, digitCountSetting))
                 .addSetting(new DoubleSetting("Max", 1, Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MAX, digitCountSetting))
+                .build();
+    }
+
+    public static SettingsGroup build2DScatterChartAxisSettingsGroup(AxisType axisType) {
+        return SettingsGroup.newBuilder()
+                .addSetting(new BooleanSetting("Autofit Axis", true, axisType == AxisType.X ? Key.SCATTER_CHART_2D_AUTOFIT_X : Key.SCATTER_CHART_2D_AUTOFIT_Y))
                 .build();
     }
 }

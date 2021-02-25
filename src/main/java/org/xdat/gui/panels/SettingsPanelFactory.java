@@ -1,5 +1,6 @@
 package org.xdat.gui.panels;
 
+import org.jetbrains.annotations.Nullable;
 import org.xdat.gui.controls.ColorChoiceButton;
 import org.xdat.gui.controls.MinMaxSpinnerModel;
 import org.xdat.gui.controls.RightAlignedSpinner;
@@ -30,33 +31,41 @@ public class SettingsPanelFactory {
         throw new IllegalStateException("No instance for you!");
     }
 
+    public static <T>SettingComponents standaloneFrom(Setting<T> setting) {
+        return from(setting, true);
+    }
+
     static <T>SettingComponents from(Setting<T> setting) {
+        return from(setting, false);
+    }
+
+    private static <T>SettingComponents from(Setting<T> setting, boolean direct) {
         SettingsType type = setting.getType();
         JLabel label = new JLabel(setting.getTitle());
         switch(type){
             case BOOLEAN:
-                return new SettingComponents(label, buildBooleanControl((BooleanSetting) setting));
+                return new SettingComponents(label, buildBooleanControl((BooleanSetting) setting, direct));
             case INTEGER:
-                return new SettingComponents(label, buildIntegerControl((IntegerSetting) setting));
+                return new SettingComponents(label, buildIntegerControl((IntegerSetting) setting, direct));
             case DOUBLE:
-                return new SettingComponents(label, buildDoubleControl((DoubleSetting) setting));
+                return new SettingComponents(label, buildDoubleControl((DoubleSetting) setting, direct));
             case STRING:
                 // FIXME
                 throw new IllegalStateException("Setting type " + type + " not yet implemented!");
             case COLOR:
-                return new SettingComponents(label, buildColorControl((ColorSetting) setting));
+                return new SettingComponents(label, buildColorControl((ColorSetting) setting, direct));
             case MULTIPLE_CHOICE:
-                return new SettingComponents(label, buildMultipleChoiceControl((MultipleChoiceSetting) setting));
+                return new SettingComponents(label, buildMultipleChoiceControl((MultipleChoiceSetting) setting, direct));
             default:
                 throw new IllegalStateException("Unknown setting type "+ type);
         }
     }
 
-    private static SettingControlPanel buildBooleanControl(BooleanSetting setting) {
+    private static SettingControlPanel buildBooleanControl(BooleanSetting setting, boolean direct) {
         JCheckBox checkBox = new JCheckBox();
         SettingControlPanel outer = new SettingControlPanel(new FlowLayout(FlowLayout.CENTER)) {
             @Override
-            public boolean applyValue(SettingsTransaction transaction) {
+            public boolean applyValue(@Nullable SettingsTransaction transaction) {
                 return setting.set(checkBox.isSelected(), transaction);
             }
 
@@ -67,10 +76,13 @@ public class SettingsPanelFactory {
         };
         checkBox.setSelected(setting.get());
         outer.add(checkBox);
+        if (direct) {
+            checkBox.addActionListener(actionEvent -> outer.applyValue(null));
+        }
         return outer;
     }
 
-    private static SettingControlPanel buildIntegerControl(IntegerSetting setting) {
+    private static SettingControlPanel buildIntegerControl(IntegerSetting setting, boolean direct) {
         JSpinner spinner = new RightAlignedSpinner(new MinMaxSpinnerModel(setting.getMin(), setting.getMax()));
         ((JSpinner.DefaultEditor)spinner.getEditor()).getTextField().setHorizontalAlignment(JTextField.RIGHT);
         SettingControlPanel outer = new SettingControlPanel(new GridLayout(1,1)) {
@@ -86,10 +98,13 @@ public class SettingsPanelFactory {
         };
         spinner.setValue(setting.get());
         outer.add(spinner);
+        if (direct) {
+            spinner.addChangeListener(actionEvent -> outer.applyValue(null));
+        }
         return outer;
     }
 
-    private static SettingControlPanel buildDoubleControl(DoubleSetting setting) {
+    private static SettingControlPanel buildDoubleControl(DoubleSetting setting, boolean direct) {
         JTextField textField = new JTextField();
 
         SettingControlPanel outer = new SettingControlPanel(new GridLayout(1,1)) {
@@ -114,10 +129,13 @@ public class SettingsPanelFactory {
         };
         textField.setText(String.valueOf(Formatting.formatDouble(setting.get(), setting.getDigitCountSetting().get())));
         outer.add(textField);
+        if (direct) {
+            textField.addActionListener(actionEvent -> outer.applyValue(null));
+        }
         return outer;
     }
 
-    private static SettingControlPanel buildColorControl(ColorSetting setting) {
+    private static SettingControlPanel buildColorControl(ColorSetting setting, boolean direct) {
         ColorChoiceButton colorChoiceButton = new ColorChoiceButton(setting.get());
         SettingControlPanel outer = new SettingControlPanel(new FlowLayout(FlowLayout.CENTER)) {
             @Override
@@ -134,13 +152,16 @@ public class SettingsPanelFactory {
             Color newColor = JColorChooser.showDialog(outer, setting.getTitle(), colorChoiceButton.getCurrentColor());
             if (newColor != null) {
                 colorChoiceButton.setCurrentColor(newColor);
+                if (direct) {
+                    outer.applyValue(null);
+                }
             }
         });
         outer.add(colorChoiceButton);
         return outer;
     }
 
-    private static SettingControlPanel buildMultipleChoiceControl(MultipleChoiceSetting setting) {
+    private static SettingControlPanel buildMultipleChoiceControl(MultipleChoiceSetting setting, boolean direct) {
         List<String> options = setting.getOptions();
         JComboBox<String> comboBox = new JComboBox<>(options.toArray(new String[0]));
         comboBox.setSelectedItem(setting.get());
@@ -157,6 +178,9 @@ public class SettingsPanelFactory {
             }
         };
         outer.add(comboBox);
+        if (direct) {
+            comboBox.addActionListener(actionEvent -> outer.applyValue(null));
+        }
         return outer;
     }
 }

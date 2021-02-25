@@ -20,6 +20,8 @@
 
 package org.xdat.settings;
 
+import org.xdat.data.AxisType;
+
 public enum Key {
     SCATTER_CHART_2D_TIC_LABEL_FONTSIZE_Y("scatterChart2DTicLabelFontsizeY"),
     PARALLEL_COORDINATES_AUTO_FIT_AXIS("ParallelCoordinatesAutoFitAxis"),
@@ -87,5 +89,16 @@ public enum Key {
 
     public String getId() {
         return id;
+    }
+
+    public static Key getScatterChartAutoFitAxis(AxisType axisType) {
+        switch (axisType) {
+            case X:
+                return Key.SCATTER_CHART_2D_AUTOFIT_X;
+            case Y:
+                return Key.SCATTER_CHART_2D_AUTOFIT_Y;
+            default:
+                throw new IllegalStateException("illegal axis type " + axisType);
+        }
     }
 }

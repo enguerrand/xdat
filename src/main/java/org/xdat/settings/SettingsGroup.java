@@ -29,6 +29,12 @@ public class SettingsGroup implements Serializable {
         return settingsMap;
     }
 
+    public void applyAllAsDefault() {
+        for (Setting<?> setting : getSettings().values()) {
+            setting.setCurrentToDefault();
+        }
+    }
+
     public Setting<?> getSetting(Key key) {
         Setting<?> setting = settingsMap.get(key);
         if (setting == null) {

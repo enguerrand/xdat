@@ -80,7 +80,6 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 
 		this.lineMap = new LinkedHashMap<>();
 		this.hoverList = new HashSet<>();
-		this.chart.addListener(source -> repaint());
 	}
 
 	public void paintComponent(Graphics g) {

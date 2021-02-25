@@ -72,7 +72,7 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 	private static final int BOTTOM_PADDING = 60;
 	private int topMargin = 10;
 	private List<Axis> axes = new LinkedList<>();
-	private SettingsGroup chartSettings;
+	private final SettingsGroup chartSettings;
 	public ParallelCoordinatesChart(DataSheet dataSheet, ProgressMonitor progressMonitor, int id) {
 		super(dataSheet, id);
 		this.chartSettings = SettingsGroupFactory.buildGeneralParallelCoordinatesChartSettingsGroup();

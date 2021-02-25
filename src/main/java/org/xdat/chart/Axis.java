@@ -51,7 +51,7 @@ public class Axis implements Serializable {
 	private Parameter parameter;
 	private Filter upperFilter;
 	private Filter lowerFilter;
-	private SettingsGroup settings;
+	private final SettingsGroup settings;
 
 	public Axis(DataSheet dataSheet, ParallelCoordinatesChart chart, Parameter parameter) {
 		this.settings = SettingsGroupFactory.buildParallelCoordinatesChartAxisSettingsGroup();

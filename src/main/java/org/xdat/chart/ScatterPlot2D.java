@@ -26,6 +26,7 @@ import org.xdat.data.AxisType;
 import org.xdat.data.DataSheet;
 import org.xdat.data.Design;
 import org.xdat.data.Parameter;
+import org.xdat.settings.SettingsGroup;
 
 import java.awt.Color;
 import java.util.HashMap;
@@ -49,8 +50,6 @@ public class ScatterPlot2D extends Plot {
 	private Parameter parameterForYAxis;
 	private boolean showDecorations;
 	private Color decorationsColor = Color.BLACK;
-	private boolean autofitX = true;
-	private boolean autofitY = true;
 	private int ticCountX = 2;
 	private int ticCountY = 2;
 	private int ticSize = 5;
@@ -61,7 +60,7 @@ public class ScatterPlot2D extends Plot {
 	private int ticLabelFontSizeX = 12;
 	private int ticLabelFontSizeY = 12;
 
-	ScatterPlot2D(DataSheet dataSheet, boolean showDecorations) {
+	ScatterPlot2D(DataSheet dataSheet, boolean showDecorations, SettingsGroup chartSettingsX, SettingsGroup axisSettingsY) {
 		super();
 		this.showDecorations = showDecorations;
 		if (dataSheet.getParameterCount() > 1) {
@@ -155,27 +154,6 @@ public class ScatterPlot2D extends Plot {
 
 	public void setDecorationsColor(Color decorationsColor) {
 		this.decorationsColor = decorationsColor;
-	}
-
-	public boolean isAutofit(AxisType axisType) {
-		switch (axisType) {
-			case X: return autofitX;
-			case Y: return autofitY;
-			default: throw new IllegalArgumentException("Unknown axis type "+axisType);
-		}
-	}
-
-	public void setAutofit(AxisType axisType, boolean autofit) {
-		switch (axisType) {
-			case X:
-				this.autofitX = autofit;
-				break;
-			case Y:
-				this.autofitY = autofit;
-				break;
-			default:
-				throw new IllegalArgumentException("Unknown axis type "+axisType);
-		}
 	}
 
 	public void autofit(DataSheet dataSheet, AxisType axisType) {
@@ -329,8 +307,6 @@ public class ScatterPlot2D extends Plot {
 	public void resetDisplaySettingsToDefault() {
 		UserPreferences userPreferences = UserPreferences.getInstance();
 		this.setDisplayedDesignSelectionMode(userPreferences.getScatterChart2DDisplayMode());
-		this.autofitX = userPreferences.isScatterChart2DAutofitX();
-		this.autofitY = userPreferences.isScatterChart2DAutofitY();
 		this.axisLabelFontSizeX = userPreferences.getScatterChart2DAxisTitleFontsizeX();
 		this.axisLabelFontSizeY = userPreferences.getScatterChart2DAxisTitleFontsizeY();
 		this.ticCountX = userPreferences.getScatterChart2DTicCountX();

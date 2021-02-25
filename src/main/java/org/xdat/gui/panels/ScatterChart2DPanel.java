@@ -94,7 +94,7 @@ public class ScatterChart2DPanel extends ChartPanel {
 			yValues[i] = dataSheet.getDesign(i).getDoubleValue(paramY);
 		}
 
-		if (chart.getScatterPlot2D().isAutofit(AxisType.X)) {
+		if (chart.isAutoFit(AxisType.X)) {
 			minX = Double.POSITIVE_INFINITY;
 			maxX = Double.NEGATIVE_INFINITY;
 			for (int i = 0; i < dataSheet.getDesignCount(); i++) {
@@ -108,7 +108,7 @@ public class ScatterChart2DPanel extends ChartPanel {
 			chart.getScatterPlot2D().setMin(AxisType.X, minX);
 		}
 
-		if (chart.getScatterPlot2D().isAutofit(AxisType.Y)) {
+		if (chart.isAutoFit(AxisType.Y)) {
 			minY = Double.POSITIVE_INFINITY;
 			maxY = Double.NEGATIVE_INFINITY;
 			for (int i = 0; i < dataSheet.getDesignCount(); i++) {
@@ -214,7 +214,6 @@ public class ScatterChart2DPanel extends ChartPanel {
 			default: {
 			}
 		}
-
 	}
 
 	public void drawAxes(Graphics g, ScatterChart2D chart, ScatterPlot2D plot) {

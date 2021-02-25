@@ -105,23 +105,6 @@ public class UserPreferences {
 		PREFS.putInt(Key.SCATTER_CHART_2D_DISPLAY_MODE.getId(), ScatterChart2DDisplayMode);
 	}
 
-	public boolean isScatterChart2DAutofitX() {
-		return PREFS.getBoolean(Key.SCATTER_CHART_2D_AUTOFIT_X.getId(), true);
-	}
-
-	public void setScatterChart2DAutofitX(boolean scatterChart2DAutofitX) {
-		PREFS.putBoolean(Key.SCATTER_CHART_2D_AUTOFIT_X.getId(), scatterChart2DAutofitX);
-	}
-
-	public boolean isScatterChart2DAutofitY() {
-		return PREFS.getBoolean(Key.SCATTER_CHART_2D_AUTOFIT_Y.getId(), true);
-	}
-
-	public void setScatterChart2DAutofitY(boolean scatterChart2DAutofitY) {
-		PREFS.putBoolean(Key.SCATTER_CHART_2D_AUTOFIT_Y.getId(), scatterChart2DAutofitY);
-	}
-
-
 	public int getScatterChart2DAxisTitleFontsizeX() {
 		return PREFS.getInt(Key.SCATTER_CHART_2D_AXIS_TITLE_FONTSIZE_X.getId(), 20);
 	}
