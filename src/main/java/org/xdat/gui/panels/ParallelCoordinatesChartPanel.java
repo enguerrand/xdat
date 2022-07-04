@@ -20,6 +20,7 @@
 
 package org.xdat.gui.panels;
 
+import org.apache.batik.svggen.SVGGraphics2D;
 import org.xdat.Main;
 import org.xdat.chart.Axis;
 import org.xdat.chart.Filter;
@@ -85,11 +86,10 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 	public void paintComponent(Graphics g) {
 		Graphics cg;
 		BufferedImage canvas;
-		if(this.chart.isAntiAliasing() || this.chart.isUseAlpha() ){
+		if((this.chart.isAntiAliasing() || this.chart.isUseAlpha()) && !(g instanceof SVGGraphics2D) ){
 			canvas = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
 			cg = canvas.getGraphics();
-		}
-		else{
+		} else{
 			canvas = null;
 			cg = g;
 		}
