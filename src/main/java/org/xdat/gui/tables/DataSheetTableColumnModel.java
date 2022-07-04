@@ -30,7 +30,7 @@ import java.util.Collection;
 
 public class DataSheetTableColumnModel extends DefaultTableColumnModel {
 
-	private Main mainWindow;
+	private final Main mainWindow;
 
 	public DataSheetTableColumnModel(Main mainWindow) {
 		super();
@@ -54,7 +54,7 @@ public class DataSheetTableColumnModel extends DefaultTableColumnModel {
 				Collection<Chart> charts = this.mainWindow.getCurrentSession().getCharts();
 				for (Chart chart : charts) {
 					if (chart instanceof ParallelCoordinatesChart) {
-						((ParallelCoordinatesChart) charts).moveAxis(src - 1, tar - 1);
+						((ParallelCoordinatesChart) chart).moveAxis(src - 1, tar - 1);
 					}
 				}
 				this.mainWindow.repaintAllChartFrames();
