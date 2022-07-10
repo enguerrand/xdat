@@ -64,19 +64,17 @@ public class AxisDisplaySettingsPanel extends JPanel {
 		this();
 		Vector<Axis> v = new Vector<>(0, 1);
 		for (Axis axis : axes) {
-			if (axis.isActive()) {
-				v.add(axis);
-				SettingsGroup settings = axis.getSettings();
-				SettingsGroupPanel settingsGroupPanel = new SettingsGroupPanel(settings);
-				getMinTextField(settingsGroupPanel);
-				getMaxTextField(settingsGroupPanel);
-				BooleanSetting autoFitSetting = settings.getBooleanSetting(Key.PARALLEL_COORDINATES_AUTO_FIT_AXIS);
-				autoFitSetting.addListener((src, transaction)-> {
-					setAxisRangeFieldsEnabled(!src.get(), settingsGroupPanel);
-				});
-				setAxisRangeFieldsEnabled(!autoFitSetting.get(), settingsGroupPanel);
-				axisSettingPanels.put(settings, settingsGroupPanel);
-			}
+			v.add(axis);
+			SettingsGroup settings = axis.getSettings();
+			SettingsGroupPanel settingsGroupPanel = new SettingsGroupPanel(settings);
+			getMinTextField(settingsGroupPanel);
+			getMaxTextField(settingsGroupPanel);
+			BooleanSetting autoFitSetting = settings.getBooleanSetting(Key.PARALLEL_COORDINATES_AUTO_FIT_AXIS);
+			autoFitSetting.addListener((src, transaction)-> {
+				setAxisRangeFieldsEnabled(!src.get(), settingsGroupPanel);
+			});
+			setAxisRangeFieldsEnabled(!autoFitSetting.get(), settingsGroupPanel);
+			axisSettingPanels.put(settings, settingsGroupPanel);
 		}
 		axisChoiceCombo = new JComboBox<>(v);
 		axisChoiceCombo.addActionListener(actionEvent -> {
@@ -108,7 +106,9 @@ public class AxisDisplaySettingsPanel extends JPanel {
 	private void setCurrentSettings(SettingsGroup settings) {
         this.settingsPanelWrapper.removeAll();
 		SettingsGroupPanel settingsGroupPanel = this.axisSettingPanels.get(settings);
-		this.settingsPanelWrapper.add(settingsGroupPanel, BorderLayout.CENTER);
+		if (settingsGroupPanel != null) {
+			this.settingsPanelWrapper.add(settingsGroupPanel, BorderLayout.CENTER);
+		}
 		this.revalidate();
 		this.repaint();
 	}
