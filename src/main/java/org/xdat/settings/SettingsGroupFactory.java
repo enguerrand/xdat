@@ -21,6 +21,7 @@
 package org.xdat.settings;
 
 import org.xdat.data.AxisType;
+import org.xdat.gui.panels.DisabledValueSupplier;
 import org.xdat.gui.panels.EnabledCondition;
 
 import javax.swing.JLabel;
@@ -65,7 +66,7 @@ public class SettingsGroupFactory {
         return new MultipleChoiceSetting("Font Family", defaultFontFamily, Key.FONT_FAMILY, availableFontFamilies);
     }
 
-    public static SettingsGroup buildParallelCoordinatesChartAxisSettingsGroup(Supplier<Double> minPossibleValueSupplier, Supplier<Double> maxPossibleValueSupplier) {
+    public static SettingsGroup buildParallelCoordinatesChartAxisSettingsGroup(DisabledValueSupplier<Double> minPossibleValueSupplier, DisabledValueSupplier<Double> maxPossibleValueSupplier) {
         IntegerSetting digitCountSetting = new IntegerSetting("Tic Label Digit Count", 3, Key.PARALLEL_COORDINATES_AXIS_TIC_LABEL_DIGIT_COUNT, 0, 20);
         BooleanSetting autoFit = new BooleanSetting("Autofit Axis", true, Key.PARALLEL_COORDINATES_AUTO_FIT_AXIS);
         DoubleSetting min = new DoubleSetting("Min", 0, Key.PARALLEL_COORDINATES_AXIS_DEFAULT_MIN, digitCountSetting);

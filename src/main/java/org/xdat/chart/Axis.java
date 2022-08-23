@@ -22,6 +22,7 @@ package org.xdat.chart;
 
 import org.xdat.data.DataSheet;
 import org.xdat.data.Parameter;
+import org.xdat.gui.panels.DisabledValueSupplierDatasheetAxisLimit;
 import org.xdat.settings.IntegerSetting;
 import org.xdat.settings.Key;
 import org.xdat.settings.Setting;
@@ -47,7 +48,7 @@ import java.io.Serializable;
  */
 public class Axis implements Serializable {
 	static final long serialVersionUID = 7L;
-	private ParallelCoordinatesChart chart;
+	private final ParallelCoordinatesChart chart;
 	private Parameter parameter;
 	private Filter upperFilter;
 	private Filter lowerFilter;
@@ -56,7 +57,10 @@ public class Axis implements Serializable {
 	public Axis(DataSheet dataSheet, ParallelCoordinatesChart chart, Parameter parameter) {
 		this.chart = chart;
 		this.parameter = parameter;
-		this.settings = SettingsGroupFactory.buildParallelCoordinatesChartAxisSettingsGroup(() -> getMinPossibleValue(dataSheet), () -> getMaxPossibleValue(dataSheet));
+		this.settings = SettingsGroupFactory.buildParallelCoordinatesChartAxisSettingsGroup(
+				new DisabledValueSupplierDatasheetAxisLimit(dataSheet, parameter, DisabledValueSupplierDatasheetAxisLimit.AxisLimitType.MIN),
+				new DisabledValueSupplierDatasheetAxisLimit(dataSheet, parameter, DisabledValueSupplierDatasheetAxisLimit.AxisLimitType.MAX)
+		);
 		initialiseSettings(dataSheet);
 		if (this.settings.getBoolean(Key.PARALLEL_COORDINATES_AUTO_FIT_AXIS)) {
 			autofit(dataSheet);

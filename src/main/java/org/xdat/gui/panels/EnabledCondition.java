@@ -1,5 +1,5 @@
 /*
- *  Copyright 2021, Enguerrand de Rochefort
+ *  Copyright 2022, Enguerrand de Rochefort
  *
  * This file is part of xdat.
  *
@@ -22,14 +22,14 @@ package org.xdat.gui.panels;
 
 import org.xdat.settings.Setting;
 
-import java.util.function.Supplier;
+import java.io.Serializable;
 
-public class EnabledCondition<T, K> {
+public class EnabledCondition<T, K> implements Serializable {
     private final Setting<T> enablingSetting;
     private final T enablingValue;
-    private final Supplier<K> disabledValueSupplier;
+    private final DisabledValueSupplier<K> disabledValueSupplier;
 
-    public EnabledCondition(Setting<T> enablingSetting, T enablingValue, Supplier<K> disabledValueSupplier) {
+    public EnabledCondition(Setting<T> enablingSetting, T enablingValue, DisabledValueSupplier<K> disabledValueSupplier) {
         this.enablingSetting = enablingSetting;
         this.enablingValue = enablingValue;
         this.disabledValueSupplier = disabledValueSupplier;
@@ -44,6 +44,6 @@ public class EnabledCondition<T, K> {
     }
 
     public K getDisabledValue() {
-        return disabledValueSupplier.get();
+        return disabledValueSupplier.getDisabledValue();
     }
 }
