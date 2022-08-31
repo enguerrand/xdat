@@ -18,5 +18,9 @@
             <source> ${project.build.directory}/${project.artifactId}.jar</source>
             <outputDirectory>/</outputDirectory>
         </file>
+        <file>
+            <source> ${project.basedir}/THIRD-PARTY.txt</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
     </files>
 </assembly>
