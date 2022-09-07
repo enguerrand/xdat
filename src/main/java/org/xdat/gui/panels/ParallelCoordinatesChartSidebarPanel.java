@@ -202,6 +202,7 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 			clusterButtonPanel.add(removeClusterButton, BorderLayout.CENTER);
 
 			final JButton applyClusterButton = new JButton("Add Designs");
+			applyClusterButton.setToolTipText("Add all currently filtered designs to cluster " + cluster.getName());
 			applyClusterButton.addActionListener(e -> cmd.applySettings((ParallelCoordinatesChart) getChart(), cluster));
 			clusterButtonPanel.add(applyClusterButton, BorderLayout.EAST);
 
