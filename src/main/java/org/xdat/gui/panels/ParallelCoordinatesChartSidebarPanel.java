@@ -58,7 +58,6 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 	private ParallelChartSidebarActionListener cmd;
 	private ColorChoiceButton activeDesignColorButton;
 	private JSlider activeDesignAlphaSlider;
-	private JButton newClusterButton;
 	private JScrollPane clusterScrollPane;
 	private JPanel clusterPanel;
 	private Map<Cluster, JSlider> clusterAlphaSliders;
@@ -111,7 +110,7 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 
 		JPanel addClusterButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		addClusterButtonPanel.setPreferredSize(new Dimension(180, 35));
-		newClusterButton = new JButton("Add Cluster");
+		JButton newClusterButton = new JButton("Add Cluster");
 		newClusterButton.addActionListener(e -> cmd.addCluster());
 		addClusterButtonPanel.add(newClusterButton);
 		generalControlsPanel.add(addClusterButtonPanel);
@@ -202,7 +201,7 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 			removeClusterButton.addActionListener(e -> cmd.removeCluster(cluster));
 			clusterButtonPanel.add(removeClusterButton, BorderLayout.CENTER);
 
-			final JButton applyClusterButton = new JButton("Apply");
+			final JButton applyClusterButton = new JButton("Add Designs");
 			applyClusterButton.addActionListener(e -> cmd.applySettings((ParallelCoordinatesChart) getChart(), cluster));
 			clusterButtonPanel.add(applyClusterButton, BorderLayout.EAST);
 
