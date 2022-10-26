@@ -70,8 +70,8 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 
 	static final long serialVersionUID = 4;
 	private static final int BOTTOM_PADDING = 60;
-	private int topMargin = 10;
-	private List<Axis> axes = new LinkedList<>();
+	private static final int TOP_MARGIN = 10;
+	private final List<Axis> axes = new LinkedList<>();
 	private final SettingsGroup chartSettings;
 	public ParallelCoordinatesChart(DataSheet dataSheet, ProgressMonitor progressMonitor, int id) {
 		super(dataSheet, id);
@@ -110,6 +110,20 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 			changeHandler.run();
 		} else {
 			transaction.handleOnce(changeHandler);
+		}
+	}
+
+	@Override
+	protected void fireChanged() {
+		applyAutoFitIfNeeded();
+		super.fireChanged();
+	}
+
+	private void applyAutoFitIfNeeded() {
+		for (Axis axis : getAxes()) {
+			if (axis.isAutoFit()) {
+				axis.autofit(getDataSheet());
+			}
 		}
 	}
 
@@ -299,7 +313,7 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 	}
 
 	public int getTopMargin() {
-		return topMargin;
+		return TOP_MARGIN;
 	}
 
 	public void resetDisplaySettingsToDefault(DataSheet dataSheet) {
