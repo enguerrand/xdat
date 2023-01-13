@@ -58,7 +58,7 @@ public class Session implements Serializable {
 	@Nullable
 	private DataSheet currentDataSheet;
 	private ClusterSet currentClusterSet;
-	private List<Chart> charts = new LinkedList<Chart>();
+	private final List<Chart> charts = new LinkedList<>();
 
 	public Session() {
 		this.currentClusterSet = new ClusterSet();
@@ -82,7 +82,10 @@ public class Session implements Serializable {
 	}
 
 	private void initTransientData() {
-		this.currentDataSheet.initTransientData();
+		DataSheet ds = this.currentDataSheet;
+		if (ds != null){
+			ds.initTransientData();
+		}
 		this.currentClusterSet.initTransientData();
 		this.charts.forEach(Chart::initTransientData);
 	}
@@ -95,8 +98,8 @@ public class Session implements Serializable {
 		this.charts.add(chart);
 	}
 
-	public boolean removeChart(Chart chart) {
-		return this.charts.remove(chart);
+	public void removeChart(Chart chart) {
+		this.charts.remove(chart);
 	}
 
 	public void clearAllCharts() {
@@ -110,6 +113,7 @@ public class Session implements Serializable {
 		}
 	}
 
+	@Nullable
 	public DataSheet getCurrentDataSheet() {
 		return currentDataSheet;
 	}

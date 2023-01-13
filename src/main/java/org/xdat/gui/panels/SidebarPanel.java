@@ -31,12 +31,12 @@ import java.awt.BorderLayout;
 
 public abstract class SidebarPanel extends JPanel {
 
-	private Main mainWindow;
-	private ChartFrame chartFrame;
-	private ChartPanel chartPanel;
-	private JPanel contentPanel;
-	private JPanel headerPanel;
-    private Chart chart;
+	private final Main mainWindow;
+	private final ChartFrame chartFrame;
+	private final ChartPanel chartPanel;
+	private final JPanel contentPanel;
+	private final JPanel headerPanel;
+    private final Chart chart;
     private boolean maximized = true;
     private final Runnable onClosed;
 

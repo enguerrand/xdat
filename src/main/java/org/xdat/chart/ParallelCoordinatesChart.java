@@ -120,17 +120,20 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 				boolean changed = false;
 				if (parametersChanged) {
 					// we never add, so only check for removal is needed
-					changed |= axes.removeIf(axis -> !dataSheet.parameterExists(axis.getParameter()));
+					changed = axes.removeIf(axis -> !dataSheet.parameterExists(axis.getParameter()));
 				}
 				for (int i = 0; i < axes.size(); i++) {
 					Axis axis = axes.get(i);
 					if (autoFitRequired[i]) {
+						changed = true;
 						axis.autofit(dataSheet);
 					}
 					if (filterResetRequired[i]) {
+						changed = true;
 						axis.resetFilters(dataSheet);
 					}
 					if (applyFiltersRequired[i]) {
+						changed = true;
 						axis.applyFilters(dataSheet);
 					}
 				}

@@ -51,7 +51,7 @@ public class DataSheet implements Serializable, ListModel {
 	static final long serialVersionUID = 8;
 	private List<Design> data = new ArrayList<>();
 	private Map<Integer, Design> designIdsMap = new HashMap<>();
-	private List<Parameter> parameters = new LinkedList<>();
+	private final List<Parameter> parameters = new LinkedList<>();
 	private transient List<ListDataListener> listDataListener;
 	private transient List<DatasheetListener> listeners;
 	private String delimiter;
@@ -365,13 +365,12 @@ public class DataSheet implements Serializable, ListModel {
 		throw new IllegalArgumentException("Parameter " + parameterName + " not found");
 	}
 
-	public boolean removeParameter(String parameterName){
+	public void removeParameter(String parameterName){
 		boolean removed = this.parameters.removeIf(p -> p.getName().equals(parameterName));
 		if (removed) {
 			fireDataPanelUpdateRequired();
 			fireOnDataChanged(false, false, false, true);
 		}
-		return removed;
 	}
 
 	public int getParameterIndex(String parameterName) {
