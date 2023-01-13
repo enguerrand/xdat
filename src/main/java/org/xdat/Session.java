@@ -20,8 +20,8 @@
 
 package org.xdat;
 
+import org.jetbrains.annotations.Nullable;
 import org.xdat.chart.Chart;
-import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.data.ClusterSet;
 import org.xdat.data.DataSheet;
 
@@ -54,6 +54,8 @@ public class Session implements Serializable {
 	public static final String sessionFileExtension = ".ses";
 	private String sessionName = "Untitled";
 	private String sessionDirectory;
+
+	@Nullable
 	private DataSheet currentDataSheet;
 	private ClusterSet currentClusterSet;
 	private List<Chart> charts = new LinkedList<Chart>();
@@ -102,10 +104,9 @@ public class Session implements Serializable {
 	}
 
 	public void removeParameter(String paramName) {
-		for (Chart chart : charts) {
-			if (chart instanceof ParallelCoordinatesChart) {
-				((ParallelCoordinatesChart) chart).removeAxis(paramName);
-			}
+		DataSheet dataSheet = currentDataSheet;
+		if (dataSheet != null) {
+			dataSheet.removeParameter(paramName);
 		}
 	}
 
@@ -113,7 +114,7 @@ public class Session implements Serializable {
 		return currentDataSheet;
 	}
 
-	public void setCurrentDataSheet(DataSheet currentDataSheet) {
+	public void setCurrentDataSheet(@Nullable DataSheet currentDataSheet) {
 		this.currentDataSheet = currentDataSheet;
 	}
 

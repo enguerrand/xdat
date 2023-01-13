@@ -59,7 +59,7 @@ public abstract class SidebarPanel extends JPanel {
 			}
 
 			@Override
-			public void onDataChanged(boolean[] autoFitRequired, boolean[] filterResetRequired, boolean[] applyFiltersRequired) {
+			public void onDataChanged(boolean[] autoFitRequired, boolean[] filterResetRequired, boolean[] applyFiltersRequired, boolean parametersChanged) {
 			}
 		};
 		mainWindow.addDataSheetSubListener(listener);

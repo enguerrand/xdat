@@ -20,6 +20,7 @@ package org.xdat;
  *
  */
 
+import org.jetbrains.annotations.Nullable;
 import org.xdat.actionListeners.scatter2DChartSettings.ParallelChartFrameComboModel;
 import org.xdat.chart.Chart;
 import org.xdat.chart.ParallelCoordinatesChart;
@@ -105,7 +106,7 @@ public class Main extends JFrame {
 			}
 
 			@Override
-			public void onDataChanged(boolean[] autoFitRequired, boolean[] filterResetRequired, boolean[] applyFiltersRequired) {
+			public void onDataChanged(boolean[] autoFitRequired, boolean[] filterResetRequired, boolean[] applyFiltersRequired, boolean parametersChanged) {
 				final ProgressMonitor progressMonitor = new ProgressMonitor(Main.this, "", "Rebuilding charts", 0, getDataSheet().getParameterCount() - 1);
 				progressMonitor.setMillisToPopup(0);
 
@@ -131,7 +132,7 @@ public class Main extends JFrame {
 
 				repaintAllChartFrames();
 
-				fireSubListeners(l -> l.onDataChanged(autoFitRequired, filterResetRequired, applyFiltersRequired));
+				fireSubListeners(l -> l.onDataChanged(autoFitRequired, filterResetRequired, applyFiltersRequired, false));
 			}
 		};
 		this.currentSession = new Session();
@@ -215,7 +216,7 @@ public class Main extends JFrame {
 		return this.currentSession.getCurrentDataSheet();
 	}
 
-	public void setDataSheet(DataSheet dataSheet) {
+	public void setDataSheet(@Nullable DataSheet dataSheet) {
 		DataSheet currentDataSheet = this.currentSession.getCurrentDataSheet();
 		if(currentDataSheet != null) {
 			currentDataSheet.removeListener(this.datasheetListener);
@@ -260,6 +261,11 @@ public class Main extends JFrame {
 
 	public void removeParameter(String paramName) {
 		getCurrentSession().removeParameter(paramName);
+		int newParamsCount = getCurrentSession().getCurrentDataSheet().getParameterCount();
+		boolean[] flags = new boolean[newParamsCount];
+		Arrays.fill(flags, false);
+		fireDataPanelUpdateRequired();
+		fireDataChanged(flags, flags, flags);
 	}
 
 	public ChartFrame getChartFrame(int index) {
@@ -459,7 +465,7 @@ public class Main extends JFrame {
 		this.datasheetListener.onDataPanelUpdateRequired();
 	}
 
-	public void fireOnDataChanged(boolean[] axisAutofitRequired, boolean[] axisResetFilterRequired, boolean[] axisApplyFiltersRequired) {
-		this.datasheetListener.onDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired);
+	public void fireDataChanged(boolean[] axisAutofitRequired, boolean[] axisResetFilterRequired, boolean[] axisApplyFiltersRequired) {
+		this.datasheetListener.onDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired, false);
 	}
 }

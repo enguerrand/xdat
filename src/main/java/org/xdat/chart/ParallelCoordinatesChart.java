@@ -22,6 +22,7 @@ package org.xdat.chart;
 
 import org.jetbrains.annotations.Nullable;
 import org.xdat.data.DataSheet;
+import org.xdat.data.DatasheetListener;
 import org.xdat.data.Design;
 import org.xdat.settings.Key;
 import org.xdat.settings.SettingsGroup;
@@ -103,6 +104,41 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 				s.addListener((source, transaction) ->
 						handleSettingChange(this::fireChanged, transaction))
 		);
+
+		dataSheet.addListener(new DatasheetListener() {
+			@Override
+			public void onClustersChanged() {
+				fireChanged();
+			}
+
+			@Override
+			public void onDataPanelUpdateRequired() {
+			}
+
+			@Override
+			public void onDataChanged(boolean[] autoFitRequired, boolean[] filterResetRequired, boolean[] applyFiltersRequired, boolean parametersChanged) {
+				boolean changed = false;
+				if (parametersChanged) {
+					// we never add, so only check for removal is needed
+					changed |= axes.removeIf(axis -> !dataSheet.parameterExists(axis.getParameter()));
+				}
+				for (int i = 0; i < axes.size(); i++) {
+					Axis axis = axes.get(i);
+					if (autoFitRequired[i]) {
+						axis.autofit(dataSheet);
+					}
+					if (filterResetRequired[i]) {
+						axis.resetFilters(dataSheet);
+					}
+					if (applyFiltersRequired[i]) {
+						axis.applyFilters(dataSheet);
+					}
+				}
+				if (changed) {
+					fireChanged();
+				}
+			}
+		});
 	}
 
 	private void handleSettingChange(Runnable changeHandler, @Nullable SettingsTransaction transaction) {
@@ -214,16 +250,6 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 
 	public void addAxis(Axis axis) {
 		this.axes.add(axis);
-	}
-
-	public void removeAxis(String parameterName) {
-		for (int i = 0; i < this.axes.size(); i++) {
-			if (parameterName.equals(this.axes.get(i).getParameter().getName())) {
-				this.axes.remove(i);
-				return;
-			}
-		}
-		throw new IllegalArgumentException("Axis " + parameterName + " not found");
 	}
 
 	public void moveAxis(int oldIndex, int newIndex) {

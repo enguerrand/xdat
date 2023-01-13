@@ -195,7 +195,7 @@ public class DataSheet implements Serializable, ListModel {
 
 		restoreClustersFromHashes(clustersToDesignHashes, this.data, clusterSet);
 
-		fireOnDataChanged(initialiseBooleanArray(true), initialiseBooleanArray(true), initialiseBooleanArray(true));
+		fireOnDataChanged(initialiseBooleanArray(true), initialiseBooleanArray(true), initialiseBooleanArray(true), false);
 		fireDataPanelUpdateRequired();
 
 	}
@@ -285,7 +285,7 @@ public class DataSheet implements Serializable, ListModel {
 		}
 
 		axisApplyFiltersRequired[columnIndex - 1] = true;
-		fireOnDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired);
+		fireOnDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired, false);
 	}
 
 	private int getLineCount(String pathToInputFile) throws IOException {
@@ -336,7 +336,7 @@ public class DataSheet implements Serializable, ListModel {
 			axisApplyFiltersRequired[i] = true;
 		}
 
-		fireOnDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired);
+		fireOnDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired, false);
 		fireDataPanelUpdateRequired();
 	}
 
@@ -363,6 +363,15 @@ public class DataSheet implements Serializable, ListModel {
 			}
 		}
 		throw new IllegalArgumentException("Parameter " + parameterName + " not found");
+	}
+
+	public boolean removeParameter(String parameterName){
+		boolean removed = this.parameters.removeIf(p -> p.getName().equals(parameterName));
+		if (removed) {
+			fireDataPanelUpdateRequired();
+			fireOnDataChanged(false, false, false, true);
+		}
+		return removed;
 	}
 
 	public int getParameterIndex(String parameterName) {
@@ -513,17 +522,17 @@ public class DataSheet implements Serializable, ListModel {
 		fireListeners(DatasheetListener::onDataPanelUpdateRequired);
 	}
 
-	public void fireOnDataChanged(boolean axisAutofitRequired, boolean axisResetFilterRequired, boolean axisApplyFiltersRequired) {
+	public void fireOnDataChanged(boolean axisAutofitRequired, boolean axisResetFilterRequired, boolean axisApplyFiltersRequired, boolean parametersChanged) {
 		boolean[] autofit = new boolean[parameters.size()];
 		boolean[] resetFilter = new boolean[parameters.size()];
 		boolean[] applyFilters = new boolean[parameters.size()];
 		Arrays.fill(autofit, axisAutofitRequired);
 		Arrays.fill(resetFilter, axisResetFilterRequired);
 		Arrays.fill(applyFilters, axisApplyFiltersRequired);
-		fireOnDataChanged(autofit, resetFilter, applyFilters);
+		fireOnDataChanged(autofit, resetFilter, applyFilters, parametersChanged);
 	}
 
-	public void fireOnDataChanged(boolean[] axisAutofitRequired, boolean[] axisResetFilterRequired, boolean[] axisApplyFiltersRequired) {
-		fireListeners(l -> l.onDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired));
+	public void fireOnDataChanged(boolean[] axisAutofitRequired, boolean[] axisResetFilterRequired, boolean[] axisApplyFiltersRequired, boolean parametersChanged) {
+		fireListeners(l -> l.onDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired, parametersChanged));
 	}
 }

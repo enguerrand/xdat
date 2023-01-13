@@ -22,5 +22,5 @@ package org.xdat.data;
 public interface DatasheetListener {
     void onClustersChanged();
     void onDataPanelUpdateRequired();
-    void onDataChanged(boolean[] autoFitRequired, boolean[] filterResetRequired, boolean[] applyFiltersRequired);
+    void onDataChanged(boolean[] autoFitRequired, boolean[] filterResetRequired, boolean[] applyFiltersRequired, boolean parametersChanged);
 }
