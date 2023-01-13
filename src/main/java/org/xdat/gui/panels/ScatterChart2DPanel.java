@@ -26,6 +26,7 @@ import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.chart.ScatterChart2D;
 import org.xdat.chart.ScatterPlot2D;
 import org.xdat.data.AxisType;
+import org.xdat.data.Cluster;
 import org.xdat.data.DataSheet;
 import org.xdat.data.Design;
 import org.xdat.data.Parameter;
@@ -38,7 +39,7 @@ import java.awt.geom.AffineTransform;
 
 public class ScatterChart2DPanel extends ChartPanel {
 	static final long serialVersionUID = 1L;
-	private Main mainWindow;
+	private final Main mainWindow;
 	private int yAxisOffset = 0;
 
 	public ScatterChart2DPanel(Main mainWindow, ScatterChart2D chart) {
@@ -157,7 +158,11 @@ public class ScatterChart2DPanel extends ChartPanel {
 					Color filteredDesignColorNoAlpha = parallelChart.getFilteredDesignColorNoAlpha();
 					for (int i = 0; i < dataSheet.getDesignCount(); i++) {
 						Design design = dataSheet.getDesign(i);
-						if (dataSheet.getDesign(i).isActive(parallelChart)) {
+						Cluster cluster = design.getCluster();
+						if (cluster != null && !cluster.isActive()) {
+							continue;
+						}
+						if (design.isActive(parallelChart)) {
 							int x = xOrig + (int) ((xValues[i] - minX) * plotWidth / xRange);
 							int y = yOrig - (int) ((yValues[i] - minY) * plotHeight / yRange);
 							if (isXConstant)
@@ -180,6 +185,11 @@ public class ScatterChart2DPanel extends ChartPanel {
 			}
 			case (ScatterPlot2D.SHOW_ALL_DESIGNS): {
 				for (int i = 0; i < dataSheet.getDesignCount(); i++) {
+					Design design = dataSheet.getDesign(i);
+					Cluster cluster = design.getCluster();
+					if (cluster != null && !cluster.isActive()) {
+						continue;
+					}
 					int x = xOrig + (int) ((xValues[i] - minX) * plotWidth / xRange);
 					int y = yOrig - (int) ((yValues[i] - minY) * plotHeight / yRange);
 					if (isXConstant)
