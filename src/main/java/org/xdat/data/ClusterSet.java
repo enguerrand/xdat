@@ -26,17 +26,24 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public class ClusterSet implements Serializable {
 
 	static final long serialVersionUID = 1L;
 	private DataSheet dataSheet;
-	private List<Cluster> clusters = new LinkedList<>();
+	private final List<Cluster> clusters = new LinkedList<>();
+
+    private transient Set<ClusterListener> listeners;
+
+    private transient ClusterListener dispatchingListener;
 
     public ClusterSet() {
+        initTransientData();
     }
 
     public ClusterSet(DataSheet dataSheet) {
@@ -47,6 +54,7 @@ public class ClusterSet implements Serializable {
 	public void newCluster(ClusterFactory factory){
         Cluster newCluster = factory.newCluster(this.clusters);
         this.clusters.add(newCluster);
+        newCluster.addClusterListener(this.dispatchingListener);
         this.dataSheet.onClustersUpdated(Collections.emptyList(), Collections.singletonList(newCluster), Collections.emptyList());
     }
 
@@ -80,6 +88,7 @@ public class ClusterSet implements Serializable {
     public void removeCluster(Cluster cluster) {
         boolean removed = this.clusters.remove(cluster);
         if (removed) {
+            cluster.removeClusterListener(dispatchingListener);
             this.dataSheet.onClustersUpdated(Collections.emptyList(), Collections.emptyList(), Collections.singletonList(cluster));
         }
     }
@@ -120,7 +129,31 @@ public class ClusterSet implements Serializable {
         this.dataSheet.onClustersUpdated(changedClusters, addedClusters, removedClusters);
     }
 
+    public void addClusterListener(ClusterListener l) {
+        this.listeners.add(l);
+    }
+
+    public void removeClusterListener(ClusterListener l) {
+        this.listeners.remove(l);
+    }
+
     public void initTransientData() {
+        listeners = new LinkedHashSet<>();
+        dispatchingListener = new ClusterListener() {
+            @Override
+            public void onNameChanged(Cluster source) {
+                for (ClusterListener listener : listeners) {
+                    listener.onNameChanged(source);
+                }
+            }
+
+            @Override
+            public void onColorChanged(Cluster source) {
+                for (ClusterListener listener : listeners) {
+                    listener.onColorChanged(source);
+                }
+            }
+        };
         for (Cluster cluster : this.clusters) {
             cluster.initTransientData();
         }

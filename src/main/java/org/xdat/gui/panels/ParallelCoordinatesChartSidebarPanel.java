@@ -20,6 +20,7 @@
 
 package org.xdat.gui.panels;
 
+import org.jetbrains.annotations.Nullable;
 import org.xdat.Main;
 import org.xdat.actionListeners.chartFrames.ParallelChartSidebarActionListener;
 import org.xdat.chart.ParallelCoordinatesChart;
@@ -61,10 +62,31 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 	private JScrollPane clusterScrollPane;
 	private JPanel clusterPanel;
 	private Map<Cluster, JSlider> clusterAlphaSliders;
-	private Map<ClusterListener, Cluster> clusterListeners;
+	private Map<Cluster, ClusterListener> clustersToListeners;
+
+	private final Runnable closeHook;
 
 	public ParallelCoordinatesChartSidebarPanel(Main mainWindow, ChartFrame chartFrame, ChartPanel chartPanel, ParallelCoordinatesChart chart) {
 		super(mainWindow, chartFrame, chartPanel, chart);
+		final ClusterListener dispatchingClusterListener = new ClusterListener() {
+			@Override
+			public void onNameChanged(Cluster source) {
+				@Nullable ClusterListener l = clustersToListeners.get(source);
+				if (l != null) {
+					l.onNameChanged(source);
+				}
+			}
+
+			@Override
+			public void onColorChanged(Cluster source) {
+				@Nullable ClusterListener l = clustersToListeners.get(source);
+				if (l != null) {
+					l.onColorChanged(source);
+				}
+			}
+		};
+		mainWindow.getCurrentClusterSet().addClusterListener(dispatchingClusterListener);
+		this.closeHook = () -> mainWindow.getCurrentClusterSet().removeClusterListener(dispatchingClusterListener);
 	}
 
 	@Override
@@ -153,9 +175,6 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 	public void updateClusterList(ClusterSet clusterSet) {
 		int clusterCount = clusterSet.getClusterCount();
 
-		for (ClusterListener l : this.clusterListeners.keySet()) {
-			this.clusterListeners.get(l).removeClusterListener(l);
-		}
 		this.clusterPanel.removeAll();
 		this.clusterPanel.setLayout(new GridLayout(clusterCount, 1));
 		this.clusterAlphaSliders.clear();
@@ -224,7 +243,7 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 
 			updateElementNames(cluster.getName(), clusterNameTextField, clusterColorButton, removeClusterButton, applyClusterButton, clusterAlphaSlider, clusterActiveCheckbox);
 
-			ClusterListener listener = new ClusterListener() {
+			this.clustersToListeners.put(cluster, new ClusterListener() {
 				@Override
 				public void onNameChanged(Cluster source) {
 					updateElementNames(source.getName(), clusterNameTextField, clusterColorButton, removeClusterButton, applyClusterButton, clusterAlphaSlider, clusterActiveCheckbox);
@@ -238,10 +257,8 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 					revalidate();
 					repaint();
 				}
-			};
-			cluster.addClusterListener(listener);
+			});
 
-			this.clusterListeners.put(listener, cluster);
 			this.clusterPanel.add(wrapperPanel);
 		}
 
@@ -286,7 +303,7 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 	protected void initialize() {
 		clusterScrollPane = new JScrollPane();
 		clusterScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-		clusterListeners = new HashMap<>();
+		clustersToListeners = new HashMap<>();
 		clusterAlphaSliders = new LinkedHashMap<>(10);
 		this.cmd = new ParallelChartSidebarActionListener(getMainWindow(), this, (ParallelCoordinatesChartPanel) getChartPanel(), getMainWindow().getClusterFactory());
 	}
@@ -296,5 +313,11 @@ public class ParallelCoordinatesChartSidebarPanel extends SidebarPanel {
 		for (JSlider slider : this.clusterAlphaSliders.values()) {
 			slider.setEnabled(enabled);
 		}
+	}
+
+	@Override
+	public void onClosed() {
+		super.onClosed();
+		this.closeHook.run();
 	}
 }
