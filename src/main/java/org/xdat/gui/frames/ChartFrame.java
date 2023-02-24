@@ -24,6 +24,8 @@ import org.xdat.Main;
 import org.xdat.chart.Chart;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.chart.ScatterChart2D;
+import org.xdat.data.Cluster;
+import org.xdat.data.ClusterListener;
 import org.xdat.exceptions.NoParametersDefinedException;
 import org.xdat.gui.ChartFrameClosingAdapter;
 import org.xdat.gui.menus.ScatterChart2D.ScatterChart2DFrameMenuBar;
@@ -45,9 +47,9 @@ import java.util.List;
 
 public class ChartFrame extends JFrame implements ComponentListener {
 
-	private Main mainWindow;
-	private Chart chart;
-	private ChartPanel chartPanel;
+	private final Main mainWindow;
+	private final Chart chart;
+	private final ChartPanel chartPanel;
 	private final List<Runnable> closeHooks = new ArrayList<>();
 
 	public ChartFrame(Main mainWindow, Chart chart) throws NoParametersDefinedException {
@@ -86,6 +88,12 @@ public class ChartFrame extends JFrame implements ComponentListener {
 		} else {
 			throw new RuntimeException("Unknown Chart Type!");
 		}
+		ClusterListener.ClusterAdapter clusterListener = new ClusterListener.ClusterAdapter() {
+			@Override
+			public void onColorChanged(Cluster source) {
+				repaint();
+			}
+		};
 		this.closeHooks.add(() -> mainWindow.removeChartFrame(this));
 
 		this.setLocation(this.chart.getLocation());
@@ -93,6 +101,8 @@ public class ChartFrame extends JFrame implements ComponentListener {
 		this.pack();
 		this.addComponentListener(this);
 		setVisible(true);
+		mainWindow.getCurrentClusterSet().addClusterListener(clusterListener);
+		this.closeHooks.add(() -> mainWindow.getCurrentClusterSet().removeClusterListener(clusterListener));
 	}
 
 	public Chart getChart() {
