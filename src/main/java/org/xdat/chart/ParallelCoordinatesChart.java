@@ -21,6 +21,7 @@
 package org.xdat.chart;
 
 import org.jetbrains.annotations.Nullable;
+import org.xdat.data.Cluster;
 import org.xdat.data.DataSheet;
 import org.xdat.data.DatasheetListener;
 import org.xdat.data.Design;
@@ -58,8 +59,7 @@ import java.util.stream.Stream;
  * that are present on each Axis. Depending on the positions of these filters,
  * certain Designs are filtered from the display. This means that they are
  * either displayed in a different color or hidden completely.
- * 
- * 
+ *
  * @see org.xdat.gui.frames.ChartFrame
  * @see Axis
  * @see Filter
@@ -187,18 +187,6 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 		return getAxisTopPos() + getAxisHeight();
 	}
 
-	public int getAxisMaxWidth() {
-		int width = 0;
-		for (int i = 0; i < this.getAxisCount(); i++) {
-			if (this.getAxis(i).isActive()) {
-				if (width < this.getAxis(i).getWidth()) {
-					width = this.getAxis(i).getWidth();
-				}
-			}
-		}
-		return width;
-	}
-
 	public void incrementAxisWidth(int deltaWidth) {
 		for (Axis axis : axes) {
 			axis.setWidth(Math.max(0, axis.getWidth() + deltaWidth));
@@ -296,13 +284,15 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 	{
 		if (designActive && design.hasGradientColor()) {
 			return design.getGradientColor();
-		} else if (designActive && design.getCluster() != null) {
-			return design.getCluster().getActiveDesignColor(useAlpha);
-		} else if (designActive) {
-			return useAlpha ? activeDesignColor : activeDesignColorNoAlpha;
-		}
-		else {
-			return useAlpha ? filteredDesignColor : filteredDesignColorNoAlpha;
+		} else {
+			@Nullable Cluster cluster = design.getCluster();
+			if (designActive && cluster != null) {
+				return cluster.getActiveDesignColor(useAlpha);
+			} else if (designActive) {
+				return useAlpha ? activeDesignColor : activeDesignColorNoAlpha;
+			} else {
+				return useAlpha ? filteredDesignColor : filteredDesignColorNoAlpha;
+			}
 		}
 	}
 

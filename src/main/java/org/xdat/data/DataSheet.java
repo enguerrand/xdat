@@ -20,15 +20,14 @@
 
 package org.xdat.data;
 
+import org.jetbrains.annotations.Nullable;
 import org.xdat.Main;
 import org.xdat.UserPreferences;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.exceptions.InconsistentDataException;
 
 import javax.swing.JOptionPane;
-import javax.swing.ListModel;
 import javax.swing.ProgressMonitor;
-import javax.swing.event.ListDataListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -46,18 +45,16 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class DataSheet implements Serializable, ListModel {
+public class DataSheet implements Serializable {
 
 	static final long serialVersionUID = 8;
 	private List<Design> data = new ArrayList<>();
 	private Map<Integer, Design> designIdsMap = new HashMap<>();
 	private final List<Parameter> parameters = new LinkedList<>();
-	private transient List<ListDataListener> listDataListener;
 	private transient List<DatasheetListener> listeners;
 	private String delimiter;
 
 	public void initTransientData() {
-		this.listDataListener = new ArrayList<>();
 		this.listeners = new ArrayList<>();
 	}
 
@@ -217,7 +214,7 @@ public class DataSheet implements Serializable, ListModel {
 	private Map<Integer, Set<Integer>> computeClusterDesignHashes(List<Design> designs) {
 		Map<Integer, Set<Integer>> clustersToDesignHashes = new HashMap<>();
 		for (Design design : designs) {
-			Cluster cluster = design.getCluster();
+			@Nullable Cluster cluster = design.getCluster();
 			if(cluster != null) {
 				clustersToDesignHashes
 						.computeIfAbsent(cluster.getUniqueId(), k -> new HashSet<>())
@@ -440,7 +437,7 @@ public class DataSheet implements Serializable, ListModel {
 
 	public void evaluateBoundsForAllDesigns(ParallelCoordinatesChart chart) {
 		for (int i = 0; i < this.getDesignCount(); i++) {
-			this.data.get(i).evaluateBounds(chart, this);
+			this.data.get(i).evaluateBounds(chart);
 		}
 	}
 
@@ -455,26 +452,6 @@ public class DataSheet implements Serializable, ListModel {
 			array[i] = value;
 		}
 		return array;
-	}
-
-	@Override
-	public void addListDataListener(ListDataListener l) {
-		listDataListener.add(l);
-	}
-
-	@Override
-	public Object getElementAt(int index) {
-		return this.parameters.get(index).getName();
-	}
-
-	@Override
-	public int getSize() {
-		return this.parameters.size();
-	}
-
-	@Override
-	public void removeListDataListener(ListDataListener l) {
-		listDataListener.remove(l);
 	}
 
 	public void addListener(DatasheetListener l) {

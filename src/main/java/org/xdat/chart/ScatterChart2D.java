@@ -51,7 +51,7 @@ public class ScatterChart2D extends Chart {
 				s.addListener((source, transaction) ->
 						handleSettingChange(this::fireChanged, transaction))
 		);
-		this.scatterPlot2D = new ScatterPlot2D(dataSheet, showDecorations, axisSettingsX, axisSettingsY);
+		this.scatterPlot2D = new ScatterPlot2D(dataSheet, showDecorations);
 		this.setFrameSize(frameSize);
 	}
 

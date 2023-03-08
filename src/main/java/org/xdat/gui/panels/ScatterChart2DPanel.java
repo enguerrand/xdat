@@ -158,7 +158,7 @@ public class ScatterChart2DPanel extends ChartPanel {
 					Color filteredDesignColorNoAlpha = parallelChart.getFilteredDesignColorNoAlpha();
 					for (int i = 0; i < dataSheet.getDesignCount(); i++) {
 						Design design = dataSheet.getDesign(i);
-						Cluster cluster = design.getCluster();
+						@Nullable Cluster cluster = design.getCluster();
 						if (cluster != null && !cluster.isActive()) {
 							continue;
 						}

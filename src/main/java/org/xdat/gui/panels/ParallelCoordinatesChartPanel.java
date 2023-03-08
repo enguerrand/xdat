@@ -21,10 +21,12 @@
 package org.xdat.gui.panels;
 
 import org.apache.batik.svggen.SVGGraphics2D;
+import org.jetbrains.annotations.Nullable;
 import org.xdat.Main;
 import org.xdat.chart.Axis;
 import org.xdat.chart.Filter;
 import org.xdat.chart.ParallelCoordinatesChart;
+import org.xdat.data.Cluster;
 import org.xdat.data.DataSheet;
 import org.xdat.data.Design;
 import org.xdat.data.Parameter;
@@ -217,8 +219,9 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 				continue;
 			}
 			boolean currentDesignClusterActive = true;
-			if (currentDesign.getCluster() != null) {
-				currentDesignClusterActive = currentDesign.getCluster().isActive();
+			@Nullable Cluster cluster = currentDesign.getCluster();
+			if (cluster != null) {
+				currentDesignClusterActive = cluster.isActive();
 			}
 
 			boolean currentDesignActive = currentDesign.isActive(chart);
@@ -235,8 +238,8 @@ public class ParallelCoordinatesChartPanel extends ChartPanel implements MouseMo
 				if ((showOnlySelectedDesigns || !currentDesign.isSelected())&&(!hoverList.contains(currentDesign.getId()))) {
 					g.setColor(chart.getDesignColor(currentDesign, currentDesignActive, useAlpha, activeDesignColor, activeDesignColorNoAlpha, filteredDesignColor, filteredDesignColorNoAlpha));
 					int lineThickness;
-					if (currentDesign.getCluster() != null) {
-						lineThickness = currentDesign.getCluster().getLineThickness();
+					if (cluster != null) {
+						lineThickness = cluster.getLineThickness();
 					} else {
 						lineThickness = chartLineThickness;
 					}

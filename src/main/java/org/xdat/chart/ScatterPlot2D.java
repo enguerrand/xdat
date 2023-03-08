@@ -23,10 +23,10 @@ package org.xdat.chart;
 import org.jetbrains.annotations.Nullable;
 import org.xdat.UserPreferences;
 import org.xdat.data.AxisType;
+import org.xdat.data.Cluster;
 import org.xdat.data.DataSheet;
 import org.xdat.data.Design;
 import org.xdat.data.Parameter;
-import org.xdat.settings.SettingsGroup;
 
 import java.awt.Color;
 import java.util.HashMap;
@@ -40,6 +40,7 @@ public class ScatterPlot2D extends Plot {
 	public static final int AXIS_LABEL_PADDING = 10;
 	public static final int TIC_LABEL_PADDING = 5;
 	public static final String TIC_LABEL_FORMAT = "%4.3f";
+	private static final int TIC_SIZE = 5;
 	private int displayedDesignSelectionMode = SHOW_ALL_DESIGNS;
 	@Nullable
 	private ParallelCoordinatesChart parallelCoordinatesChartForFiltering;
@@ -48,11 +49,10 @@ public class ScatterPlot2D extends Plot {
 	private Color selectedDesignColor = Color.BLUE;
 	private Parameter parameterForXAxis;
 	private Parameter parameterForYAxis;
-	private boolean showDecorations;
+	private final boolean showDecorations;
 	private Color decorationsColor = Color.BLACK;
 	private int ticCountX = 2;
 	private int ticCountY = 2;
-	private int ticSize = 5;
 	private final Map<String, Double> minValues = new HashMap<>();
 	private final Map<String, Double> maxValues = new HashMap<>();
 	private int axisLabelFontSizeX = 20;
@@ -60,7 +60,7 @@ public class ScatterPlot2D extends Plot {
 	private int ticLabelFontSizeX = 12;
 	private int ticLabelFontSizeY = 12;
 
-	ScatterPlot2D(DataSheet dataSheet, boolean showDecorations, SettingsGroup chartSettingsX, SettingsGroup axisSettingsY) {
+	ScatterPlot2D(DataSheet dataSheet, boolean showDecorations) {
 		super();
 		this.showDecorations = showDecorations;
 		if (dataSheet.getParameterCount() > 1) {
@@ -78,8 +78,9 @@ public class ScatterPlot2D extends Plot {
 	}
 
 	public Color getDesignColor(Design design) {
-		if (design.getCluster() != null) {
-			return design.getCluster().getActiveDesignColor(false);
+		@Nullable Cluster cluster = design.getCluster();
+		if (cluster != null) {
+			return cluster.getActiveDesignColor(false);
 		} else {
 			return activeDesignColor;
 		}
@@ -195,7 +196,7 @@ public class ScatterPlot2D extends Plot {
 	}
 
 	public int getTicSize() {
-		return ticSize;
+		return TIC_SIZE;
 	}
 
 
