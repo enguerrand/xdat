@@ -47,9 +47,14 @@ class ParallelCoordinatesChartFrameOptionsMenu extends JMenu {
 		mi.addActionListener(cmd::resetToDefault);
 		this.add(mi);
 
-		mi = new JMenuItem("Export to png", 'x');
-		mi.setMnemonic(KeyEvent.VK_X);
+		mi = new JMenuItem("Export to png", 'p');
+		mi.setMnemonic(KeyEvent.VK_P);
 		mi.addActionListener(cmd::exportToPng);
+		this.add(mi);
+
+		mi = new JMenuItem("Export to svg", 's');
+		mi.setMnemonic(KeyEvent.VK_S);
+		mi.addActionListener(cmd::exportToSvg);
 		this.add(mi);
 	}
 }

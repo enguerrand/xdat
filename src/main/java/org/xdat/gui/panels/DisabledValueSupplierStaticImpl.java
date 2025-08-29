@@ -1,5 +1,5 @@
 /*
- *  Copyright 2019, Enguerrand de Rochefort
+ *  Copyright 2022, Enguerrand de Rochefort
  *
  * This file is part of xdat.
  *
@@ -17,10 +17,19 @@
  * along with xdat.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.xdat.data;
 
-public interface DatasheetListener {
-    void onClustersChanged();
-    void onDataPanelUpdateRequired();
-    void onDataChanged(boolean[] autoFitRequired, boolean[] filterResetRequired, boolean[] applyFiltersRequired, boolean parametersChanged);
+package org.xdat.gui.panels;
+
+public class DisabledValueSupplierStaticImpl<T> implements DisabledValueSupplier<T> {
+    public static final long serialVersionUID = 1L;
+    private final T staticValue;
+
+    public DisabledValueSupplierStaticImpl(T staticValue) {
+        this.staticValue = staticValue;
+    }
+
+    @Override
+    public T getDisabledValue() {
+        return staticValue;
+    }
 }

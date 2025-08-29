@@ -1,12 +1,14 @@
 package org.xdat.gui.panels;
 
+import org.xdat.settings.Setting;
+
 import javax.swing.JComponent;
 
-public class SettingComponents {
+public class SettingComponents<K> {
     private final JComponent label;
-    private final SettingControlPanel control;
+    private final SettingControlPanel<K> control;
 
-    public SettingComponents(JComponent label, SettingControlPanel control) {
+    public SettingComponents(JComponent label, SettingControlPanel<K> control) {
         this.label = label;
         this.control = control;
     }
@@ -15,7 +17,16 @@ public class SettingComponents {
         return label;
     }
 
-    public SettingControlPanel getControl() {
+    public SettingControlPanel<K> getControl() {
         return control;
     }
+
+    public <T> void onLinkedSettingsControlUpdated(Setting<T> sourceSetting, T currentControlValue) {
+        control.onLinkedSettingsControlUpdated(sourceSetting, currentControlValue);
+    }
+
+    public <T> void setEnabledWhen(EnabledCondition<T, K> enabledCondition) {
+        control.setEnabledWhen(enabledCondition);
+    }
+
 }

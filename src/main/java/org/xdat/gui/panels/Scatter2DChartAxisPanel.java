@@ -28,8 +28,10 @@ import org.xdat.data.Parameter;
 import org.xdat.gui.controls.MinMaxSpinnerModel;
 import org.xdat.gui.controls.RightAlignedSpinner;
 import org.xdat.gui.frames.ChartFrame;
+import org.xdat.settings.Key;
+import org.xdat.settings.SettingsGroup;
 
-import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -42,16 +44,17 @@ import java.awt.GridLayout;
 import java.util.Vector;
 
 public class Scatter2DChartAxisPanel extends JPanel {
-	private AxisType axisType;
-	private ScatterChart2D chart;
-	private JTextField axisMinTextField = new JTextField();
-	private JTextField axisMaxTextField = new JTextField();
-	private JCheckBox autoFitAxisCheckbox = new JCheckBox();
-	private JSpinner ticCountSpinner = new RightAlignedSpinner(new MinMaxSpinnerModel(1, 500));
+	private final SettingsGroup settings;
+	private final AxisType axisType;
+	private final ScatterChart2D chart;
+	private final JTextField axisMinTextField = new JTextField();
+	private final JTextField axisMaxTextField = new JTextField();
+	private final JSpinner ticCountSpinner = new RightAlignedSpinner(new MinMaxSpinnerModel(1, 500));
 	private final JSpinner ticLabelDigitCountSpinner;
 	private final JSpinner axisLabelFontSizeSpinner;
 	private final JSpinner ticLabelFontSizeSpinner;
 	private boolean updating = false;
+	private final SettingComponents autoFitComp;
 
 	/**
 	 * Instantiates a new axis display settings panel that is used to modify the
@@ -61,6 +64,8 @@ public class Scatter2DChartAxisPanel extends JPanel {
 	public Scatter2DChartAxisPanel(Main mainWindow, ChartFrame chartFrame, ScatterChart2D chart, AxisType axisType) {
 		this.chart = chart;
 		this.axisType = axisType;
+		this.settings = chart.getAxisSettings(axisType);
+
 		// main panel
 		Scatter2DChartAxisPanelActionListener cmd = new Scatter2DChartAxisPanelActionListener(mainWindow, chartFrame, chart, axisType);
 		String title = axisType.getLabel();
@@ -89,6 +94,8 @@ public class Scatter2DChartAxisPanel extends JPanel {
 		JScrollPane scrollPane = new JScrollPane(parameterSelectionList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		mainPanel.add(scrollPane, BorderLayout.NORTH);
 
+		// setting controls
+		autoFitComp = SettingsPanelFactory.standaloneFrom(settings.getBooleanSetting(Key.getScatterChartAutoFitAxis(axisType)));
 		// Other controls
 
 		JPanel otherControlsPanel = new JPanel(new BorderLayout());
@@ -98,7 +105,7 @@ public class Scatter2DChartAxisPanel extends JPanel {
 		otherControlsPanel.add(controlsPanel, BorderLayout.CENTER);
 		mainPanel.add(otherControlsPanel, BorderLayout.CENTER);
 
-		JLabel autoFitAxisLabel = new JLabel("Autofit axis  ");
+		JComponent autoFitAxisLabel = autoFitComp.getLabel();
 		JLabel axisMinLabel = new JLabel("Axis minimum   ");
 		JLabel axisMaxLabel = new JLabel("Axis maximum   ");
 		JLabel axisLabelFontSizeLabel = new JLabel("Axis Title Fontsize  ");
@@ -137,7 +144,7 @@ public class Scatter2DChartAxisPanel extends JPanel {
 
 		ticLabelDigitCountSpinner = new RightAlignedSpinner(new MinMaxSpinnerModel(0, 20));
 
-		controlsPanel.add(autoFitAxisCheckbox);
+		controlsPanel.add(autoFitComp.getControl());
 		controlsPanel.add(this.axisMinTextField);
 		controlsPanel.add(this.axisMaxTextField);
 		controlsPanel.add(axisLabelFontSizeSpinner);
@@ -145,15 +152,17 @@ public class Scatter2DChartAxisPanel extends JPanel {
 		controlsPanel.add(ticLabelFontSizeSpinner);
 		controlsPanel.add(ticLabelDigitCountSpinner);
 
-		autoFitAxisCheckbox.addActionListener(actionEvent -> {
+		this.settings.getBooleanSetting(Key.getScatterChartAutoFitAxis(axisType)).addListener((source, transaction) -> {
 			if (updating) {
 				return;
 			}
-			boolean newState = autoFitAxisCheckbox.isSelected();
+			boolean newState = source.get();
 			this.updating = true;
 			updateMinMaxFields();
 			this.updating = false;
-			cmd.updateAutofitAxis(newState);
+			if (newState) {
+				this.chart.getScatterPlot2D().autofit(mainWindow.getDataSheet(), this.axisType);
+			}
 		});
 		this.axisMinTextField.addActionListener(e -> {
 			if (updating) {
@@ -176,14 +185,13 @@ public class Scatter2DChartAxisPanel extends JPanel {
 		});
 
 		currentParameterChanged();
-
 	}
 
 	private void updateMinMaxFields() {
-		boolean autofit = autoFitAxisCheckbox.isSelected();
+		boolean autoFit = settings.getBoolean(Key.getScatterChartAutoFitAxis(this.axisType));
 		boolean numeric = this.chart.getScatterPlot2D().getParameterForAxis(this.axisType).isNumeric();
-		this.axisMaxTextField.setEnabled(!autofit && numeric);
-		this.axisMinTextField.setEnabled(!autofit && numeric);
+		this.axisMaxTextField.setEnabled(!autoFit && numeric);
+		this.axisMinTextField.setEnabled(!autoFit && numeric);
 		this.axisMaxTextField.setText(Double.toString(this.chart.getScatterPlot2D().getMax(this.axisType)));
 		this.axisMinTextField.setText(Double.toString(this.chart.getScatterPlot2D().getMin(this.axisType)));
 	}
@@ -204,8 +212,8 @@ public class Scatter2DChartAxisPanel extends JPanel {
 		axisLabelFontSizeSpinner.setValue(chart.getScatterPlot2D().getAxisLabelFontSize(axisType));
 		ticLabelFontSizeSpinner.setValue(chart.getScatterPlot2D().getTicLabelFontSize(axisType));
 		updateMinMaxFields();
-		autoFitAxisCheckbox.setSelected(chart.getScatterPlot2D().isAutofit(this.axisType));
-		autoFitAxisCheckbox.setEnabled(numeric);
+
+		autoFitComp.getControl().setEnabled(numeric);
 		this.updating = false;
 	}
 }

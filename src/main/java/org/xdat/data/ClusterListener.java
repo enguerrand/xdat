@@ -23,4 +23,10 @@ package org.xdat.data;
 public interface ClusterListener {
 	void onNameChanged(Cluster source);
 	void onColorChanged(Cluster source);
+	class ClusterAdapter implements ClusterListener {
+		@Override
+		public void onNameChanged(Cluster source) {}
+		@Override
+		public void onColorChanged(Cluster source) {}
+	}
 }

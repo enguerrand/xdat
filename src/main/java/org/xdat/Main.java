@@ -20,6 +20,7 @@ package org.xdat;
  *
  */
 
+import org.jetbrains.annotations.Nullable;
 import org.xdat.actionListeners.scatter2DChartSettings.ParallelChartFrameComboModel;
 import org.xdat.chart.Chart;
 import org.xdat.chart.ParallelCoordinatesChart;
@@ -32,6 +33,7 @@ import org.xdat.gui.WindowClosingAdapter;
 import org.xdat.gui.frames.ChartFrame;
 import org.xdat.gui.menus.mainWindow.MainMenuBar;
 import org.xdat.gui.panels.DataSheetTablePanel;
+import org.xdat.gui.panels.DisabledValueSupplierStaticImpl;
 import org.xdat.settings.Setting;
 import org.xdat.settings.SettingsGroup;
 import org.xdat.settings.SettingsGroupFactory;
@@ -58,9 +60,9 @@ import java.util.function.Consumer;
 
 public class Main extends JFrame {
 	public static final long serialVersionUID = 10L;
-	private MainMenuBar mainMenuBar;
+	private final MainMenuBar mainMenuBar;
 	private Session currentSession;
-	private List<ChartFrame> chartFrames = new LinkedList<>();
+	private final List<ChartFrame> chartFrames = new LinkedList<>();
 	private final BuildProperties buildProperties;
 	private final ClusterFactory clusterFactory = new ClusterFactory();
 	private final DatasheetListener datasheetListener;
@@ -82,7 +84,9 @@ public class Main extends JFrame {
 		for (Setting<?> value : generalSettingsGroup.getSettings().values()) {
 			value.addListener((source, transaction) -> source.setCurrentToDefault());
 		}
-		parallelCoordinatesAxisSettingsGroup = SettingsGroupFactory.buildParallelCoordinatesChartAxisSettingsGroup();
+		parallelCoordinatesAxisSettingsGroup = SettingsGroupFactory.buildParallelCoordinatesChartAxisSettingsGroup(
+				new DisabledValueSupplierStaticImpl<>(0.0), new DisabledValueSupplierStaticImpl<>(1.0)
+		);
 		for (Setting<?> value : parallelCoordinatesAxisSettingsGroup.getSettings().values()) {
 			value.addListener((source, transaction) -> source.setCurrentToDefault());
 		}
@@ -102,7 +106,7 @@ public class Main extends JFrame {
 			}
 
 			@Override
-			public void onDataChanged(boolean[] autoFitRequired, boolean[] filterResetRequired, boolean[] applyFiltersRequired) {
+			public void onDataChanged(boolean[] autoFitRequired, boolean[] filterResetRequired, boolean[] applyFiltersRequired, boolean parametersChanged) {
 				final ProgressMonitor progressMonitor = new ProgressMonitor(Main.this, "", "Rebuilding charts", 0, getDataSheet().getParameterCount() - 1);
 				progressMonitor.setMillisToPopup(0);
 
@@ -128,7 +132,7 @@ public class Main extends JFrame {
 
 				repaintAllChartFrames();
 
-				fireSubListeners(l -> l.onDataChanged(autoFitRequired, filterResetRequired, applyFiltersRequired));
+				fireSubListeners(l -> l.onDataChanged(autoFitRequired, filterResetRequired, applyFiltersRequired, false));
 			}
 		};
 		this.currentSession = new Session();
@@ -155,22 +159,18 @@ public class Main extends JFrame {
 	}
 
 	public void initialiseDataPanel() {
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-				if (dataSheetTablePanel == null) {
-					dataSheetTablePanel = new DataSheetTablePanel(Main.this);
-					setContentPane(dataSheetTablePanel);
-					// this.repaint();
-					dataSheetTablePanel.revalidate();
-				} else if (currentSession.getCurrentDataSheet() != null) {
-					dataSheetTablePanel.initialiseDataSheetTableModel();
-					dataSheetTablePanel.revalidate();
-				} else {
-					setContentPane(new JPanel());
-					repaint();
-				}
+		SwingUtilities.invokeLater(() -> {
+			if (dataSheetTablePanel == null) {
+				dataSheetTablePanel = new DataSheetTablePanel(Main.this);
+				setContentPane(dataSheetTablePanel);
+				// this.repaint();
+				dataSheetTablePanel.revalidate();
+			} else if (currentSession.getCurrentDataSheet() != null) {
+				dataSheetTablePanel.initialiseDataSheetTableModel();
+				dataSheetTablePanel.revalidate();
+			} else {
+				setContentPane(new JPanel());
+				repaint();
 			}
 		});
 	}
@@ -216,7 +216,7 @@ public class Main extends JFrame {
 		return this.currentSession.getCurrentDataSheet();
 	}
 
-	public void setDataSheet(DataSheet dataSheet) {
+	public void setDataSheet(@Nullable DataSheet dataSheet) {
 		DataSheet currentDataSheet = this.currentSession.getCurrentDataSheet();
 		if(currentDataSheet != null) {
 			currentDataSheet.removeListener(this.datasheetListener);
@@ -261,6 +261,11 @@ public class Main extends JFrame {
 
 	public void removeParameter(String paramName) {
 		getCurrentSession().removeParameter(paramName);
+		int newParamsCount = getCurrentSession().getCurrentDataSheet().getParameterCount();
+		boolean[] flags = new boolean[newParamsCount];
+		Arrays.fill(flags, false);
+		fireDataPanelUpdateRequired();
+		fireDataChanged(flags, flags, flags);
 	}
 
 	public ChartFrame getChartFrame(int index) {
@@ -279,7 +284,7 @@ public class Main extends JFrame {
 		return this.chartFrames.size();
 	}
 
-	public int getUniqueChartId(Class chartClass) {
+	public int getUniqueChartId(Class<?> chartClass) {
 		int id = 0;
 		for (int i = 0; i < this.getChartFrameCount(); i++) {
 
@@ -330,8 +335,8 @@ public class Main extends JFrame {
 	}
 
 	public void refilterAllChartFrames(int columnIndex) {
-		for (int i = 0; i < this.chartFrames.size(); i++) {
-			Chart c = this.chartFrames.get(i).getChart();
+		for (ChartFrame chartFrame : this.chartFrames) {
+			Chart c = chartFrame.getChart();
 			if (c.getClass().equals(ParallelCoordinatesChart.class)) {
 				((ParallelCoordinatesChart) c).getAxis(columnIndex).applyFilters(getDataSheet());
 			}
@@ -339,8 +344,8 @@ public class Main extends JFrame {
 	}
 
 	public void autofitAxisAllChartFrames(int axisIndex) {
-		for (int i = 0; i < this.chartFrames.size(); i++) {
-			Chart c = this.chartFrames.get(i).getChart();
+		for (ChartFrame chartFrame : this.chartFrames) {
+			Chart c = chartFrame.getChart();
 			if (c.getClass().equals(ParallelCoordinatesChart.class)) {
 				((ParallelCoordinatesChart) c).getAxis(axisIndex).autofit(getDataSheet());
 			}
@@ -348,8 +353,8 @@ public class Main extends JFrame {
 	}
 
 	public void resetFiltersOnAxisAllChartFrames(int axisIndex) {
-		for (int i = 0; i < this.chartFrames.size(); i++) {
-			Chart c = this.chartFrames.get(i).getChart();
+		for (ChartFrame chartFrame : this.chartFrames) {
+			Chart c = chartFrame.getChart();
 			if (c.getClass().equals(ParallelCoordinatesChart.class)) {
 				((ParallelCoordinatesChart) c).getAxis(axisIndex).resetFilters(getDataSheet());
 			}
@@ -403,17 +408,17 @@ public class Main extends JFrame {
 	}
 
 	public void addChartToComboboxes(ChartFrame chartFrame) {
-		for (int i = 0; i < this.comboModels.size(); i++) {
+		for (ParallelChartFrameComboModel comboModel : this.comboModels) {
 			if (chartFrame.getChart().getClass().equals(ParallelCoordinatesChart.class)) {
-				comboModels.get(i).addElement(chartFrame.getChart().getTitle());
+				comboModel.addElement(chartFrame.getChart().getTitle());
 			}
 		}
 	}
 
 	public void removeChartFromComboboxes(ChartFrame chartFrame) {
-		for (int i = 0; i < this.comboModels.size(); i++) {
+		for (ParallelChartFrameComboModel comboModel : this.comboModels) {
 			if (chartFrame.getChart().getClass().equals(ParallelCoordinatesChart.class)) {
-				comboModels.get(i).removeElement(chartFrame.getChart().getTitle());
+				comboModel.removeElement(chartFrame.getChart().getTitle());
 			}
 		}
 	}
@@ -460,7 +465,7 @@ public class Main extends JFrame {
 		this.datasheetListener.onDataPanelUpdateRequired();
 	}
 
-	public void fireOnDataChanged(boolean[] axisAutofitRequired, boolean[] axisResetFilterRequired, boolean[] axisApplyFiltersRequired) {
-		this.datasheetListener.onDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired);
+	public void fireDataChanged(boolean[] axisAutofitRequired, boolean[] axisResetFilterRequired, boolean[] axisApplyFiltersRequired) {
+		this.datasheetListener.onDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired, false);
 	}
 }

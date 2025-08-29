@@ -83,7 +83,7 @@ public class UserPreferences {
 		int g = PREFS.getInt(key.getId() + "Green", defaultValue.getGreen());
 		int b = PREFS.getInt(key.getId() + "Blue", defaultValue.getBlue());
 		int a = PREFS.getInt(key.getId() + "Alpha", defaultValue.getAlpha());
-		return new Color(r, g, b);
+		return new Color(r, g, b, a);
 	}
 
 	public static void putColor(Key key, Color value) {
@@ -104,23 +104,6 @@ public class UserPreferences {
 	public void setScatterChart2DDisplayMode(int ScatterChart2DDisplayMode) {
 		PREFS.putInt(Key.SCATTER_CHART_2D_DISPLAY_MODE.getId(), ScatterChart2DDisplayMode);
 	}
-
-	public boolean isScatterChart2DAutofitX() {
-		return PREFS.getBoolean(Key.SCATTER_CHART_2D_AUTOFIT_X.getId(), true);
-	}
-
-	public void setScatterChart2DAutofitX(boolean scatterChart2DAutofitX) {
-		PREFS.putBoolean(Key.SCATTER_CHART_2D_AUTOFIT_X.getId(), scatterChart2DAutofitX);
-	}
-
-	public boolean isScatterChart2DAutofitY() {
-		return PREFS.getBoolean(Key.SCATTER_CHART_2D_AUTOFIT_Y.getId(), true);
-	}
-
-	public void setScatterChart2DAutofitY(boolean scatterChart2DAutofitY) {
-		PREFS.putBoolean(Key.SCATTER_CHART_2D_AUTOFIT_Y.getId(), scatterChart2DAutofitY);
-	}
-
 
 	public int getScatterChart2DAxisTitleFontsizeX() {
 		return PREFS.getInt(Key.SCATTER_CHART_2D_AXIS_TITLE_FONTSIZE_X.getId(), 20);
@@ -328,14 +311,10 @@ public class UserPreferences {
 
 	public Locale getLocale() {
 		int locale = PREFS.getInt(Key.LOCALE.getId(), LOCALE_US);
-		switch (locale) {
-			case (LOCALE_DE): {
-				return Locale.GERMANY;
-			}
-			default: {
-				return Locale.US;
-			}
+		if (locale == LOCALE_DE) {
+			return Locale.GERMANY;
 		}
+		return Locale.US;
 	}
 
 	public void setLocale(int locale) {

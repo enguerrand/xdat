@@ -35,6 +35,7 @@ public abstract class ChartPanel extends JPanel {
 	private int marginRight = 20;
 	ChartPanel(Chart chart) {
 		this.chart = chart;
+		chart.addListener(source -> repaint());
 	}
 
 	public void paintComponent(Graphics g) {

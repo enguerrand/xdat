@@ -26,6 +26,7 @@ import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.chart.ScatterChart2D;
 import org.xdat.chart.ScatterPlot2D;
 import org.xdat.data.AxisType;
+import org.xdat.data.Cluster;
 import org.xdat.data.DataSheet;
 import org.xdat.data.Design;
 import org.xdat.data.Parameter;
@@ -38,7 +39,7 @@ import java.awt.geom.AffineTransform;
 
 public class ScatterChart2DPanel extends ChartPanel {
 	static final long serialVersionUID = 1L;
-	private Main mainWindow;
+	private final Main mainWindow;
 	private int yAxisOffset = 0;
 
 	public ScatterChart2DPanel(Main mainWindow, ScatterChart2D chart) {
@@ -81,8 +82,8 @@ public class ScatterChart2DPanel extends ChartPanel {
 			return;
 		}
 		DataSheet dataSheet = chart.getDataSheet();
-		double xValues[] = new double[dataSheet.getDesignCount()];
-		double yValues[] = new double[dataSheet.getDesignCount()];
+		double[] xValues = new double[dataSheet.getDesignCount()];
+		double[] yValues = new double[dataSheet.getDesignCount()];
 		double minX = chart.getScatterPlot2D().getMin(AxisType.X);
 		double maxX = chart.getScatterPlot2D().getMax(AxisType.X);
 		double minY = chart.getScatterPlot2D().getMin(AxisType.Y);
@@ -94,7 +95,7 @@ public class ScatterChart2DPanel extends ChartPanel {
 			yValues[i] = dataSheet.getDesign(i).getDoubleValue(paramY);
 		}
 
-		if (chart.getScatterPlot2D().isAutofit(AxisType.X)) {
+		if (chart.isAutoFit(AxisType.X)) {
 			minX = Double.POSITIVE_INFINITY;
 			maxX = Double.NEGATIVE_INFINITY;
 			for (int i = 0; i < dataSheet.getDesignCount(); i++) {
@@ -108,7 +109,7 @@ public class ScatterChart2DPanel extends ChartPanel {
 			chart.getScatterPlot2D().setMin(AxisType.X, minX);
 		}
 
-		if (chart.getScatterPlot2D().isAutofit(AxisType.Y)) {
+		if (chart.isAutoFit(AxisType.Y)) {
 			minY = Double.POSITIVE_INFINITY;
 			maxY = Double.NEGATIVE_INFINITY;
 			for (int i = 0; i < dataSheet.getDesignCount(); i++) {
@@ -157,7 +158,11 @@ public class ScatterChart2DPanel extends ChartPanel {
 					Color filteredDesignColorNoAlpha = parallelChart.getFilteredDesignColorNoAlpha();
 					for (int i = 0; i < dataSheet.getDesignCount(); i++) {
 						Design design = dataSheet.getDesign(i);
-						if (dataSheet.getDesign(i).isActive(parallelChart)) {
+						@Nullable Cluster cluster = design.getCluster();
+						if (cluster != null && !cluster.isActive()) {
+							continue;
+						}
+						if (design.isActive(parallelChart)) {
 							int x = xOrig + (int) ((xValues[i] - minX) * plotWidth / xRange);
 							int y = yOrig - (int) ((yValues[i] - minY) * plotHeight / yRange);
 							if (isXConstant)
@@ -180,6 +185,11 @@ public class ScatterChart2DPanel extends ChartPanel {
 			}
 			case (ScatterPlot2D.SHOW_ALL_DESIGNS): {
 				for (int i = 0; i < dataSheet.getDesignCount(); i++) {
+					Design design = dataSheet.getDesign(i);
+					Cluster cluster = design.getCluster();
+					if (cluster != null && !cluster.isActive()) {
+						continue;
+					}
 					int x = xOrig + (int) ((xValues[i] - minX) * plotWidth / xRange);
 					int y = yOrig - (int) ((yValues[i] - minY) * plotHeight / yRange);
 					if (isXConstant)
@@ -214,7 +224,6 @@ public class ScatterChart2DPanel extends ChartPanel {
 			default: {
 			}
 		}
-
 	}
 
 	public void drawAxes(Graphics g, ScatterChart2D chart, ScatterPlot2D plot) {

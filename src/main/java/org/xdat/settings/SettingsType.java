@@ -6,5 +6,6 @@ public enum SettingsType {
     DOUBLE,
     STRING,
     COLOR,
+    MULTIPLE_CHOICE,
     ;
 }

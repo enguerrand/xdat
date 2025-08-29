@@ -1,5 +1,5 @@
 /*
- *  Copyright 2019, Enguerrand de Rochefort
+ *  Copyright 2022, Enguerrand de Rochefort
  *
  * This file is part of xdat.
  *
@@ -17,10 +17,12 @@
  * along with xdat.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.xdat.data;
 
-public interface DatasheetListener {
-    void onClustersChanged();
-    void onDataPanelUpdateRequired();
-    void onDataChanged(boolean[] autoFitRequired, boolean[] filterResetRequired, boolean[] applyFiltersRequired, boolean parametersChanged);
+package org.xdat.gui.panels;
+
+import java.io.Serializable;
+
+public interface DisabledValueSupplier <T> extends Serializable {
+    long serialVersionUID = 1L;
+    T getDisabledValue();
 }

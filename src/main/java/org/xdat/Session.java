@@ -20,8 +20,8 @@
 
 package org.xdat;
 
+import org.jetbrains.annotations.Nullable;
 import org.xdat.chart.Chart;
-import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.data.ClusterSet;
 import org.xdat.data.DataSheet;
 
@@ -54,9 +54,11 @@ public class Session implements Serializable {
 	public static final String sessionFileExtension = ".ses";
 	private String sessionName = "Untitled";
 	private String sessionDirectory;
+
+	@Nullable
 	private DataSheet currentDataSheet;
 	private ClusterSet currentClusterSet;
-	private List<Chart> charts = new LinkedList<Chart>();
+	private final List<Chart> charts = new LinkedList<>();
 
 	public Session() {
 		this.currentClusterSet = new ClusterSet();
@@ -80,7 +82,10 @@ public class Session implements Serializable {
 	}
 
 	private void initTransientData() {
-		this.currentDataSheet.initTransientData();
+		DataSheet ds = this.currentDataSheet;
+		if (ds != null){
+			ds.initTransientData();
+		}
 		this.currentClusterSet.initTransientData();
 		this.charts.forEach(Chart::initTransientData);
 	}
@@ -93,8 +98,8 @@ public class Session implements Serializable {
 		this.charts.add(chart);
 	}
 
-	public boolean removeChart(Chart chart) {
-		return this.charts.remove(chart);
+	public void removeChart(Chart chart) {
+		this.charts.remove(chart);
 	}
 
 	public void clearAllCharts() {
@@ -102,18 +107,18 @@ public class Session implements Serializable {
 	}
 
 	public void removeParameter(String paramName) {
-		for (Chart chart : charts) {
-			if (chart instanceof ParallelCoordinatesChart) {
-				((ParallelCoordinatesChart) chart).removeAxis(paramName);
-			}
+		DataSheet dataSheet = currentDataSheet;
+		if (dataSheet != null) {
+			dataSheet.removeParameter(paramName);
 		}
 	}
 
+	@Nullable
 	public DataSheet getCurrentDataSheet() {
 		return currentDataSheet;
 	}
 
-	public void setCurrentDataSheet(DataSheet currentDataSheet) {
+	public void setCurrentDataSheet(@Nullable DataSheet currentDataSheet) {
 		this.currentDataSheet = currentDataSheet;
 	}
 

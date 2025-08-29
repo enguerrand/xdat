@@ -1,20 +1,26 @@
 package org.xdat.settings;
 
 import org.jetbrains.annotations.Nullable;
+import org.xdat.gui.panels.EnabledCondition;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 public abstract class Setting<T> implements Serializable {
     static final long serialVersionUID = 1L;
+    private final String uniqueId = UUID.randomUUID().toString();
     private final Key key;
     private final T hardCodedDefault;
     private T currentValue;
     private final String title;
     private final SettingsType type;
     private transient List<SettingsListener<T>> listeners;
+    @Nullable
+    private EnabledCondition<?, T> enabledCondition;
 
     Setting(String title, T hardCodedDefault, SettingsType type, Key key) {
         this.title = title;
@@ -23,6 +29,10 @@ public abstract class Setting<T> implements Serializable {
         this.hardCodedDefault = hardCodedDefault;
         this.currentValue = getDefault();
         initTransientData();
+    }
+
+    public String getUniqueId() {
+        return uniqueId;
     }
 
     public void addListener(SettingsListener<T> l) {
@@ -89,5 +99,13 @@ public abstract class Setting<T> implements Serializable {
 
     public boolean resetToDefault(@Nullable SettingsTransaction t) {
         return set(getDefault(), t);
+    }
+
+    public void setEnabledCondition(@Nullable EnabledCondition<?, T> enabledCondition) {
+        this.enabledCondition = enabledCondition;
+    }
+
+    public Optional<EnabledCondition<?, T>> getEnabledCondition() {
+        return Optional.ofNullable(enabledCondition);
     }
 }

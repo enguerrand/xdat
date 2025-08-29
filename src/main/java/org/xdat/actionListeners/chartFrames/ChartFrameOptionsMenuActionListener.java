@@ -20,6 +20,10 @@
 
 package org.xdat.actionListeners.chartFrames;
 
+import org.apache.batik.dom.GenericDOMImplementation;
+import org.apache.batik.svggen.SVGGraphics2D;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
 import org.xdat.Main;
 import org.xdat.UserPreferences;
 import org.xdat.gui.frames.ChartFrame;
@@ -70,6 +74,31 @@ public class ChartFrameOptionsMenuActionListener {
                 ImageIO.write(bi, "png", new File(filepath));
             } catch (IOException exc) {
                 JOptionPane.showMessageDialog(this.chartFrame, "IOException on saving image: " + exc.getMessage(), "Export to Image", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    public void exportToSvg(ActionEvent e) {
+        JFileChooser chooser = new JFileChooser();
+        if (UserPreferences.getInstance().getCurrentDir() != null)
+            chooser.setCurrentDirectory(new File(UserPreferences.getInstance().getCurrentDir()));
+        int returnVal = chooser.showSaveDialog(this.chartFrame);
+
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            String filepath = chooser.getSelectedFile().getAbsolutePath();
+            if (!filepath.endsWith(".svg")) {
+                filepath = filepath + ".svg";
+            }
+            UserPreferences.getInstance().setLastFile(filepath);
+            try {
+                DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
+                String svgNS = "http://www.w3.org/2000/svg";
+                Document document = domImpl.createDocument(svgNS, "svg", null);
+                SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
+                chartFrame.getChartPanel().paint(svgGenerator);
+                svgGenerator.stream(filepath, true);
+            } catch (IOException exc) {
+                JOptionPane.showMessageDialog(this.chartFrame, "IOException on saving SVG: " + exc.getMessage(), "Export to SVG", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

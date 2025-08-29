@@ -51,7 +51,7 @@ import java.util.function.Supplier;
 
 public class ScatterChart2DSettingsDialog extends JDialog {
 
-	private ChartFrame chartFrame;
+	private final ChartFrame chartFrame;
 	private final Runnable onClosed;
 
 	public ScatterChart2DSettingsDialog(Main mainWindow, ChartFrame chartFrame, ScatterChart2D scatterChart2D) {
@@ -68,7 +68,7 @@ public class ScatterChart2DSettingsDialog extends JDialog {
 			}
 
 			@Override
-			public void onDataChanged(boolean[] autoFitRequired, boolean[] filterResetRequired, boolean[] applyFiltersRequired) {
+			public void onDataChanged(boolean[] autoFitRequired, boolean[] filterResetRequired, boolean[] applyFiltersRequired, boolean parametersChanged) {
 				repaint();
 			}
 		};

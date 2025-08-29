@@ -53,8 +53,8 @@ public class Filter implements Serializable {
 	public static final int UPPER_FILTER = 0;
 	public static final int LOWER_FILTER = 1;
 	public static final double FILTER_TOLERANCE = 0.00001;
-	private int filterType;
-	private Axis axis;
+	private final int filterType;
+	private final Axis axis;
 	private int xPos;
 	private double value;
 	public Filter(DataSheet dataSheet, Axis axis, int filterType) {
@@ -222,7 +222,7 @@ public class Filter implements Serializable {
 					design.setActive(this, true);
 			}
 		}
-		dataSheet.fireOnDataChanged(false, false, false);
+		dataSheet.fireOnDataChanged(false, false, false, false);
 	}
 
 	public void reset(DataSheet dataSheet) {

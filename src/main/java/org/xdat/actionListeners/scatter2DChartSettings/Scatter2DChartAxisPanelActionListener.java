@@ -56,14 +56,6 @@ public class Scatter2DChartAxisPanelActionListener {
 		this.frame.repaint();
 	}
 
-	public void updateAutofitAxis(boolean newState) {
-		this.chart.getScatterPlot2D().setAutofit(this.axisType, newState);
-		if (newState) {
-			this.chart.getScatterPlot2D().autofit(this.mainWindow.getDataSheet(), this.axisType);
-		}
-		this.frame.repaint();
-	}
-
 	public void ticLabelFontsizeUpdated(int value) {
 		this.chart.getScatterPlot2D().setTicLabelFontSize(this.axisType, value);
 		frame.repaint();

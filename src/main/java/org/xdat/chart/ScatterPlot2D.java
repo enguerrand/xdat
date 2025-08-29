@@ -23,6 +23,7 @@ package org.xdat.chart;
 import org.jetbrains.annotations.Nullable;
 import org.xdat.UserPreferences;
 import org.xdat.data.AxisType;
+import org.xdat.data.Cluster;
 import org.xdat.data.DataSheet;
 import org.xdat.data.Design;
 import org.xdat.data.Parameter;
@@ -39,6 +40,7 @@ public class ScatterPlot2D extends Plot {
 	public static final int AXIS_LABEL_PADDING = 10;
 	public static final int TIC_LABEL_PADDING = 5;
 	public static final String TIC_LABEL_FORMAT = "%4.3f";
+	private static final int TIC_SIZE = 5;
 	private int displayedDesignSelectionMode = SHOW_ALL_DESIGNS;
 	@Nullable
 	private ParallelCoordinatesChart parallelCoordinatesChartForFiltering;
@@ -47,13 +49,10 @@ public class ScatterPlot2D extends Plot {
 	private Color selectedDesignColor = Color.BLUE;
 	private Parameter parameterForXAxis;
 	private Parameter parameterForYAxis;
-	private boolean showDecorations;
+	private final boolean showDecorations;
 	private Color decorationsColor = Color.BLACK;
-	private boolean autofitX = true;
-	private boolean autofitY = true;
 	private int ticCountX = 2;
 	private int ticCountY = 2;
-	private int ticSize = 5;
 	private final Map<String, Double> minValues = new HashMap<>();
 	private final Map<String, Double> maxValues = new HashMap<>();
 	private int axisLabelFontSizeX = 20;
@@ -79,8 +78,9 @@ public class ScatterPlot2D extends Plot {
 	}
 
 	public Color getDesignColor(Design design) {
-		if (design.getCluster() != null) {
-			return design.getCluster().getActiveDesignColor(false);
+		@Nullable Cluster cluster = design.getCluster();
+		if (cluster != null) {
+			return cluster.getActiveDesignColor(false);
 		} else {
 			return activeDesignColor;
 		}
@@ -157,27 +157,6 @@ public class ScatterPlot2D extends Plot {
 		this.decorationsColor = decorationsColor;
 	}
 
-	public boolean isAutofit(AxisType axisType) {
-		switch (axisType) {
-			case X: return autofitX;
-			case Y: return autofitY;
-			default: throw new IllegalArgumentException("Unknown axis type "+axisType);
-		}
-	}
-
-	public void setAutofit(AxisType axisType, boolean autofit) {
-		switch (axisType) {
-			case X:
-				this.autofitX = autofit;
-				break;
-			case Y:
-				this.autofitY = autofit;
-				break;
-			default:
-				throw new IllegalArgumentException("Unknown axis type "+axisType);
-		}
-	}
-
 	public void autofit(DataSheet dataSheet, AxisType axisType) {
 		Parameter parameter = getParameterForAxis(axisType);
 		autofitParam(dataSheet, parameter);
@@ -217,7 +196,7 @@ public class ScatterPlot2D extends Plot {
 	}
 
 	public int getTicSize() {
-		return ticSize;
+		return TIC_SIZE;
 	}
 
 
@@ -329,8 +308,6 @@ public class ScatterPlot2D extends Plot {
 	public void resetDisplaySettingsToDefault() {
 		UserPreferences userPreferences = UserPreferences.getInstance();
 		this.setDisplayedDesignSelectionMode(userPreferences.getScatterChart2DDisplayMode());
-		this.autofitX = userPreferences.isScatterChart2DAutofitX();
-		this.autofitY = userPreferences.isScatterChart2DAutofitY();
 		this.axisLabelFontSizeX = userPreferences.getScatterChart2DAxisTitleFontsizeX();
 		this.axisLabelFontSizeY = userPreferences.getScatterChart2DAxisTitleFontsizeY();
 		this.ticCountX = userPreferences.getScatterChart2DTicCountX();

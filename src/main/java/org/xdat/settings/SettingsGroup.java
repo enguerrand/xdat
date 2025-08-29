@@ -19,7 +19,7 @@ public class SettingsGroup implements Serializable {
 
     private SettingsGroup(Collection<Setting<?>> settings) {
         LinkedHashMap<Key, Setting<?>> m = new LinkedHashMap<>();
-        for (Setting setting : settings) {
+        for (Setting<?> setting : settings) {
             m.put(setting.getKey(), setting);
         }
         this.settingsMap = Collections.unmodifiableMap(m);
@@ -27,6 +27,12 @@ public class SettingsGroup implements Serializable {
 
     public Map<Key, Setting<?>> getSettings() {
         return settingsMap;
+    }
+
+    public void applyAllAsDefault() {
+        for (Setting<?> setting : getSettings().values()) {
+            setting.setCurrentToDefault();
+        }
     }
 
     public Setting<?> getSetting(Key key) {
@@ -43,6 +49,10 @@ public class SettingsGroup implements Serializable {
 
     public ColorSetting getColorSetting(Key key) {
         return (ColorSetting) getSetting(key);
+    }
+
+    public MultipleChoiceSetting getMultipleChoiceSetting(Key key) {
+        return (MultipleChoiceSetting) getSetting(key);
     }
 
     public DoubleSetting getDoubleSetting(Key key) {

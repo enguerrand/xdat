@@ -21,7 +21,9 @@
 package org.xdat.chart;
 
 import org.jetbrains.annotations.Nullable;
+import org.xdat.data.Cluster;
 import org.xdat.data.DataSheet;
+import org.xdat.data.DatasheetListener;
 import org.xdat.data.Design;
 import org.xdat.settings.Key;
 import org.xdat.settings.SettingsGroup;
@@ -57,8 +59,7 @@ import java.util.stream.Stream;
  * that are present on each Axis. Depending on the positions of these filters,
  * certain Designs are filtered from the display. This means that they are
  * either displayed in a different color or hidden completely.
- * 
- * 
+ *
  * @see org.xdat.gui.frames.ChartFrame
  * @see Axis
  * @see Filter
@@ -70,9 +71,9 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 
 	static final long serialVersionUID = 4;
 	private static final int BOTTOM_PADDING = 60;
-	private int topMargin = 10;
-	private List<Axis> axes = new LinkedList<>();
-	private SettingsGroup chartSettings;
+	private static final int TOP_MARGIN = 10;
+	private final List<Axis> axes = new LinkedList<>();
+	private final SettingsGroup chartSettings;
 	public ParallelCoordinatesChart(DataSheet dataSheet, ProgressMonitor progressMonitor, int id) {
 		super(dataSheet, id);
 		this.chartSettings = SettingsGroupFactory.buildGeneralParallelCoordinatesChartSettingsGroup();
@@ -103,6 +104,44 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 				s.addListener((source, transaction) ->
 						handleSettingChange(this::fireChanged, transaction))
 		);
+
+		dataSheet.addListener(new DatasheetListener() {
+			@Override
+			public void onClustersChanged() {
+				fireChanged();
+			}
+
+			@Override
+			public void onDataPanelUpdateRequired() {
+			}
+
+			@Override
+			public void onDataChanged(boolean[] autoFitRequired, boolean[] filterResetRequired, boolean[] applyFiltersRequired, boolean parametersChanged) {
+				boolean changed = false;
+				if (parametersChanged) {
+					// we never add, so only check for removal is needed
+					changed = axes.removeIf(axis -> !dataSheet.parameterExists(axis.getParameter()));
+				}
+				for (int i = 0; i < axes.size(); i++) {
+					Axis axis = axes.get(i);
+					if (autoFitRequired[i]) {
+						changed = true;
+						axis.autofit(dataSheet);
+					}
+					if (filterResetRequired[i]) {
+						changed = true;
+						axis.resetFilters(dataSheet);
+					}
+					if (applyFiltersRequired[i]) {
+						changed = true;
+						axis.applyFilters(dataSheet);
+					}
+				}
+				if (changed) {
+					fireChanged();
+				}
+			}
+		});
 	}
 
 	private void handleSettingChange(Runnable changeHandler, @Nullable SettingsTransaction transaction) {
@@ -110,6 +149,20 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 			changeHandler.run();
 		} else {
 			transaction.handleOnce(changeHandler);
+		}
+	}
+
+	@Override
+	protected void fireChanged() {
+		applyAutoFitIfNeeded();
+		super.fireChanged();
+	}
+
+	private void applyAutoFitIfNeeded() {
+		for (Axis axis : getAxes()) {
+			if (axis.isAutoFit()) {
+				axis.autofit(getDataSheet());
+			}
 		}
 	}
 
@@ -132,18 +185,6 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 
 	public int getHeight() {
 		return getAxisTopPos() + getAxisHeight();
-	}
-
-	public int getAxisMaxWidth() {
-		int width = 0;
-		for (int i = 0; i < this.getAxisCount(); i++) {
-			if (this.getAxis(i).isActive()) {
-				if (width < this.getAxis(i).getWidth()) {
-					width = this.getAxis(i).getWidth();
-				}
-			}
-		}
-		return width;
 	}
 
 	public void incrementAxisWidth(int deltaWidth) {
@@ -202,16 +243,6 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 		this.axes.add(axis);
 	}
 
-	public void removeAxis(String parameterName) {
-		for (int i = 0; i < this.axes.size(); i++) {
-			if (parameterName.equals(this.axes.get(i).getParameter().getName())) {
-				this.axes.remove(i);
-				return;
-			}
-		}
-		throw new IllegalArgumentException("Axis " + parameterName + " not found");
-	}
-
 	public void moveAxis(int oldIndex, int newIndex) {
 		Axis axis = this.axes.remove(oldIndex);
 		this.axes.add(newIndex, axis);
@@ -253,13 +284,15 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 	{
 		if (designActive && design.hasGradientColor()) {
 			return design.getGradientColor();
-		} else if (designActive && design.getCluster() != null) {
-			return design.getCluster().getActiveDesignColor(useAlpha);
-		} else if (designActive) {
-			return useAlpha ? activeDesignColor : activeDesignColorNoAlpha;
-		}
-		else {
-			return useAlpha ? filteredDesignColor : filteredDesignColorNoAlpha;
+		} else {
+			@Nullable Cluster cluster = design.getCluster();
+			if (designActive && cluster != null) {
+				return cluster.getActiveDesignColor(useAlpha);
+			} else if (designActive) {
+				return useAlpha ? activeDesignColor : activeDesignColorNoAlpha;
+			} else {
+				return useAlpha ? filteredDesignColor : filteredDesignColorNoAlpha;
+			}
 		}
 	}
 
@@ -294,8 +327,12 @@ public class ParallelCoordinatesChart extends Chart implements Serializable {
 		return chartSettings.getColor(Key.PARALLEL_COORDINATES_FILTER_COLOR);
 	}
 
+	public String getFontFamily() {
+		return chartSettings.getMultipleChoiceSetting(Key.FONT_FAMILY).get();
+	}
+
 	public int getTopMargin() {
-		return topMargin;
+		return TOP_MARGIN;
 	}
 
 	public void resetDisplaySettingsToDefault(DataSheet dataSheet) {

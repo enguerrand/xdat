@@ -20,6 +20,7 @@
 
 package org.xdat.data;
 
+import org.jetbrains.annotations.Nullable;
 import org.xdat.chart.Axis;
 import org.xdat.chart.Filter;
 import org.xdat.chart.ParallelCoordinatesChart;
@@ -35,11 +36,12 @@ import java.util.Optional;
 public class Design implements Serializable {
 
 	static final long serialVersionUID = 4L;
-	private Map<Parameter, String> stringParameterValues = new HashMap<>(0, 1);
-	private Map<Parameter, Float> numericalParameterValues = new HashMap<>(0, 1);
-	private int id;
-	private Cluster cluster;
-	private Map<Filter, Boolean> activationMap = new HashMap<>();
+	private final Map<Parameter, String> stringParameterValues = new HashMap<>(0, 1);
+	private final Map<Parameter, Float> numericalParameterValues = new HashMap<>(0, 1);
+	private final int id;
+	@Nullable
+	private Cluster cluster = null;
+	private final Map<Filter, Boolean> activationMap = new HashMap<>();
 	private boolean insideBounds;
 	private boolean selected = false;
 	private Color gradientColor = null;
@@ -108,17 +110,17 @@ public class Design implements Serializable {
 		this.activationMap.put(filter, active);
 	}
 
-	public void evaluateBounds(ParallelCoordinatesChart chart, DataSheet dataSheet) {
+	public void evaluateBounds(ParallelCoordinatesChart chart) {
 		this.insideBounds = true;
 		for (int i = 0; i < chart.getAxisCount(); i++) {
-			if (!isInsideBounds(chart.getAxis(i), dataSheet)) {
+			if (!isInsideBounds(chart.getAxis(i))) {
 				this.insideBounds = false;
 				return;
 			}
 		}
 	}
 
-	private boolean isInsideBounds(Axis axis, DataSheet dataSheet) {
+	private boolean isInsideBounds(Axis axis) {
 		double value = this.getDoubleValue(axis.getParameter());
 		double max = axis.getMax();
 		double min = axis.getMin();
@@ -141,11 +143,12 @@ public class Design implements Serializable {
 		return id;
 	}
 
+	@Nullable
 	public Cluster getCluster() {
 		return cluster;
 	}
 
-	public void setCluster(Cluster cluster) {
+	public void setCluster(@Nullable Cluster cluster) {
 		this.cluster = cluster;
 	}
 

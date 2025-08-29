@@ -20,15 +20,14 @@
 
 package org.xdat.data;
 
+import org.jetbrains.annotations.Nullable;
 import org.xdat.Main;
 import org.xdat.UserPreferences;
 import org.xdat.chart.ParallelCoordinatesChart;
 import org.xdat.exceptions.InconsistentDataException;
 
 import javax.swing.JOptionPane;
-import javax.swing.ListModel;
 import javax.swing.ProgressMonitor;
-import javax.swing.event.ListDataListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -46,18 +45,16 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class DataSheet implements Serializable, ListModel {
+public class DataSheet implements Serializable {
 
 	static final long serialVersionUID = 8;
 	private List<Design> data = new ArrayList<>();
 	private Map<Integer, Design> designIdsMap = new HashMap<>();
-	private List<Parameter> parameters = new LinkedList<>();
-	private transient List<ListDataListener> listDataListener;
+	private final List<Parameter> parameters = new LinkedList<>();
 	private transient List<DatasheetListener> listeners;
 	private String delimiter;
 
 	public void initTransientData() {
-		this.listDataListener = new ArrayList<>();
 		this.listeners = new ArrayList<>();
 	}
 
@@ -195,7 +192,7 @@ public class DataSheet implements Serializable, ListModel {
 
 		restoreClustersFromHashes(clustersToDesignHashes, this.data, clusterSet);
 
-		fireOnDataChanged(initialiseBooleanArray(true), initialiseBooleanArray(true), initialiseBooleanArray(true));
+		fireOnDataChanged(initialiseBooleanArray(true), initialiseBooleanArray(true), initialiseBooleanArray(true), false);
 		fireDataPanelUpdateRequired();
 
 	}
@@ -217,7 +214,7 @@ public class DataSheet implements Serializable, ListModel {
 	private Map<Integer, Set<Integer>> computeClusterDesignHashes(List<Design> designs) {
 		Map<Integer, Set<Integer>> clustersToDesignHashes = new HashMap<>();
 		for (Design design : designs) {
-			Cluster cluster = design.getCluster();
+			@Nullable Cluster cluster = design.getCluster();
 			if(cluster != null) {
 				clustersToDesignHashes
 						.computeIfAbsent(cluster.getUniqueId(), k -> new HashSet<>())
@@ -285,7 +282,7 @@ public class DataSheet implements Serializable, ListModel {
 		}
 
 		axisApplyFiltersRequired[columnIndex - 1] = true;
-		fireOnDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired);
+		fireOnDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired, false);
 	}
 
 	private int getLineCount(String pathToInputFile) throws IOException {
@@ -336,7 +333,7 @@ public class DataSheet implements Serializable, ListModel {
 			axisApplyFiltersRequired[i] = true;
 		}
 
-		fireOnDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired);
+		fireOnDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired, false);
 		fireDataPanelUpdateRequired();
 	}
 
@@ -363,6 +360,14 @@ public class DataSheet implements Serializable, ListModel {
 			}
 		}
 		throw new IllegalArgumentException("Parameter " + parameterName + " not found");
+	}
+
+	public void removeParameter(String parameterName){
+		boolean removed = this.parameters.removeIf(p -> p.getName().equals(parameterName));
+		if (removed) {
+			fireDataPanelUpdateRequired();
+			fireOnDataChanged(false, false, false, true);
+		}
 	}
 
 	public int getParameterIndex(String parameterName) {
@@ -432,7 +437,7 @@ public class DataSheet implements Serializable, ListModel {
 
 	public void evaluateBoundsForAllDesigns(ParallelCoordinatesChart chart) {
 		for (int i = 0; i < this.getDesignCount(); i++) {
-			this.data.get(i).evaluateBounds(chart, this);
+			this.data.get(i).evaluateBounds(chart);
 		}
 	}
 
@@ -447,26 +452,6 @@ public class DataSheet implements Serializable, ListModel {
 			array[i] = value;
 		}
 		return array;
-	}
-
-	@Override
-	public void addListDataListener(ListDataListener l) {
-		listDataListener.add(l);
-	}
-
-	@Override
-	public Object getElementAt(int index) {
-		return this.parameters.get(index).getName();
-	}
-
-	@Override
-	public int getSize() {
-		return this.parameters.size();
-	}
-
-	@Override
-	public void removeListDataListener(ListDataListener l) {
-		listDataListener.remove(l);
 	}
 
 	public void addListener(DatasheetListener l) {
@@ -513,17 +498,17 @@ public class DataSheet implements Serializable, ListModel {
 		fireListeners(DatasheetListener::onDataPanelUpdateRequired);
 	}
 
-	public void fireOnDataChanged(boolean axisAutofitRequired, boolean axisResetFilterRequired, boolean axisApplyFiltersRequired) {
+	public void fireOnDataChanged(boolean axisAutofitRequired, boolean axisResetFilterRequired, boolean axisApplyFiltersRequired, boolean parametersChanged) {
 		boolean[] autofit = new boolean[parameters.size()];
 		boolean[] resetFilter = new boolean[parameters.size()];
 		boolean[] applyFilters = new boolean[parameters.size()];
 		Arrays.fill(autofit, axisAutofitRequired);
 		Arrays.fill(resetFilter, axisResetFilterRequired);
 		Arrays.fill(applyFilters, axisApplyFiltersRequired);
-		fireOnDataChanged(autofit, resetFilter, applyFilters);
+		fireOnDataChanged(autofit, resetFilter, applyFilters, parametersChanged);
 	}
 
-	public void fireOnDataChanged(boolean[] axisAutofitRequired, boolean[] axisResetFilterRequired, boolean[] axisApplyFiltersRequired) {
-		fireListeners(l -> l.onDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired));
+	public void fireOnDataChanged(boolean[] axisAutofitRequired, boolean[] axisResetFilterRequired, boolean[] axisApplyFiltersRequired, boolean parametersChanged) {
+		fireListeners(l -> l.onDataChanged(axisAutofitRequired, axisResetFilterRequired, axisApplyFiltersRequired, parametersChanged));
 	}
 }
