@@ -18,17 +18,17 @@
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>16.0.2</version>
+            <version>26.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
             <artifactId>batik-svg-dom</artifactId>
-            <version>1.14</version>
+            <version>1.19</version>
         </dependency>
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
             <artifactId>batik-svggen</artifactId>
-            <version>1.14</version>
+            <version>1.19</version>
         </dependency>
     </dependencies>
     <build>
